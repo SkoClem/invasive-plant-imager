@@ -1,5 +1,3 @@
-# app/lcai.py
-
 import os
 import json
 import requests
