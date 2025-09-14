@@ -3,7 +3,10 @@ import React from 'react';
 function UploadPage() {
   const handleUploadClick = () => {
     // This would trigger the file input in a real implementation
-    document.querySelector('.file-input').click();
+    const fileInput = document.querySelector('.file-input') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
+    }
   };
 
   return (
@@ -26,7 +29,7 @@ function UploadPage() {
               </svg>
             </div>
             <p>Tap here to take a photo</p>
-            <input type="file" className="file-input" accept="image/*" capture="camera" />
+            <input type="file" className="file-input" accept="image/*" capture="environment" />
           </div>
 
           <div className="upload-guidelines">
