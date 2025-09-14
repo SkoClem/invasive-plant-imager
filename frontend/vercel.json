@@ -2,7 +2,10 @@
   "builds": [
     {
       "src": "package.json",
-      "use": "@vercel/react-scripts"
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "build"
+      }
     }
   ]
 }
