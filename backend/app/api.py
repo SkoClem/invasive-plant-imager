@@ -15,7 +15,7 @@ def chat(message: Message) -> dict[str, str]:
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/api/analyze-plant", response_model=PlantAnalysisResponse)
+@router.post("/api/analyze-plant")
 async def analyze_plant(
     image: UploadFile = File(...),
     region: str = Form("North America")
@@ -37,16 +37,9 @@ async def analyze_plant(
         base64_image = base64.b64encode(image_data).decode('utf-8')
 
         # Analyze the image
-        result = imager.chat_response(base64_image)
+        parsed_data = imager.analyze_plant_image(base64_image)
 
-        # Parse LLM response and return structured data
-        # For now, return the raw response with default values
-        return PlantAnalysisResponse(
-            is_invasive=False,  # Will be parsed from LLM response
-            confidence=0.0,     # Will be parsed from LLM response
-            explanation=result,
-            plant_name=None     # Will be parsed from LLM response
-        )
+        return parsed_data
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
