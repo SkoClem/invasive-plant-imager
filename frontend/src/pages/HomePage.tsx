@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface HomePageProps {
-  setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about') => void;
+  setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results') => void;
 }
 
 function HomePage({ setCurrentPage }: HomePageProps) {

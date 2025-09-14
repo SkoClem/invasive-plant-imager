@@ -29,7 +29,7 @@ async def analyze_plant(
             raise HTTPException(status_code=400, detail="File must be an image")
 
         # Set region for analysis
-        imager.region = region
+        imager.set_region(region)
 
         # Convert uploaded file to base64
         image_data = await image.read()
