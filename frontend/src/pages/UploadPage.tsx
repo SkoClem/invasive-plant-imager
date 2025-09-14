@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import RegionSelector from '../components/RegionSelector';
-import { plantAnalysisService } from '../services/plantAnalysisService';
-import { PlantAnalysisResponse } from '../types/plantAnalysis';
 
 interface UploadPageProps {
   setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results') => void;
