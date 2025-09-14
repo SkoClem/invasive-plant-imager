@@ -27,20 +27,20 @@ This section must be a markdown code block starting with ``` and ending with ```
 This section must be a JSON object, wrapped in a markdown code block with the language identifier ```json. The JSON must adhere strictly to the following structure and data types:
 
 ```json
-{
+{{
   "specieIdentified": "string",
   "nativeRegion": "string",
   "invasiveOrNot": "boolean",
   "invasiveEffects": "string",
   "nativeAlternatives": [
-    {
+    {{
       "commonName": "string",
       "scientificName": "string",
       "characteristics": "string"
-    }
+    }}
   ],
   "removeInstructions": "string"
-}
+}}
 ```
 
 ***EXAMPLE OUTPUT 1***
@@ -55,21 +55,21 @@ I will identify the plant as a Chinese Tallow Tree based on the image provided. 
   "invasiveOrNot": true,
   "invasiveEffects": "Forms dense monocultures that displace native plants, degrades wildlife habitat, and is highly prolific, spreading rapidly via birds and water. Its leaves are also toxic to livestock.",
   "nativeAlternatives": [
-    {
+    {{
       "commonName": "Possumhaw Holly",
       "scientificName": "Ilex decidua",
       "characteristics": "Deciduous tree with a similar size and form, provides red berries in winter that are a valuable food source for birds, and is well-adapted to Texas soils."
-    },
-    {
+    }},
+    {{
       "commonName": "Texas Red Oak",
       "scientificName": "Quercus texana",
       "characteristics": "A stately, native deciduous tree that offers dense shade and valuable acorns for wildlife, with vibrant fall foliage."
-    },
-    {
+    }},
+    {{
       "commonName": "Drummond's Red Maple",
       "scientificName": "Acer rubrum var. drummondii",
       "characteristics": "A native variety of red maple that tolerates wet soils, has showy red flowers in spring, and provides excellent fall color."
-    }
+    }}
   ],
   "removeInstructions": "For young trees, pull the entire root system. For larger trees, cut the trunk at the base and immediately apply a systemic herbicide to the stump to prevent resprouting. A foliar application of herbicide can also be used on seedlings and young plants."
 }}
@@ -87,11 +87,11 @@ I will identify the plant as Texas Sage, which is a desirable native species. I 
   "invasiveOrNot": false,
   "invasiveEffects": "",
   "nativeAlternatives": [
-    {
+    {{
       "commonName": "Cenizo",
       "scientificName": "Leucophyllum frutescens",
       "characteristics": "A desirable native plant that is not invasive and provides an ideal option for xeriscaping and pollinator habitat. No alternatives needed as it is a perfect choice for its region."
-    }
+    }}
   ],
   "removeInstructions": "As a non-invasive plant, removal is not typically necessary for ecological reasons. If removal is desired, simply dig up the entire root ball with a shovel to prevent resprouting. The plant can be relocated or composted."
 }}
