@@ -1,52 +1,88 @@
 import React, { useEffect } from 'react';
 import { PlantInfo } from '../types/api';
+import { plantAnalysisService } from '../services/plantAnalysisService';
+import { convertToPlantInfo } from '../utils/dataConversion';
 
 interface LoadingPageProps {
   setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results') => void;
   setPlantData: (data: PlantInfo) => void;
+  pendingAnalysis: { file: File; region: string } | null;
 }
 
-// Mock data for demonstration
-const mockPlantData: PlantInfo = {
-  scientificName: "Lonicera japonica",
-  commonName: "Japanese Honeysuckle",
-  isInvasive: true,
-  confidence: 0.92,
-  description: "Japanese honeysuckle is a woody vine that can grow up to 30 feet long. It features fragrant, tubular flowers that are white or yellow and turn creamy with age.",
-  impact: "This invasive vine outcompetes native vegetation by forming dense mats that shade out understory plants. It can girdle small trees and alter forest structure, reducing biodiversity and habitat quality for wildlife.",
-  nativeAlternatives: [
-    {
-      scientificName: "Lonicera sempervirens",
-      commonName: "Trumpet Honeysuckle",
-      description: "A native vine with trumpet-shaped red flowers that attract hummingbirds and butterflies.",
-      benefits: ["Supports local pollinators", "Provides food for birds", "Well-behaved growth habit"]
-    },
-    {
-      scientificName: "Campsis radicans",
-      commonName: "Trumpet Creeper",
-      description: "A vigorous native vine with large trumpet-shaped orange flowers that are very attractive to hummingbirds.",
-      benefits: ["Excellent for hummingbirds", "Drought tolerant once established", "Fast-growing screen"]
-    }
-  ],
-  controlMethods: [
-    "Manual removal by pulling vines from the base",
-    "Cutting and treating stumps with herbicide",
-    "Regular monitoring to prevent regrowth",
-    "Planting native competitors to reduce available space"
-  ],
-  region: "United States, Texas"
-};
-
-function LoadingPage({ setCurrentPage, setPlantData }: LoadingPageProps) {
+function LoadingPage({ setCurrentPage, setPlantData, pendingAnalysis }: LoadingPageProps) {
   useEffect(() => {
-    // Simulate API call with 3-second delay
-    const timer = setTimeout(() => {
-      setPlantData(mockPlantData);
-      setCurrentPage('results');
-    }, 3000);
+    if (!pendingAnalysis) {
+      console.error('No pending analysis data available');
+      setCurrentPage('upload');
+      return;
+    }
 
-    return () => clearTimeout(timer);
-  }, [setCurrentPage, setPlantData]);
+    // Flag to prevent multiple requests
+    let isMounted = true;
+    let hasMadeRequest = false;
+
+    const performAnalysis = async () => {
+      // Prevent multiple requests
+      if (hasMadeRequest || !isMounted) return;
+      hasMadeRequest = true;
+
+      console.log('🌱 Starting analysis with:', {
+        fileName: pendingAnalysis.file.name,
+        fileSize: `${(pendingAnalysis.file.size / 1024 / 1024).toFixed(2)} MB`,
+        fileType: pendingAnalysis.file.type,
+        region: pendingAnalysis.region
+      });
+
+      // Show image info in loading screen
+      console.log(`📤 Uploading: ${pendingAnalysis.file.name} (${(pendingAnalysis.file.size / 1024 / 1024).toFixed(2)} MB)`);
+
+      // Safety timeout - redirect back to upload after 2 minutes
+      const safetyTimeout = setTimeout(() => {
+        if (isMounted) {
+          console.error('Analysis timed out after 2 minutes');
+          alert('Analysis is taking too long. Please try again.');
+          setCurrentPage('upload');
+        }
+      }, 120000); // 2 minutes
+
+      try {
+        console.log('Making API call to backend...');
+        const result = await plantAnalysisService.analyzePlant({
+          image: pendingAnalysis.file,
+          region: pendingAnalysis.region
+        });
+
+        if (!isMounted) return;
+
+        console.log('API response received:', result);
+
+        // Clear safety timeout
+        clearTimeout(safetyTimeout);
+
+        const plantInfo = convertToPlantInfo(result);
+        console.log('Converted to PlantInfo:', plantInfo);
+
+        if (isMounted) {
+          setPlantData(plantInfo);
+          setCurrentPage('results');
+        }
+      } catch (error) {
+        if (!isMounted) return;
+
+        console.error('Analysis failed:', error);
+        clearTimeout(safetyTimeout);
+        alert(`Analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        setCurrentPage('upload');
+      }
+    };
+
+    performAnalysis();
+
+    // Cleanup function
+    return () => {
+      isMounted = false;
+    };
+  }, [pendingAnalysis, setCurrentPage, setPlantData]);
 
   return (
     <section className="loading-section">
@@ -62,7 +98,15 @@ function LoadingPage({ setCurrentPage, setPlantData }: LoadingPageProps) {
           </div>
 
           <h1 className="loading-title">Analyzing Your Plant</h1>
-          <p className="loading-subtitle">Our AI is identifying your plant and checking if it's invasive in your region</p>
+          <p className="loading-subtitle">
+            Our AI is identifying your plant and checking if it's invasive in your region
+            {pendingAnalysis && (
+              <span className="file-info">
+                <br />
+                📸 {pendingAnalysis.file.name} ({(pendingAnalysis.file.size / 1024 / 1024).toFixed(1)} MB)
+              </span>
+            )}
+          </p>
 
           <div className="loading-steps">
             <div className="loading-step">
@@ -100,7 +144,11 @@ function LoadingPage({ setCurrentPage, setPlantData }: LoadingPageProps) {
             <div className="progress-bar">
               <div className="progress-fill"></div>
             </div>
-            <p className="progress-text">This may take a few moments...</p>
+            <p className="progress-text">
+              {pendingAnalysis ?
+                "Waking up the AI service... This may take up to a minute if the service is sleeping." :
+                "This may take a few moments..."}
+            </p>
           </div>
         </div>
       </div>

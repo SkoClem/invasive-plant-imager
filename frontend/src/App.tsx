@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useSwipeable } from 'react-swipeable';
 import { PlantInfo } from './types/api';
+import { PlantAnalysisResponse } from './types/plantAnalysis';
 import './App.css';
 import HomePage from './pages/HomePage';
 import UploadPage from './pages/UploadPage';
@@ -18,10 +19,12 @@ function App() {
   const [transitionDirection, setTransitionDirection] = useState<DirectionType>('forward');
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [plantData, setPlantData] = useState<PlantInfo | null>(null);
+  const [analysisResult, setAnalysisResult] = useState<PlantAnalysisResponse | null>(null);
+  const [pendingAnalysis, setPendingAnalysis] = useState<{ file: File; region: string } | null>(null);
   const pageRef = useRef<HTMLDivElement>(null);
 
   // Define the order of pages for swipe navigation
-  const pageOrder: PageType[] = ['home', 'upload', 'collection', 'about'];
+  const pageOrder: PageType[] = ['home', 'upload', 'about'];
   // Note: loading and results pages are not in swipe navigation as they're part of the upload flow
 
   // Handle page navigation with direction detection
@@ -48,6 +51,12 @@ function App() {
     }, 10);
   };
 
+  // Start analysis with file and region
+  const startAnalysis = (file: File, region: string) => {
+    setPendingAnalysis({ file, region });
+    navigateToPage('loading');
+  };
+
   // Handle swipe navigation (only for main pages)
   const handleSwipe = (direction: 'left' | 'right') => {
     // Don't allow swipe navigation on loading and results pages
@@ -70,6 +79,7 @@ function App() {
     trackMouse: false
   });
 
+  
   // Page rendering function
   const renderPage = () => {
     const getTransitionClass = () => {
@@ -87,13 +97,17 @@ function App() {
             case 'home':
               return <HomePage setCurrentPage={navigateToPage} />;
             case 'upload':
-              return <UploadPage setCurrentPage={navigateToPage} />;
+              return <UploadPage setCurrentPage={navigateToPage} startAnalysis={startAnalysis} />;
             case 'collection':
               return <CollectionPage setCurrentPage={navigateToPage} />;
             case 'about':
               return <AboutPage setCurrentPage={navigateToPage} />;
             case 'loading':
-              return <LoadingPage setCurrentPage={navigateToPage} setPlantData={setPlantData} />;
+              return <LoadingPage
+                setCurrentPage={navigateToPage}
+                setPlantData={setPlantData}
+                pendingAnalysis={pendingAnalysis}
+              />;
             case 'results':
               return <ResultsPage setCurrentPage={navigateToPage} plantData={plantData} />;
             default:
@@ -108,8 +122,8 @@ function App() {
     <div className="App">
       {/* Navigation Bar */}
       <nav className="navbar">
-        <button 
-          className="navbar-logo" 
+        <button
+          className="navbar-logo"
           onClick={() => navigateToPage('home')}
         >
           Invasive Plant Imager
@@ -117,7 +131,7 @@ function App() {
       </nav>
 
       {/* Main Content */}
-      <div {...swipeHandlers}>
+      <div className="main-content" {...swipeHandlers}>
         {renderPage()}
       </div>
 
@@ -146,18 +160,7 @@ function App() {
           </div>
           <span className="tab-label">Scan</span>
         </button>
-        <button
-          className={`tab-item ${currentPage === 'collection' ? 'active' : ''}`}
-          onClick={() => navigateToPage('collection')}
-        >
-          <div className="tab-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-              <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
-            </svg>
-          </div>
-          <span className="tab-label">Collection</span>
-        </button>
-        <button
+          <button
           className={`tab-item ${currentPage === 'about' ? 'active' : ''}`}
           onClick={() => navigateToPage('about')}
         >
@@ -169,7 +172,8 @@ function App() {
           <span className="tab-label">About</span>
         </button>
       </nav>
-    </div>
+
+      </div>
   );
 }
 

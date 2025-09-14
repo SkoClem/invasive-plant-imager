@@ -1,26 +1,64 @@
 import React, { useState } from 'react';
 import RegionSelector from '../components/RegionSelector';
+import { plantAnalysisService } from '../services/plantAnalysisService';
+import { PlantAnalysisResponse } from '../types/plantAnalysis';
 
 interface UploadPageProps {
   setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results') => void;
+  startAnalysis: (file: File, region: string) => void;
 }
 
-function UploadPage({ setCurrentPage }: UploadPageProps) {
+function UploadPage({ setCurrentPage, startAnalysis }: UploadPageProps) {
   const [selectedRegion, setSelectedRegion] = useState<string>('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       setSelectedFile(file);
+      setError(null);
+
+      console.log('📁 File selected:', {
+        name: file.name,
+        size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
+        type: file.type,
+        lastModified: new Date(file.lastModified).toISOString()
+      });
+
+      // Create preview URL (stored in browser memory)
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const previewUrl = e.target?.result as string;
+        setImagePreview(previewUrl);
+        console.log('🖼️ Image preview created - stored in browser memory as base64 data URL');
+        console.log('📊 Preview size:', Math.round(previewUrl.length / 1024), 'KB');
+      };
+      reader.readAsDataURL(file);
     }
   };
 
   const handleAnalyzeClick = () => {
-    if (selectedFile && selectedRegion) {
-      setCurrentPage('loading');
-      // TODO: Add actual API call here
+    if (!selectedFile || !selectedRegion) {
+      return;
     }
+
+    setIsAnalyzing(true);
+    setError(null);
+
+    console.log('🚀 Starting analysis process:');
+    console.log('📦 Original file object:', {
+      name: selectedFile.name,
+      size: `${(selectedFile.size / 1024 / 1024).toFixed(2)} MB`,
+      type: selectedFile.type,
+      storedIn: 'Browser File object reference'
+    });
+    console.log('📤 File will be sent directly to backend - no temporary server storage');
+
+    // Start the analysis process - will navigate to loading page
+    startAnalysis(selectedFile, selectedRegion);
   };
 
   const handleUploadClick = () => {
@@ -46,53 +84,220 @@ function UploadPage({ setCurrentPage }: UploadPageProps) {
         </div>
 
         <div className="upload-container">
-          <div
-            className="upload-box"
-            onClick={handleUploadClick}
-            role="button"
-            aria-label="Take a photo with camera"
-          >
-            <div className="upload-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="48" height="48" fill="currentColor">
-                <path d="M9 3L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-3.17L15 3H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
-                <circle cx="12" cy="13" r="3"/>
-              </svg>
+          {imagePreview ? (
+            <div className="image-preview-container">
+              <img
+                src={imagePreview}
+                alt="Selected plant"
+                className="image-preview"
+              />
+              <button
+                className="change-image-button"
+                onClick={handleUploadClick}
+              >
+                Change Image
+              </button>
+              <input
+                type="file"
+                className="file-input"
+                accept="image/*"
+                capture="environment"
+                onChange={handleFileSelect}
+              />
             </div>
-            <p>Tap here to take a photo</p>
-            <input
-  type="file"
-  className="file-input"
-  accept="image/*"
-  capture="environment"
-  onChange={handleFileSelect}
-/>
-          </div>
-
-          <div className="upload-guidelines">
-            <h3>For best results:</h3>
-            <ul>
-              <li>Ensure good lighting when taking photos</li>
-              <li>Hold the camera steady to avoid blur</li>
-              <li>Focus on the plant's distinctive features</li>
-              <li>Include leaves, flowers, or fruits if possible</li>
-              <li>Take multiple photos from different angles if needed</li>
-            </ul>
-          </div>
+          ) : (
+            <div
+              className="upload-box"
+              onClick={handleUploadClick}
+              role="button"
+              aria-label="Take a photo with camera"
+            >
+              <div className="upload-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="48" height="48" fill="currentColor">
+                  <path d="M9 3L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-3.17L15 3H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+                  <circle cx="12" cy="13" r="3"/>
+                </svg>
+              </div>
+              <p>Tap here to take a photo</p>
+              <input
+                type="file"
+                className="file-input"
+                accept="image/*"
+                capture="environment"
+                onChange={handleFileSelect}
+              />
+            </div>
+          )}
         </div>
 
+        {error && (
+          <div className="error-message">
+            {error}
+          </div>
+        )}
+
         <button
-  className={`button upload-button ${!selectedFile || !selectedRegion ? 'disabled' : ''}`}
-  onClick={handleAnalyzeClick}
-  disabled={!selectedFile || !selectedRegion}
->
-  {!selectedFile && !selectedRegion ? 'Select Region & Photo' :
-   !selectedFile ? 'Select a Photo' :
-   !selectedRegion ? 'Select a Region' :
-   'Analyze Photo'}
-</button>
+          className={`button upload-button ${!selectedFile || !selectedRegion || isAnalyzing ? 'disabled' : ''}`}
+          onClick={handleAnalyzeClick}
+          disabled={!selectedFile || !selectedRegion || isAnalyzing}
+        >
+          {isAnalyzing ? 'Analyzing...' : 'ANALYZE PLANT'}
+        </button>
+
+        <div className="upload-guidelines">
+          <h3>For best results:</h3>
+          <ul>
+            <li>Ensure good lighting when taking photos</li>
+            <li>Focus on the plant's distinctive features</li>
+            <li>Include leaves, flowers, or fruits if possible</li>
+          </ul>
+        </div>
       </div>
     </section>
   );
+}
+
+// Add some basic styling for image preview
+const styles = `
+  .image-preview-container {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .image-preview {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .change-image-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s ease;
+  }
+
+  .change-image-button:hover {
+    background: rgba(0, 0, 0, 0.9);
+  }
+
+  .upload-container {
+    margin-bottom: 20px;
+  }
+
+  .file-info {
+    font-size: 14px;
+    color: #666;
+    display: inline-block;
+  }
+
+  /* Mobile-friendly styles for upload guidelines */
+  .upload-guidelines {
+    background-color: var(--container-bg);
+    border-radius: var(--radius-card);
+    padding: 1.5rem;
+    margin-top: 2rem;
+    border: 1px solid var(--border-subtle);
+  }
+
+  .upload-guidelines h3 {
+    color: var(--accent-bright);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+  }
+
+  .upload-guidelines ul {
+    list-style-position: inside;
+    color: var(--secondary-text);
+    padding-left: 0;
+    margin: 0;
+  }
+
+  .upload-guidelines li {
+    margin-bottom: 0.75rem;
+    line-height: 1.5;
+    font-size: 0.95rem;
+  }
+
+  /* Make page more scrollable on mobile */
+  @media (max-width: 480px) {
+    .upload-section {
+      padding-top: 60px;
+      min-height: auto;
+      padding-bottom: 120px;
+    }
+
+    .container {
+      padding: 0 1rem;
+      max-width: 100%;
+    }
+
+    .upload-guidelines {
+      margin-top: 1.5rem;
+      padding: 1.25rem;
+    }
+
+    .upload-guidelines h3 {
+      font-size: 1rem;
+    }
+
+    .upload-guidelines li {
+      font-size: 0.9rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .upload-button {
+      margin-top: 1.5rem;
+      min-width: auto;
+      width: 100%;
+      padding: 1rem;
+    }
+
+    /* Ensure content doesn't get hidden behind tab navigation */
+    .upload-section {
+      margin-bottom: 2rem;
+    }
+  }
+
+  /* Touch-friendly improvements */
+  @media (hover: none) and (pointer: coarse) {
+    .upload-box {
+      min-height: 200px;
+      padding: 2rem 1rem;
+    }
+
+    .upload-icon {
+      font-size: 3.5rem;
+    }
+
+    .region-selector-button {
+      padding: 1.2rem 1.5rem;
+      min-height: 56px;
+    }
+  }
+`;
+
+// Add styles to head if not already added
+if (typeof document !== 'undefined') {
+  const styleElement = document.createElement('style');
+  styleElement.textContent = styles;
+  if (!document.head.querySelector('style[data-upload-page-styles]')) {
+    styleElement.setAttribute('data-upload-page-styles', 'true');
+    document.head.appendChild(styleElement);
+  }
 }
 
 export default UploadPage;

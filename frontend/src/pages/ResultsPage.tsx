@@ -60,9 +60,6 @@ function ResultsPage({ setCurrentPage, plantData, error }: ResultsPageProps) {
             <h1 className="status-title">
               {plantData.isInvasive ? 'Invasive Species Detected' : 'Native Plant Identified'}
             </h1>
-            <p className="confidence-level">
-              Confidence: {(plantData.confidence * 100).toFixed(1)}%
-            </p>
           </div>
         </div>
 
