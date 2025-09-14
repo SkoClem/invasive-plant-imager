@@ -1,6 +1,7 @@
 import os
 import json
 import requests
+#TODO: get environment variables without dotenv package
 from dotenv import load_dotenv
 
 class LLM:

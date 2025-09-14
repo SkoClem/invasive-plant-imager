@@ -1,7 +1,8 @@
 from llm_framework import LLM
 import os
 llm = LLM()
-
+from dotenv import load_dotenv
+#TODO: get environment variables without dotenv package
 load_dotenv(override=True)
 API_KEY,API_NAME,API_URL = llm.initialize_llm(KEY='LLM_KEY',NAME='LLM_NAME',URL='LLM_URL')
 print(llm)
@@ -24,7 +25,7 @@ class Generate:
                                          max_tokens=max_tokens)
         return self.LLM.get_output(url=self.url, llm_contents=contents)
     
-class Conversation:
+class Imager:
     def __init__(self):
         self.gen = Generate()
         self.prompt = "prompt"
