@@ -1,7 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { useSwipeable } from 'react-swipeable';
 import { PlantInfo } from './types/api';
-import { PlantAnalysisResponse } from './types/plantAnalysis';
 import './App.css';
 import HomePage from './pages/HomePage';
 import UploadPage from './pages/UploadPage';
@@ -19,8 +18,7 @@ function App() {
   const [transitionDirection, setTransitionDirection] = useState<DirectionType>('forward');
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [plantData, setPlantData] = useState<PlantInfo | null>(null);
-  const [analysisResult, setAnalysisResult] = useState<PlantAnalysisResponse | null>(null);
-  const [pendingAnalysis, setPendingAnalysis] = useState<{ file: File; region: string } | null>(null);
+    const [pendingAnalysis, setPendingAnalysis] = useState<{ file: File; region: string } | null>(null);
   const pageRef = useRef<HTMLDivElement>(null);
 
   // Define the order of pages for swipe navigation
