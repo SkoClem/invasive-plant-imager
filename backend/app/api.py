@@ -1,7 +1,7 @@
 from typing import Dict, Any
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form
-from schemas import Message, PlantAnalysisRequest, PlantAnalysisResponse
-from backend import Imager
+from app.schemas import Message, PlantAnalysisRequest, PlantAnalysisResponse
+from app.backend import Imager
 
 imager = Imager()
 router = APIRouter()
