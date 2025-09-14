@@ -1,6 +1,10 @@
 import React from 'react';
 
-function AboutPage() {
+interface AboutPageProps {
+  setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results') => void;
+}
+
+function AboutPage({ setCurrentPage }: AboutPageProps) {
   return (
     <section className="about-section">
       <div className="container">

@@ -1,12 +1,15 @@
 import React, { useState, useRef } from 'react';
 import { useSwipeable } from 'react-swipeable';
+import { PlantInfo } from './types/api';
 import './App.css';
 import HomePage from './pages/HomePage';
 import UploadPage from './pages/UploadPage';
 import CollectionPage from './pages/CollectionPage';
 import AboutPage from './pages/AboutPage';
+import LoadingPage from './pages/LoadingPage';
+import ResultsPage from './pages/ResultsPage';
 
-type PageType = 'home' | 'upload' | 'collection' | 'about';
+type PageType = 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results';
 type DirectionType = 'forward' | 'backward';
 
 
@@ -14,10 +17,12 @@ function App() {
   const [currentPage, setCurrentPage] = useState<PageType>('home');
   const [transitionDirection, setTransitionDirection] = useState<DirectionType>('forward');
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [plantData, setPlantData] = useState<PlantInfo | null>(null);
   const pageRef = useRef<HTMLDivElement>(null);
 
   // Define the order of pages for swipe navigation
   const pageOrder: PageType[] = ['home', 'upload', 'collection', 'about'];
+  // Note: loading and results pages are not in swipe navigation as they're part of the upload flow
 
   // Handle page navigation with direction detection
   const navigateToPage = (newPage: PageType) => {
@@ -43,8 +48,11 @@ function App() {
     }, 10);
   };
 
-  // Handle swipe navigation
+  // Handle swipe navigation (only for main pages)
   const handleSwipe = (direction: 'left' | 'right') => {
+    // Don't allow swipe navigation on loading and results pages
+    if (currentPage === 'loading' || currentPage === 'results') return;
+
     const currentIndex = pageOrder.indexOf(currentPage);
     if (direction === 'left' && currentIndex < pageOrder.length - 1) {
       setTransitionDirection('forward');
@@ -79,11 +87,15 @@ function App() {
             case 'home':
               return <HomePage setCurrentPage={navigateToPage} />;
             case 'upload':
-              return <UploadPage />;
+              return <UploadPage setCurrentPage={navigateToPage} />;
             case 'collection':
               return <CollectionPage setCurrentPage={navigateToPage} />;
             case 'about':
-              return <AboutPage />;
+              return <AboutPage setCurrentPage={navigateToPage} />;
+            case 'loading':
+              return <LoadingPage setCurrentPage={navigateToPage} setPlantData={setPlantData} />;
+            case 'results':
+              return <ResultsPage setCurrentPage={navigateToPage} plantData={plantData} />;
             default:
               return <HomePage setCurrentPage={navigateToPage} />;
           }

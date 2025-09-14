@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface CollectionPageProps {
-  setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about') => void;
+  setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results') => void;
 }
 
 function CollectionPage({ setCurrentPage }: CollectionPageProps) {

@@ -1,7 +1,7 @@
 from app.llm_framework import LLM, Gemini, ImageLLM
-import os
 import base64
 llm = LLM()
+from app.prompts import invasive_or_not
 from dotenv import load_dotenv
 #TODO: get environment variables without dotenv package
 load_dotenv(override=True)
@@ -29,21 +29,26 @@ class Generate:
         return self.LLM.get_output(url=self.url, llm_contents=contents)
     
 class Imager:
-    def __init__(self):
+    def __init__(self, region: str = "North America"):
         self.llm_info = LLM().initialize_llm(KEY='LLM_KEY',NAME='LLM_NAME',URL='LLM_URL')
         self.key, self.name, self.url = self.llm_info
-        self.region = "North America"  # Default region, can be changed
+        self.region = region
         self.image_llm = ImageLLM()
+        self.prompt = invasive_or_not(self.region)
+
+    def set_region(self, region: str):
+        """Update the region for analysis"""
+        self.region = region
+        self.prompt = invasive_or_not(self.region)
 
     def analyze_plant_image(self, image_path: str)->str:
         """Analyze plant image for invasive species"""
         image_data = self._image_to_base64(image_path)
-        prompt = f"Based on the image of the plant, is the plant invasive species in {self.region}?"
 
         contents = self.image_llm.llm_contents(
             key=self.key,
             name=self.name,
-            prompt=prompt,
+            prompt=self.prompt,
             image_data=image_data,
             max_tokens=300
         )

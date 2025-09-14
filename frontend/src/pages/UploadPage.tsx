@@ -1,6 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
+import RegionSelector from '../components/RegionSelector';
 
-function UploadPage() {
+interface UploadPageProps {
+  setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results') => void;
+}
+
+function UploadPage({ setCurrentPage }: UploadPageProps) {
+  const [selectedRegion, setSelectedRegion] = useState<string>('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
+
+  const handleAnalyzeClick = () => {
+    if (selectedFile && selectedRegion) {
+      setCurrentPage('loading');
+      // TODO: Add actual API call here
+    }
+  };
+
   const handleUploadClick = () => {
     // This would trigger the file input in a real implementation
     const fileInput = document.querySelector('.file-input') as HTMLInputElement;
@@ -14,6 +36,14 @@ function UploadPage() {
       <div className="container">
         <h1>Scan Plant with Camera</h1>
         <p className="subtitle">Take a photo of a plant to identify if it's invasive.</p>
+
+        {/* Region Selector */}
+        <div className="region-selector-container">
+          <RegionSelector
+            selectedRegion={selectedRegion}
+            onRegionChange={setSelectedRegion}
+          />
+        </div>
 
         <div className="upload-container">
           <div
@@ -29,7 +59,13 @@ function UploadPage() {
               </svg>
             </div>
             <p>Tap here to take a photo</p>
-            <input type="file" className="file-input" accept="image/*" capture="environment" />
+            <input
+  type="file"
+  className="file-input"
+  accept="image/*"
+  capture="environment"
+  onChange={handleFileSelect}
+/>
           </div>
 
           <div className="upload-guidelines">
@@ -44,7 +80,16 @@ function UploadPage() {
           </div>
         </div>
 
-        <button className="button upload-button">Analyze Photo</button>
+        <button
+  className={`button upload-button ${!selectedFile || !selectedRegion ? 'disabled' : ''}`}
+  onClick={handleAnalyzeClick}
+  disabled={!selectedFile || !selectedRegion}
+>
+  {!selectedFile && !selectedRegion ? 'Select Region & Photo' :
+   !selectedFile ? 'Select a Photo' :
+   !selectedRegion ? 'Select a Region' :
+   'Analyze Photo'}
+</button>
       </div>
     </section>
   );
