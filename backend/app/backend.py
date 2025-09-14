@@ -1,4 +1,4 @@
-from llm_framework import LLM, Gemini, ImageLLM
+from app.llm_framework import LLM, Gemini, ImageLLM
 import os
 import base64
 llm = LLM()
