@@ -80,7 +80,61 @@ class LLM:
             return f"Error parsing API response: {e}\nResponse JSON: {result}"
         except Exception as e:
             return f'An unexpected error occurred: {e}'
-        
+
+class ImageLLM:
+    def llm_contents(self, key, name, prompt, image_data=None, system_prompt=None, max_tokens=None)->list:
+        if system_prompt:
+            prompt = f"{system_prompt}\n\nUser Question: {prompt}"
+
+        payload = {
+            "contents": []
+        }
+
+        # Add text content
+        content_parts = [{"text": prompt}]
+
+        # Add image if provided
+        if image_data:
+            # Assuming image_data is base64 encoded string
+            content_parts.append({
+                "inline_data": {
+                    "mime_type": "image/jpeg",  # or detect from image_data
+                    "data": image_data
+                }
+            })
+
+        payload["contents"].append({
+            "role": "user",
+            "parts": content_parts
+        })
+
+        if max_tokens:
+            payload["generationConfig"] = {"maxOutputTokens": max_tokens}
+
+        headers = {
+            "x-goog-api-key": key,
+            "Content-Type": "application/json",
+        }
+        return [payload, headers]
+
+    def get_output(self, url, llm_contents, mode='default'):
+        payload, headers = llm_contents[0], llm_contents[1]
+        try:
+            response = requests.post(url, json=payload, headers=headers)
+            response.raise_for_status()
+
+            result = response.json()
+            output = result["candidates"][0]["content"]["parts"][0]["text"]
+
+            return str(output)
+
+        except requests.exceptions.HTTPError as e:
+            return f"HTTP Error: {e}\nResponse Content: {e.response.text}"
+        except (KeyError, IndexError) as e:
+            return f"Error parsing API response: {e}\nResponse JSON: {result}"
+        except Exception as e:
+            return f'An unexpected error occurred: {e}'
+
 class Gemini:
     def llm_contents(self, key, name, prompt, system_prompt=None, max_tokens=None)->list:
         if system_prompt:
