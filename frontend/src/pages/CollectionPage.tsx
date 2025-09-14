@@ -1,6 +1,10 @@
 import React from 'react';
 
-function CollectionPage({ setCurrentPage }) {
+interface CollectionPageProps {
+  setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about') => void;
+}
+
+function CollectionPage({ setCurrentPage }: CollectionPageProps) {
   return (
     <section className="collection-section">
       <div className="container">

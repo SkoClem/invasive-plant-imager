@@ -6,30 +6,34 @@ import UploadPage from './pages/UploadPage';
 import CollectionPage from './pages/CollectionPage';
 import AboutPage from './pages/AboutPage';
 
+type PageType = 'home' | 'upload' | 'collection' | 'about';
+type DirectionType = 'forward' | 'backward';
+
+
 function App() {
-  const [currentPage, setCurrentPage] = useState('home');
-  const [transitionDirection, setTransitionDirection] = useState('forward');
+  const [currentPage, setCurrentPage] = useState<PageType>('home');
+  const [transitionDirection, setTransitionDirection] = useState<DirectionType>('forward');
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const pageRef = useRef(null);
-  
+  const pageRef = useRef<HTMLDivElement>(null);
+
   // Define the order of pages for swipe navigation
-  const pageOrder = ['home', 'upload', 'collection', 'about'];
-  
+  const pageOrder: PageType[] = ['home', 'upload', 'collection', 'about'];
+
   // Handle page navigation with direction detection
-  const navigateToPage = (newPage) => {
+  const navigateToPage = (newPage: PageType) => {
     if (newPage === currentPage || isTransitioning) return;
-    
+
     const currentIndex = pageOrder.indexOf(currentPage);
     const newIndex = pageOrder.indexOf(newPage);
-    
+
     if (newIndex > currentIndex) {
       setTransitionDirection('forward');
     } else {
       setTransitionDirection('backward');
     }
-    
+
     setIsTransitioning(true);
-    
+
     // Start transition
     setTimeout(() => {
       setCurrentPage(newPage);
@@ -38,9 +42,9 @@ function App() {
       }, 300);
     }, 10);
   };
-  
+
   // Handle swipe navigation
-  const handleSwipe = (direction) => {
+  const handleSwipe = (direction: 'left' | 'right') => {
     const currentIndex = pageOrder.indexOf(currentPage);
     if (direction === 'left' && currentIndex < pageOrder.length - 1) {
       setTransitionDirection('forward');
@@ -55,7 +59,6 @@ function App() {
   const swipeHandlers = useSwipeable({
     onSwipedLeft: () => handleSwipe('left'),
     onSwipedRight: () => handleSwipe('right'),
-    preventDefaultTouchmoveEvent: true,
     trackMouse: false
   });
 

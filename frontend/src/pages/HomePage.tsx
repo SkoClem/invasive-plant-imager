@@ -1,6 +1,10 @@
 import React from 'react';
 
-function HomePage({ setCurrentPage }) {
+interface HomePageProps {
+  setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about') => void;
+}
+
+function HomePage({ setCurrentPage }: HomePageProps) {
   return (
     <>
       {/* Hero Section */}
