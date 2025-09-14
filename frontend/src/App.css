@@ -226,11 +226,20 @@
   font-weight: 500;
 }
 
-/* Adjust main content to account for tab navigation */
+/* Adjust main content to account for tab navigation and footer */
 .App {
   padding-bottom: 70px; /* Height of tab navigation */
   overflow-x: hidden;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  position: relative;
+  overflow-y: auto;
 }
 
 .page-container {
@@ -280,12 +289,14 @@
 .about-section,
 .collection-section {
   min-height: calc(100vh - 150px); /* Adjusted for tab navigation */
+  overflow-y: auto;
 }
 
 /* Upload Page Styles */
 .upload-section {
   padding-top: 80px;
   min-height: calc(100vh - 180px);
+  overflow-y: auto;
 }
 
 .upload-container {
@@ -305,10 +316,20 @@
 @media (max-width: 480px) {
   .upload-section {
     padding-top: 70px;
+    min-height: auto;
+    padding-bottom: 100px;
   }
-  
+
   .upload-container {
     margin: 1.5rem 0;
+  }
+
+  .upload-box {
+    padding: 2rem 1rem;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 }
 
@@ -349,26 +370,7 @@
   display: none;
 }
 
-.upload-guidelines {
-  flex: 1;
-  background-color: var(--container-bg);
-  border-radius: var(--radius-card);
-  padding: 2rem;
-}
-
-.upload-guidelines h3 {
-  color: var(--accent-bright);
-  margin-bottom: 1rem;
-}
-
-.upload-guidelines ul {
-  list-style-position: inside;
-  color: var(--secondary-text);
-}
-
-.upload-guidelines li {
-  margin-bottom: 0.5rem;
-}
+/* Upload guidelines styles are now handled in UploadPage.tsx for better mobile responsiveness */
 
 .upload-button {
   margin-top: 2rem;
@@ -563,6 +565,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow-y: auto;
 }
 
 .loading-content {
@@ -719,6 +722,7 @@
 .results-section {
   padding-top: 80px;
   min-height: calc(100vh - 180px);
+  overflow-y: auto;
 }
 
 .results-header {
@@ -1032,7 +1036,13 @@
 
   .loading-section, .results-section {
     padding-top: 60px;
-    min-height: calc(100vh - 140px);
+    min-height: auto;
+    padding-bottom: 100px;
+  }
+
+  .collection-section, .about-section {
+    min-height: auto;
+    padding-bottom: 100px;
   }
 }
 
@@ -1225,3 +1235,5 @@
     min-height: 80vh;
   }
 }
+
+
