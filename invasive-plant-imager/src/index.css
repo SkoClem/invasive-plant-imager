@@ -1,0 +1,220 @@
+/* Import Inter font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;500&display=swap');
+
+:root {
+  /* Color Palette */
+  --primary-bg: #fffaf5;
+  --container-bg: #ffffff;
+  --primary-text: #333333;
+  --secondary-text: #666666;
+  --accent-bright: #2e7d32;
+  --accent-lime: #4caf50;
+  --accent-chartreuse: #8bc34a;
+  --glow-strong: rgba(46, 125, 50, 0.7);
+  --glow-medium: rgba(76, 175, 80, 0.5);
+  --glow-bright: rgba(76, 175, 80, 0.8);
+  --glow-subtle: rgba(76, 175, 80, 0.3);
+  --frosted-glass: rgba(255, 255, 255, 0.7);
+  --border-subtle: rgba(76, 175, 80, 0.2);
+  --border-bright: rgba(46, 125, 50, 0.7);
+  --border-nav: rgba(76, 175, 80, 0.3);
+  
+  /* Spacing Variables */
+  --section-gap: 5rem;
+  --grid-gap: 2rem;
+  --page-padding: 2rem;
+  --card-padding: 2rem;
+  --nav-padding-v: 1.5rem;
+  --nav-padding-h: 3rem;
+  
+  /* Sizing Variables */
+  --max-width-standard: 1200px;
+  --max-width-wide: 1400px;
+  --carousel-height: 400px;
+  --slide-width: 60%;
+  --nav-button-size: 50px;
+  --hero-min-height: 60vh;
+  
+  /* Animation Timings */
+  --transition-standard: 0.3s;
+  --transition-page: 500ms;
+  --transition-carousel: 600ms;
+  --animation-hero: 1500ms;
+  --delay-title: 500ms;
+  --delay-subtitle: 700ms;
+  --delay-button: 900ms;
+  
+  /* Border Radius */
+  --radius-button: 50px;
+  --radius-card: 15px;
+  --radius-carousel: 20px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--primary-bg);
+  color: var(--primary-text);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 300;
+  margin-bottom: 1rem;
+}
+
+h1 {
+  font-size: clamp(3rem, 10vw, 5rem);
+  letter-spacing: 0.2rem;
+  text-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+}
+
+h2 {
+  font-size: 2.5rem;
+}
+
+h3 {
+  font-size: 1.8rem;
+}
+
+p {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+}
+
+/* Buttons */
+button, .button {
+  background: linear-gradient(135deg, var(--accent-bright), var(--accent-lime), var(--accent-chartreuse));
+  color: var(--primary-bg);
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 1rem;
+  padding: 0.8rem 2rem;
+  border: none;
+  border-radius: var(--radius-button);
+  cursor: pointer;
+  transition: transform var(--transition-standard), box-shadow var(--transition-standard);
+  text-transform: uppercase;
+  letter-spacing: 0.05rem;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  min-height: 44px; /* Minimum touch target size */
+}
+
+button:hover, .button:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 25px var(--glow-medium);
+}
+
+button:active, .button:active {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 15px var(--glow-medium);
+}
+
+/* Links */
+a {
+  color: var(--accent-bright);
+  text-decoration: none;
+  transition: color var(--transition-standard), text-shadow var(--transition-standard);
+  -webkit-tap-highlight-color: transparent;
+  padding: 0.3rem 0.5rem; /* Larger touch target */
+  display: inline-block;
+}
+
+a:hover, a:active {
+  color: var(--accent-lime);
+  text-shadow: 0 0 8px var(--glow-subtle);
+}
+
+@media (max-width: 480px) {
+  a {
+    padding: 0.5rem; /* Even larger touch target on mobile */
+  }
+}
+
+/* Container */
+.container {
+  width: 100%;
+  max-width: var(--max-width-standard);
+  margin: 0 auto;
+  padding: 0 var(--page-padding);
+  padding-left: calc(var(--page-padding) + env(safe-area-inset-left));
+  padding-right: calc(var(--page-padding) + env(safe-area-inset-right));
+}
+
+.wide-container {
+  max-width: var(--max-width-wide);
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Section Spacing */
+section {
+  margin-bottom: var(--section-gap);
+}
+
+/* Copyright */
+.copyright {
+  font-size: 0.9rem;
+  color: var(--secondary-text);
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 768px) {
+  :root {
+    --section-gap: 3rem;
+    --page-padding: 1.5rem;
+    --card-padding: 1.5rem;
+  }
+  
+  h1 {
+    font-size: clamp(2.5rem, 8vw, 4rem);
+  }
+  
+  h2 {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --section-gap: 2rem;
+    --page-padding: 1rem;
+    --card-padding: 1rem;
+  }
+  
+  h1 {
+    font-size: clamp(2rem, 7vw, 3rem);
+  }
+  
+  h2 {
+    font-size: 1.8rem;
+  }
+  
+  button, .button {
+    padding: 0.7rem 1.5rem;
+  }
+}
