@@ -1,10 +1,13 @@
 import React from 'react';
+import RegionSelector from '../components/RegionSelector';
 
 interface HomePageProps {
   setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results') => void;
+  selectedRegion: string;
+  setSelectedRegion: (region: string) => void;
 }
 
-function HomePage({ setCurrentPage }: HomePageProps) {
+function HomePage({ setCurrentPage, selectedRegion, setSelectedRegion }: HomePageProps) {
   return (
     <>
       {/* Hero Section */}
@@ -14,11 +17,21 @@ function HomePage({ setCurrentPage }: HomePageProps) {
           <p className="subtitle hero-subtitle">
             Use AI-powered image recognition to identify and learn about invasive plant species in your area.
           </p>
+          
+          {/* Region Selection */}
+          <div className="region-selection-container">
+            <RegionSelector
+              selectedRegion={selectedRegion}
+              onRegionChange={setSelectedRegion}
+            />
+          </div>
+          
           <button
             className="button hero-button"
             onClick={() => setCurrentPage('upload')}
+            disabled={!selectedRegion}
           >
-            Scan with Camera
+            {selectedRegion ? 'Scan with Camera' : 'Select Region First'}
           </button>
         </div>
       </section>
