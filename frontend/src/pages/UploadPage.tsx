@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import RegionSelector from '../components/RegionSelector';
+import { plantAnalysisService } from '../services/plantAnalysisService';
+import { PlantAnalysisResponse } from '../types/plantAnalysis';
 
 interface UploadPageProps {
   setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results') => void;
   startAnalysis: (file: File, region: string) => void;
+  selectedRegion: string;
 }
 
-function UploadPage({ setCurrentPage, startAnalysis }: UploadPageProps) {
-  const [selectedRegion, setSelectedRegion] = useState<string>('');
+function UploadPage({ setCurrentPage, startAnalysis, selectedRegion }: UploadPageProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
@@ -72,14 +73,9 @@ function UploadPage({ setCurrentPage, startAnalysis }: UploadPageProps) {
       <div className="container">
         <h1>Scan Plant with Camera</h1>
         <p className="subtitle">Take a photo of a plant to identify if it's invasive.</p>
-
-        {/* Region Selector */}
-        <div className="region-selector-container">
-          <RegionSelector
-            selectedRegion={selectedRegion}
-            onRegionChange={setSelectedRegion}
-          />
-        </div>
+        {selectedRegion && (
+          <p className="selected-region-display">Selected Region: <strong>{selectedRegion}</strong></p>
+        )}
 
         <div className="upload-container">
           {imagePreview ? (
@@ -207,7 +203,7 @@ const styles = `
     background-color: var(--container-bg);
     border-radius: var(--radius-card);
     padding: 1.5rem;
-    margin-top: 2rem;
+    margin-top: 1rem;
     border: 1px solid var(--border-subtle);
   }
 

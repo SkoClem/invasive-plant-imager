@@ -7,9 +7,10 @@ interface LoadingPageProps {
   setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results') => void;
   setPlantData: (data: PlantInfo) => void;
   pendingAnalysis: { file: File; region: string } | null;
+  updateImageInCollection: (imageId: string, plantData: PlantInfo | null, status: 'completed' | 'error') => void;
 }
 
-function LoadingPage({ setCurrentPage, setPlantData, pendingAnalysis }: LoadingPageProps) {
+function LoadingPage({ setCurrentPage, setPlantData, pendingAnalysis, updateImageInCollection }: LoadingPageProps) {
   useEffect(() => {
     if (!pendingAnalysis) {
       console.error('No pending analysis data available');
