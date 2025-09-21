@@ -8,6 +8,7 @@ import CollectionPage from './pages/CollectionPage';
 import AboutPage from './pages/AboutPage';
 import LoadingPage from './pages/LoadingPage';
 import ResultsPage from './pages/ResultsPage';
+import { AuthProvider } from './contexts/AuthContext';
 
 type PageType = 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results';
 type DirectionType = 'forward' | 'backward';
@@ -26,7 +27,7 @@ interface CollectedImage {
   plantData?: PlantInfo;
 }
 
-function App() {
+function AppContent() {
   const [currentPage, setCurrentPage] = useState<PageType>('home');
   const [transitionDirection, setTransitionDirection] = useState<DirectionType>('forward');
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -299,5 +300,12 @@ function App() {
   );
 }
 
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+}
 
 export default App;

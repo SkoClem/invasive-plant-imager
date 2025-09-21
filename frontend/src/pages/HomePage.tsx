@@ -1,5 +1,6 @@
 import React from 'react';
 import RegionSelector from '../components/RegionSelector';
+import AuthButton from '../components/AuthButton';
 
 interface HomePageProps {
   setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results') => void;
@@ -13,6 +14,10 @@ function HomePage({ setCurrentPage, selectedRegion, setSelectedRegion }: HomePag
       {/* Hero Section */}
       <section className="hero">
         <div className="container">
+          <div className="hero-header">
+            <AuthButton className="auth-button-hero" />
+          </div>
+          
           <h1 className="hero-title">Identify Invasive Plants</h1>
           <p className="subtitle hero-subtitle">
             Use AI-powered image recognition to identify and learn about invasive plant species in your area.
