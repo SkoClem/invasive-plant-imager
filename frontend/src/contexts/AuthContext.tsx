@@ -7,12 +7,15 @@ import {
   UserCredential 
 } from 'firebase/auth';
 import { auth, googleProvider } from '../config/firebase';
+import { authService, AuthUser } from '../services/authService';
 
 interface AuthContextType {
-  currentUser: User | null;
+  currentUser: AuthUser | null;
+  firebaseUser: User | null;
   loading: boolean;
   signInWithGoogle: () => Promise<UserCredential>;
   logout: () => Promise<void>;
+  isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -30,32 +33,104 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
+  const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   const signInWithGoogle = async (): Promise<UserCredential> => {
     try {
+      setLoading(true);
+      
+      // Step 1: Sign in with Firebase
       const result = await signInWithPopup(auth, googleProvider);
+      
+      // Step 2: Get Firebase ID token
+      const idToken = await result.user.getIdToken();
+      
+      // Step 3: Send token to backend and get JWT
+      const backendUser = await authService.loginWithFirebaseToken(idToken);
+      
+      // Step 4: Update local state
+      setCurrentUser(backendUser);
+      setFirebaseUser(result.user);
+      
+      console.log('✅ Authentication successful:', backendUser);
+      
       return result;
     } catch (error) {
-      console.error('Error signing in with Google:', error);
+      console.error('❌ Sign in failed:', error);
+      
+      // Clean up on error
+      setCurrentUser(null);
+      setFirebaseUser(null);
+      authService.logout();
+      
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
   const logout = async (): Promise<void> => {
     try {
+      setLoading(true);
+      
+      // Step 1: Sign out from Firebase
       await signOut(auth);
+      
+      // Step 2: Clear backend session
+      authService.logout();
+      
+      // Step 3: Clear local state
+      setCurrentUser(null);
+      setFirebaseUser(null);
+      
+      console.log('✅ Logout successful');
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error('❌ Sign out failed:', error);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
-      setLoading(false);
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setLoading(true);
+      
+      try {
+        if (user) {
+          // User is signed in with Firebase
+          setFirebaseUser(user);
+          
+          // Check if we have a valid backend session
+          const backendUser = await authService.getCurrentUser();
+          
+          if (backendUser) {
+            // Valid backend session exists
+            setCurrentUser(backendUser);
+          } else {
+            // No valid backend session, need to re-authenticate
+            console.log('🔄 Re-authenticating with backend...');
+            const idToken = await user.getIdToken();
+            const newBackendUser = await authService.loginWithFirebaseToken(idToken);
+            setCurrentUser(newBackendUser);
+          }
+        } else {
+          // User is signed out
+          setFirebaseUser(null);
+          setCurrentUser(null);
+          authService.logout();
+        }
+      } catch (error) {
+        console.error('❌ Auth state change error:', error);
+        // On error, clear everything
+        setFirebaseUser(null);
+        setCurrentUser(null);
+        authService.logout();
+      } finally {
+        setLoading(false);
+      }
     });
 
     return unsubscribe;
@@ -63,9 +138,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const value: AuthContextType = {
     currentUser,
+    firebaseUser,
     loading,
     signInWithGoogle,
-    logout
+    logout,
+    isAuthenticated: currentUser !== null && authService.isAuthenticated()
   };
 
   return (

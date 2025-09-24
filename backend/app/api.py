@@ -1,14 +1,43 @@
 from typing import Dict, Any
-from fastapi import APIRouter, HTTPException, UploadFile, File, Form
-from app.schemas import Message, PlantAnalysisRequest, PlantAnalysisResponse
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Depends
+from app.schemas import Message, PlantAnalysisRequest, PlantAnalysisResponse, FirebaseLoginRequest, LoginResponse, ProtectedResponse
 from app.backend import Imager
+from app.auth import AuthService, get_current_user, get_current_user_optional
 
 imager = Imager()
 router = APIRouter()
 
+# Authentication endpoints
+@router.post("/api/auth/login", response_model=LoginResponse)
+async def login(request: FirebaseLoginRequest):
+    """Login with Firebase ID token and get JWT token"""
+    try:
+        # Verify Firebase token and get user info
+        user_info = AuthService.verify_firebase_token(request.id_token)
+        
+        # Create JWT token
+        jwt_token = AuthService.create_jwt_token(user_info)
+        
+        return LoginResponse(
+            access_token=jwt_token,
+            token_type="bearer",
+            user=user_info
+        )
+    except Exception as e:
+        raise HTTPException(status_code=401, detail=str(e))
+
+@router.get("/api/auth/me", response_model=ProtectedResponse)
+async def get_current_user_info(current_user: Dict[str, Any] = Depends(get_current_user)):
+    """Get current authenticated user information"""
+    return ProtectedResponse(
+        message="User authenticated successfully",
+        user=current_user
+    )
+
 @router.post("/api/chat")
-def chat(message: Message) -> dict[str, str]:
-    print("Message request received")
+def chat(message: Message, current_user: Dict[str, Any] = Depends(get_current_user_optional)) -> dict[str, str]:
+    """Chat endpoint - optionally authenticated"""
+    print(f"Message request received from user: {current_user.get('email') if current_user else 'anonymous'}")
     try:
         response = imager.chat_response(message.message)
         return {"text": response}
@@ -18,10 +47,11 @@ def chat(message: Message) -> dict[str, str]:
 @router.post("/api/analyze-plant")
 async def analyze_plant(
     image: UploadFile = File(...),
-    region: str = Form("North America")
+    region: str = Form("North America"),
+    current_user: Dict[str, Any] = Depends(get_current_user)
 ):
-    """Analyze plant image for invasive species detection"""
-    print(f"Plant analysis request received for region: {region}")
+    """Analyze plant image for invasive species detection - requires authentication"""
+    print(f"Plant analysis request received from user: {current_user['email']} for region: {region}")
 
     try:
         # Validate image file
@@ -38,6 +68,10 @@ async def analyze_plant(
 
         # Analyze the image
         parsed_data = imager.analyze_plant_image(base64_image)
+
+        # Add user information to the response for potential future use
+        parsed_data['analyzed_by'] = current_user['uid']
+        parsed_data['user_email'] = current_user['email']
 
         return parsed_data
 

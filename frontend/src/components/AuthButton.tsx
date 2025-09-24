@@ -37,11 +37,11 @@ const AuthButton: React.FC<AuthButtonProps> = ({ className = '' }) => {
       <div className={`auth-container ${className}`}>
         <div className="user-info">
           <img 
-            src={currentUser.photoURL || '/default-avatar.png'} 
+            src={currentUser.picture || currentUser.photoURL || '/default-avatar.png'} 
             alt="Profile" 
             className="user-avatar"
           />
-          <span className="user-name">{currentUser.displayName}</span>
+          <span className="user-name">{currentUser.name || currentUser.displayName}</span>
         </div>
         <button 
           onClick={handleSignOut}
