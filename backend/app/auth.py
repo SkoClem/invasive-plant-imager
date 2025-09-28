@@ -18,23 +18,33 @@ def initialize_firebase():
         firebase_admin.get_app()
     except ValueError:
         # Firebase not initialized, initialize it
-        # For production, use service account key file
-        # For development, you can use default credentials or service account key
         
-        # Option 1: Using service account key file (recommended for production)
-        service_account_path = os.getenv('FIREBASE_SERVICE_ACCOUNT_PATH')
-        if service_account_path and os.path.exists(service_account_path):
-            cred = credentials.Certificate(service_account_path)
+        # Option 1: Using service account JSON from environment variable (for production)
+        service_account_json = os.getenv('FIREBASE_SERVICE_ACCOUNT_JSON')
+        if service_account_json:
+            import json
+            import tempfile
+            # Parse the JSON string and create a temporary file
+            service_account_info = json.loads(service_account_json)
+            cred = credentials.Certificate(service_account_info)
             firebase_admin.initialize_app(cred)
+            print("Firebase initialized with service account from environment variable")
         else:
-            # Option 2: Using default credentials (for development)
-            # This works if you have gcloud CLI configured or running on Google Cloud
-            try:
-                cred = credentials.ApplicationDefault()
+            # Option 2: Using service account key file (for local development)
+            service_account_path = os.getenv('FIREBASE_SERVICE_ACCOUNT_PATH')
+            if service_account_path and os.path.exists(service_account_path):
+                cred = credentials.Certificate(service_account_path)
                 firebase_admin.initialize_app(cred)
-            except Exception as e:
-                print(f"Warning: Could not initialize Firebase Admin SDK: {e}")
-                print("Please set FIREBASE_SERVICE_ACCOUNT_PATH or configure default credentials")
+                print("Firebase initialized with service account file")
+            else:
+                # Option 3: Using default credentials (fallback)
+                try:
+                    cred = credentials.ApplicationDefault()
+                    firebase_admin.initialize_app(cred)
+                    print("Firebase initialized with default credentials")
+                except Exception as e:
+                    print(f"Warning: Could not initialize Firebase Admin SDK: {e}")
+                    print("Please set FIREBASE_SERVICE_ACCOUNT_JSON or FIREBASE_SERVICE_ACCOUNT_PATH")
 
 # Initialize Firebase on module import
 initialize_firebase()
