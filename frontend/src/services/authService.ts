@@ -1,5 +1,3 @@
-import { User } from 'firebase/auth';
-
 const API_BASE_URL = (process.env.REACT_APP_BACKEND_URL || 'https://plant-imager-backend.onrender.com').replace(/\/$/, '');
 
 export interface LoginResponse {
