@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import RegionSelector from '../components/RegionSelector';
-import AuthButton from '../components/AuthButton';
 
 interface UploadPageProps {
   setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results') => void;

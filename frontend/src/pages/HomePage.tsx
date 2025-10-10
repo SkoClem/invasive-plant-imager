@@ -1,5 +1,4 @@
 import React from 'react';
-import AuthButton from '../components/AuthButton';
 
 interface HomePageProps {
   setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results') => void;
