@@ -1,0 +1,598 @@
+/* CollectionPage Specific Styles */
+
+.collection-section {
+  margin-top: 100px !important;
+  min-height: auto !important;
+  height: auto !important;
+  background: linear-gradient(135deg, var(--bg-primary), white);
+}
+
+/* Collection Header */
+.collection-header {
+  margin-bottom: 5rem;
+  text-align: center;
+}
+
+.page-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.page-subtitle {
+  font-size: 1.2rem;
+  color: var(--secondary-text);
+  margin-bottom: 2rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Collection Stats */
+.collection-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: var(--radius-card);
+  box-shadow: 0 2px 10px var(--shadow-light);
+  border: 1px solid var(--border-subtle);
+  text-align: center;
+  min-width: 120px;
+  transition: all var(--transition-standard);
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px var(--shadow-medium);
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent-bright);
+  margin-bottom: 0.25rem;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: var(--secondary-text);
+  font-weight: 500;
+}
+
+/* Collection Empty State */
+.collection-empty.enhanced {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: var(--radius-large);
+  box-shadow: 0 4px 20px var(--shadow-light);
+  border: 1px solid var(--border-subtle);
+  margin: 2rem auto;
+  max-width: 600px;
+}
+
+.empty-illustration {
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.empty-icon {
+  font-size: 5rem;
+  margin-bottom: 1rem;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.empty-decoration {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.deco-leaf {
+  position: absolute;
+  font-size: 1.5rem;
+  animation: float-leaf 4s ease-in-out infinite;
+}
+
+.deco-leaf:nth-child(1) {
+  top: -20px;
+  left: -30px;
+  animation-delay: 0s;
+}
+
+.deco-leaf:nth-child(2) {
+  top: -10px;
+  right: -20px;
+  animation-delay: 1s;
+}
+
+.deco-leaf:nth-child(3) {
+  bottom: -15px;
+  left: 20px;
+  animation-delay: 2s;
+}
+
+@keyframes float-leaf {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(10deg); }
+}
+
+.empty-content {
+  text-align: center;
+}
+
+.empty-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.empty-description {
+  font-size: 1.1rem;
+  color: var(--secondary-text);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.empty-benefits {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  align-items: center;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+.benefit-icon {
+  font-size: 1.2rem;
+}
+
+/* Collection Content */
+.collection-content {
+  padding: 2rem 0;
+}
+
+/* Collection Actions */
+.collection-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.view-options {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.view-button {
+  padding: 0.5rem;
+  border: 2px solid var(--border-light);
+  background: white;
+  border-radius: var(--radius-smooth);
+  cursor: pointer;
+  transition: all var(--transition-standard);
+}
+
+.view-button:hover {
+  border-color: var(--accent-bright);
+  background: rgba(76, 175, 80, 0.05);
+}
+
+.view-button.active {
+  border-color: var(--accent-bright);
+  background: var(--accent-bright);
+  color: white;
+}
+
+.view-icon {
+  font-size: 1.2rem;
+}
+
+/* Collection Grid */
+.collection-grid.enhanced {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.collection-item.enhanced {
+  background: white;
+  border-radius: var(--radius-card);
+  box-shadow: 0 4px 15px var(--shadow-light);
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.collection-item.enhanced:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 35px var(--shadow-medium);
+}
+
+/* Item Header */
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.analyzing {
+  background: rgba(255, 152, 0, 0.1);
+  color: var(--warning-yellow);
+  border: 1px solid rgba(255, 152, 0, 0.2);
+}
+
+.status-badge.completed {
+  background: rgba(76, 175, 80, 0.1);
+  color: var(--success-green);
+  border: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+.status-badge.error {
+  background: rgba(244, 67, 54, 0.1);
+  color: var(--danger-red);
+  border: 1px solid rgba(244, 67, 54, 0.2);
+}
+
+.status-icon {
+  font-size: 0.9rem;
+}
+
+.item-actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.action-button {
+  padding: 0.5rem;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: var(--radius-smooth);
+  cursor: pointer;
+  transition: all var(--transition-standard);
+}
+
+.action-button:hover {
+  background: var(--bg-primary);
+  color: var(--accent-bright);
+}
+
+/* Image Preview Enhanced */
+.image-preview.enhanced {
+  position: relative;
+  width: 100%;
+  height: 250px;
+  overflow: hidden;
+}
+
+.image-preview.enhanced img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-standard);
+}
+
+.collection-item.enhanced:hover .image-preview.enhanced img {
+  transform: scale(1.05);
+}
+
+.image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--transition-standard);
+}
+
+.collection-item.enhanced:hover .image-overlay {
+  opacity: 1;
+}
+
+.overlay-button {
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all var(--transition-standard);
+}
+
+.overlay-button:hover {
+  background: white;
+  transform: scale(1.1);
+}
+
+.placeholder-image.enhanced {
+  width: 100%;
+  height: 250px;
+  background: linear-gradient(135deg, var(--bg-primary), white);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+}
+
+.placeholder-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.placeholder-text {
+  font-size: 1rem;
+  opacity: 0.7;
+}
+
+/* Image Details Enhanced */
+.image-details.enhanced {
+  padding: 1.5rem;
+}
+
+.plant-name {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.confidence-meter {
+  margin-bottom: 1rem;
+}
+
+.confidence-label {
+  font-size: 0.9rem;
+  color: var(--secondary-text);
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.confidence-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-primary);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.confidence-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-bright), var(--primary-green));
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.plant-description {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.image-metadata {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-light);
+}
+
+.metadata-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.metadata-icon {
+  font-size: 1rem;
+  opacity: 0.7;
+}
+
+.metadata-text {
+  flex: 1;
+}
+
+/* Collection Footer */
+.collection-footer {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-light);
+  text-align: center;
+}
+
+.collection-tip {
+  color: var(--secondary-text);
+  font-size: 0.9rem;
+  margin-top: 1rem;
+  font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .collection-section {
+    padding-top: 70px;
+    min-height: auto;
+    padding-bottom: 100px;
+  }
+
+  .collection-header {
+    margin-bottom: 2rem;
+  }
+
+  .page-title {
+    font-size: 2rem;
+  }
+
+  .collection-stats {
+    gap: 1rem;
+  }
+
+  .stat-card {
+    min-width: 100px;
+    padding: 1rem;
+  }
+
+  .stat-number {
+    font-size: 1.5rem;
+  }
+
+  .collection-grid.enhanced {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .collection-item.enhanced {
+    margin-bottom: 1rem;
+  }
+
+  .image-preview.enhanced {
+    height: 200px;
+  }
+
+  .image-details.enhanced {
+    padding: 1rem;
+  }
+
+  .collection-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .view-options {
+    justify-content: center;
+  }
+
+  .empty-benefits {
+    align-items: stretch;
+  }
+
+  .benefit-item {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .collection-section {
+    padding-top: 60px;
+  }
+
+  .page-title {
+    font-size: 1.8rem;
+  }
+
+  .collection-stats {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .stat-card {
+    width: 100%;
+    max-width: 200px;
+  }
+
+  .collection-empty.enhanced {
+    margin: 1rem;
+    padding: 2rem 1rem;
+  }
+
+  .empty-title {
+    font-size: 1.5rem;
+  }
+
+  .empty-description {
+    font-size: 1rem;
+  }
+
+  .empty-benefits {
+    gap: 0.75rem;
+  }
+
+  .benefit-item {
+    font-size: 0.9rem;
+  }
+
+  .collection-item.enhanced {
+    margin-bottom: 0.75rem;
+  }
+
+  .image-preview.enhanced {
+    height: 180px;
+  }
+
+  .placeholder-image.enhanced {
+    height: 180px;
+  }
+
+  .placeholder-icon {
+    font-size: 2.5rem;
+  }
+
+  .image-details.enhanced {
+    padding: 0.75rem;
+  }
+
+  .plant-name {
+    font-size: 1.1rem;
+  }
+
+  .metadata-item {
+    font-size: 0.8rem;
+  }
+}

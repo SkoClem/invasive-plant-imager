@@ -1,0 +1,244 @@
+/* Layout Components - Navigation, Main App Structure */
+
+/* Main App Container */
+.App {
+  text-align: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Navigation Bar */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--nav-padding-v) var(--nav-padding-h);
+  padding-left: calc(var(--nav-padding-h) + env(safe-area-inset-left));
+  padding-right: calc(var(--nav-padding-h) + env(safe-area-inset-right));
+  padding-top: calc(var(--nav-padding-v) + env(safe-area-inset-top));
+  background-color: rgba(255, 250, 245, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-light);
+  z-index: 1000;
+  transition: background-color var(--transition-standard);
+}
+
+.navbar-logo {
+  font-size: 1.5rem;
+  font-weight: 300;
+  letter-spacing: 0.1rem;
+  color: var(--primary-text);
+  transition: transform var(--transition-standard);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+  text-align: left;
+}
+
+.navbar-logo:hover {
+  transform: scale(1.05);
+}
+
+/* Auth Button in Navigation */
+.navbar .auth-button {
+  margin-left: auto;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+}
+
+/* Main Content Area */
+.main-content {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  padding-top: 180px; /* Height of navbar + much more space */
+  padding-bottom: 80px; /* Height of tab navigation */
+}
+
+/* Page Container with Transitions */
+.page-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  opacity: 1;
+  transform: translateX(0);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.page-forward-active {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+.page-backward-active {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+/* Tab Navigation */
+.tab-navigation {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid var(--border-light);
+  padding: 0.5rem 0;
+  padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+  z-index: 1000;
+  box-shadow: 0 -2px 10px var(--shadow-light);
+}
+
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-standard);
+  border-radius: var(--radius-smooth);
+  min-width: 60px;
+}
+
+.tab-item:hover {
+  background-color: var(--bg-primary);
+  transform: translateY(-2px);
+}
+
+.tab-item.active {
+  color: var(--accent-bright);
+}
+
+.tab-item.active .tab-icon {
+  background-color: var(--accent-bright);
+  color: white;
+}
+
+.tab-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--bg-primary);
+  color: var(--text-secondary);
+  transition: all var(--transition-standard);
+}
+
+.tab-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.tab-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: color var(--transition-standard);
+}
+
+.tab-item.active .tab-label {
+  color: var(--accent-bright);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0.75rem 1rem;
+  }
+
+  .navbar-logo {
+    font-size: 1.25rem;
+  }
+
+  .main-content {
+    padding-top: 70px;
+    padding-bottom: 70px;
+  }
+
+  .tab-item {
+    padding: 0.4rem 0.8rem;
+    min-width: 50px;
+  }
+
+  .tab-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .tab-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .tab-label {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tab-navigation {
+    padding: 0.25rem 0;
+  }
+
+  .tab-item {
+    padding: 0.3rem 0.5rem;
+    min-width: 45px;
+  }
+
+  .tab-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .tab-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .tab-label {
+    font-size: 0.65rem;
+  }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+  .tab-item {
+    min-width: 70px;
+    padding: 0.75rem 1rem;
+  }
+
+  .tab-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .tab-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .tab-label {
+    font-size: 0.8rem;
+  }
+}

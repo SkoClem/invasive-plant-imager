@@ -1,0 +1,22 @@
+/* Import all modular CSS files */
+
+/* Base styles and variables */
+@import './base.css';
+
+/* Layout components */
+@import './layout.css';
+
+/* Reusable components */
+@import './components.css';
+
+/* Specific component styles */
+@import './components/AuthButton.css';
+@import './components/RegionSelector.css';
+
+/* Page-specific styles */
+@import './pages/HomePage.css';
+@import './pages/UploadPage.css';
+@import './pages/CollectionPage.css';
+@import './pages/LoadingPage.css';
+@import './pages/ResultsPage.css';
+@import './pages/AboutPage.css';

@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
+import RegionSelector from '../components/RegionSelector';
+import AuthButton from '../components/AuthButton';
 
 interface UploadPageProps {
   setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results') => void;
   startAnalysis: (file: File, region: string) => void;
   selectedRegion: string;
+  setSelectedRegion: (region: string) => void;
 }
 
-function UploadPage({ setCurrentPage, startAnalysis, selectedRegion }: UploadPageProps) {
+function UploadPage({ setCurrentPage, startAnalysis, selectedRegion, setSelectedRegion }: UploadPageProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
@@ -69,57 +72,74 @@ function UploadPage({ setCurrentPage, startAnalysis, selectedRegion }: UploadPag
   return (
     <section className="upload-section">
       <div className="container">
-        <h1>Scan Plant with Camera</h1>
-        <p className="subtitle">Take a photo of a plant to identify if it's invasive.</p>
-        {selectedRegion && (
-          <p className="selected-region-display">Selected Region: <strong>{selectedRegion}</strong></p>
-        )}
+        <div className="upload-page-header">
+          <div className="header-left">
+            <h1>Scan Plant with Camera</h1>
+            <p className="subtitle">Take a photo of a plant to identify if it's invasive.</p>
+          </div>
+        </div>
 
-        <div className="upload-container">
-          {imagePreview ? (
-            <div className="image-preview-container">
-              <img
-                src={imagePreview}
-                alt="Selected plant"
-                className="image-preview"
-              />
-              <button
-                className="change-image-button"
-                onClick={handleUploadClick}
-              >
-                Change Image
-              </button>
-              <input
-                type="file"
-                className="file-input"
-                accept="image/*"
-                capture="environment"
-                onChange={handleFileSelect}
-              />
-            </div>
-          ) : (
-            <div
-              className="upload-box"
-              onClick={handleUploadClick}
-              role="button"
-              aria-label="Take a photo with camera"
-            >
-              <div className="upload-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="48" height="48" fill="currentColor">
-                  <path d="M9 3L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-3.17L15 3H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
-                  <circle cx="12" cy="13" r="3"/>
-                </svg>
+        {/* Region Selection */}
+        <div className="region-section">
+          <div className="region-header">
+            <h2>Select Your Region</h2>
+            <p className="region-hint">Choose your location for accurate plant identification</p>
+          </div>
+          <div className="region-selector-container">
+            <RegionSelector
+              selectedRegion={selectedRegion}
+              onRegionChange={setSelectedRegion}
+            />
+          </div>
+        </div>
+
+        <div className="upload-section-content">
+          <div className="upload-container">
+            {imagePreview ? (
+              <div className="image-preview-container">
+                <img
+                  src={imagePreview}
+                  alt="Selected plant"
+                  className="image-preview"
+                />
+                <button
+                  className="change-image-button"
+                  onClick={handleUploadClick}
+                >
+                  Change Image
+                </button>
+                <input
+                  type="file"
+                  className="file-input"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={handleFileSelect}
+                />
               </div>
-              <p>Tap here to take a photo</p>
-              <input
-                type="file"
-                className="file-input"
-                accept="image/*"
-                capture="environment"
-                onChange={handleFileSelect}
-              />
-            </div>
-          )}
+            ) : (
+              <div
+                className="upload-box"
+                onClick={handleUploadClick}
+                role="button"
+                aria-label="Take a photo with camera"
+              >
+                <div className="upload-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="48" height="48" fill="currentColor">
+                    <path d="M9 3L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-3.17L15 3H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+                    <circle cx="12" cy="13" r="3"/>
+                  </svg>
+                </div>
+                <p>Tap here to take a photo</p>
+                <input
+                  type="file"
+                  className="file-input"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={handleFileSelect}
+                />
+              </div>
+            )}
+          </div>
         </div>
 
         {error && (

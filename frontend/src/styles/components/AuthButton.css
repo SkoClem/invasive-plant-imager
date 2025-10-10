@@ -1,0 +1,527 @@
+/* AuthButton Component Styles */
+
+/* Base Auth Button */
+.auth-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: transparent;
+  color: var(--text-primary);
+}
+
+.auth-button:hover {
+  background: rgba(76, 175, 80, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Auth Container */
+.auth-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-name {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.user-status {
+  font-size: 0.8rem;
+  color: var(--secondary-text);
+}
+
+/* Sign Out Button */
+.sign-out-button {
+  background: #f8f9fa;
+  color: #5f6368;
+  border: 1px solid #dadce0;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sign-out-button:hover {
+  background: #f1f3f4;
+}
+
+/* Google Icon */
+.google-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* Hero Variant */
+.auth-button-hero {
+  margin-left: auto;
+}
+
+/* Enhanced Auth Button */
+.auth-button.enhanced {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: transparent;
+  color: var(--text-primary);
+}
+
+.auth-button.enhanced:hover {
+  background: rgba(76, 175, 80, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced Auth Container */
+.auth-container.enhanced {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: linear-gradient(135deg, var(--container-bg), #f8f9fa);
+  padding: 0.75rem 1.25rem;
+  border-radius: 16px;
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all var(--transition-standard);
+}
+
+.auth-container.enhanced:hover {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced User Info */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.user-avatar-wrapper {
+  position: relative;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--accent-lime);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.online-indicator {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  background: var(--success-green);
+  border: 2px solid white;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+.user-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.user-status {
+  font-size: 0.8rem;
+  color: var(--secondary-text);
+  font-weight: 400;
+}
+
+/* Enhanced Sign Out Button */
+.sign-out-button.enhanced {
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  color: #5f6368;
+  border: 1px solid #dadce0;
+  padding: 0.6rem 1.2rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-standard);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sign-out-button.enhanced:hover {
+  background: linear-gradient(135deg, #e8eaed, #dadce0);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Sign In Button */
+.sign-in-button.enhanced {
+  background: linear-gradient(135deg, var(--accent-bright), var(--primary-green));
+  color: white;
+  border: none;
+  padding: 0.875rem 1.75rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px var(--shadow-medium);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sign-in-button.enhanced:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px var(--shadow-medium);
+}
+
+.sign-in-button.enhanced:active {
+  transform: translateY(0);
+}
+
+.google-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.sign-in-text {
+  font-weight: 600;
+}
+
+.security-badge {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Compact Variant */
+.auth-container.compact {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+.auth-container.compact .user-menu-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: all var(--transition-standard);
+}
+
+.auth-container.compact .user-menu-button:hover {
+  background: rgba(76, 175, 80, 0.1);
+  border-color: var(--accent-bright);
+}
+
+.auth-container.compact .user-avatar {
+  width: 32px;
+  height: 32px;
+  border: none;
+}
+
+.auth-container.compact .user-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.menu-arrow {
+  transition: transform var(--transition-standard);
+  color: var(--secondary-text);
+}
+
+.menu-arrow.open {
+  transform: rotate(180deg);
+}
+
+/* User Dropdown Menu */
+.user-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  background: white;
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 280px;
+  overflow: hidden;
+}
+
+.user-info-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, var(--bg-primary), white);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.user-avatar-large {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--accent-bright);
+}
+
+.user-details {
+  flex: 1;
+}
+
+.user-name-large {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.user-email {
+  font-size: 0.85rem;
+  color: var(--secondary-text);
+}
+
+.menu-divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 0.5rem 0;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-standard);
+  width: 100%;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.menu-item:hover {
+  background: rgba(76, 175, 80, 0.1);
+  color: var(--accent-bright);
+}
+
+.sign-out-item {
+  color: var(--danger-red);
+  border-top: 1px solid var(--border-subtle);
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+}
+
+.sign-out-item:hover {
+  background: rgba(244, 67, 54, 0.1);
+  color: var(--danger-red);
+}
+
+.menu-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Floating Variant */
+.auth-button.sign-in-button.floating {
+  position: fixed;
+  bottom: 100px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-bright), var(--primary-green));
+  color: white;
+  border: none;
+  box-shadow: 0 4px 15px var(--shadow-medium);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all var(--transition-standard);
+}
+
+.auth-button.sign-in-button.floating:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 25px var(--shadow-dark);
+}
+
+/* Upload Page Variant */
+.auth-button-upload {
+  margin-left: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .auth-container.enhanced {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+  }
+
+  .user-info {
+    order: 2;
+  }
+
+  .auth-button.enhanced {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .user-dropdown-menu {
+    right: -10px;
+    min-width: 260px;
+  }
+
+  .user-info-header {
+    padding: 1rem;
+  }
+
+  .user-avatar-large {
+    width: 40px;
+    height: 40px;
+  }
+
+  .menu-item {
+    padding: 0.75rem 1rem;
+  }
+
+  .auth-button.sign-in-button.floating {
+    bottom: 90px;
+    right: 15px;
+    width: 50px;
+    height: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-button.enhanced {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.85rem;
+  }
+
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .user-dropdown-menu {
+    min-width: 240px;
+  }
+
+  .user-info-header {
+    padding: 0.75rem;
+  }
+
+  .user-avatar-large {
+    width: 36px;
+    height: 36px;
+  }
+
+  .user-name-large {
+    font-size: 0.9rem;
+  }
+
+  .user-email {
+    font-size: 0.8rem;
+  }
+
+  .auth-button.sign-in-button.floating {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+  .auth-button.enhanced {
+    min-height: 48px;
+    padding: 1rem 1.5rem;
+  }
+
+  .sign-out-button.enhanced {
+    min-height: 44px;
+    padding: 0.75rem 1.25rem;
+  }
+
+  .menu-item {
+    min-height: 44px;
+    padding: 1rem 1.25rem;
+  }
+
+  .auth-button.sign-in-button.floating {
+    width: 60px;
+    height: 60px;
+  }
+}

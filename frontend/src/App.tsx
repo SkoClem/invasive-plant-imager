@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useSwipeable } from 'react-swipeable';
 import { PlantInfo } from './types/api';
-import './App.css';
+import './styles/index.css';
 import HomePage from './pages/HomePage';
 import UploadPage from './pages/UploadPage';
 import CollectionPage from './pages/CollectionPage';
@@ -9,6 +9,7 @@ import AboutPage from './pages/AboutPage';
 import LoadingPage from './pages/LoadingPage';
 import ResultsPage from './pages/ResultsPage';
 import { AuthProvider } from './contexts/AuthContext';
+import AuthButton from './components/AuthButton';
 
 type PageType = 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results';
 type DirectionType = 'forward' | 'backward';
@@ -70,7 +71,7 @@ function AppContent() {
       const serializableCollection = imageCollection.map(img => ({
         ...img,
         file: undefined, // Remove File object as it's not serializable
-        preview: img.preview.startsWith('blob:') ? undefined : img.preview, // Remove blob URLs
+        preview: img.preview && img.preview.startsWith('blob:') ? undefined : img.preview, // Remove blob URLs
       }));
       localStorage.setItem('imageCollection', JSON.stringify(serializableCollection));
     }
@@ -191,16 +192,15 @@ function AppContent() {
         {(() => {
           switch (currentPage) {
             case 'home':
-              return <HomePage 
-                setCurrentPage={navigateToPage} 
-                selectedRegion={selectedRegion}
-                setSelectedRegion={updateSelectedRegion}
+              return <HomePage
+                setCurrentPage={navigateToPage}
               />;
             case 'upload':
-              return <UploadPage 
-                setCurrentPage={navigateToPage} 
+              return <UploadPage
+                setCurrentPage={navigateToPage}
                 startAnalysis={startAnalysis}
                 selectedRegion={selectedRegion}
+                setSelectedRegion={updateSelectedRegion}
               />;
             case 'collection':
               return <CollectionPage 
@@ -219,10 +219,8 @@ function AppContent() {
             case 'results':
               return <ResultsPage setCurrentPage={navigateToPage} plantData={plantData} />;
             default:
-              return <HomePage 
+              return <HomePage
                 setCurrentPage={navigateToPage}
-                selectedRegion={selectedRegion}
-                setSelectedRegion={updateSelectedRegion}
               />;
           }
         })()} 
@@ -240,6 +238,7 @@ function AppContent() {
         >
           Invasive Plant Imager
         </button>
+        <AuthButton variant="compact" />
       </nav>
 
       {/* Main Content */}

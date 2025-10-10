@@ -1,0 +1,396 @@
+/* ResultsPage Specific Styles */
+
+.results-section {
+  padding-top: 80px;
+  min-height: calc(100vh - 180px);
+  overflow-y: auto;
+  background: linear-gradient(135deg, var(--bg-primary), white);
+}
+
+/* Results Header */
+.results-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem;
+  border-radius: var(--radius-card);
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 20px var(--shadow-medium);
+}
+
+.results-header.invasive {
+  background: linear-gradient(135deg, #d32f2f, #f44336);
+  color: white;
+}
+
+.results-header.non-invasive {
+  background: linear-gradient(135deg, var(--accent-bright), var(--accent-lime));
+  color: white;
+}
+
+.status-icon {
+  font-size: 3rem;
+  flex-shrink: 0;
+}
+
+.results-info {
+  flex: 1;
+}
+
+.status-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.status-subtitle {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  line-height: 1.4;
+}
+
+.confidence-badge {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  backdrop-filter: blur(5px);
+}
+
+/* Results Content */
+.results-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Plant Info Card */
+.plant-info-card {
+  background: white;
+  border-radius: var(--radius-card);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 15px var(--shadow-light);
+  border: 1px solid var(--border-subtle);
+}
+
+.plant-info-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.plant-icon {
+  font-size: 2.5rem;
+  flex-shrink: 0;
+}
+
+.plant-details {
+  flex: 1;
+}
+
+.plant-name {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.scientific-name {
+  font-size: 1rem;
+  color: var(--secondary-text);
+  font-style: italic;
+}
+
+.plant-info-content {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.info-section {
+  padding: 1rem;
+  background: var(--bg-primary);
+  border-radius: var(--radius-smooth);
+  border-left: 4px solid var(--accent-bright);
+}
+
+.info-section h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.info-section p {
+  color: var(--secondary-text);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.section-icon {
+  font-size: 1.2rem;
+  color: var(--accent-bright);
+}
+
+/* Invasive Alert */
+.invasive-alert {
+  background: rgba(244, 67, 54, 0.1);
+  border: 2px solid rgba(244, 67, 54, 0.2);
+  border-radius: var(--radius-card);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.invasive-alert-icon {
+  font-size: 2.5rem;
+  color: var(--danger-red);
+  flex-shrink: 0;
+}
+
+.invasive-alert-content {
+  flex: 1;
+}
+
+.invasive-alert h3 {
+  color: var(--danger-red);
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.invasive-alert p {
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Image Preview */
+.results-image {
+  width: 100%;
+  max-width: 400px;
+  height: 300px;
+  object-fit: cover;
+  border-radius: var(--radius-card);
+  margin: 0 auto 2rem;
+  display: block;
+  box-shadow: 0 4px 15px var(--shadow-light);
+}
+
+/* Metadata */
+.results-metadata {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.metadata-card {
+  background: white;
+  padding: 1rem;
+  border-radius: var(--radius-smooth);
+  border: 1px solid var(--border-subtle);
+  text-align: center;
+}
+
+.metadata-label {
+  font-size: 0.85rem;
+  color: var(--secondary-text);
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.metadata-value {
+  font-size: 1rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Action Buttons */
+.results-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 2rem 0;
+}
+
+.action-button-primary {
+  background: linear-gradient(135deg, var(--accent-bright), var(--primary-green));
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: var(--radius-large);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-standard);
+  box-shadow: 0 4px 15px var(--shadow-medium);
+}
+
+.action-button-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px var(--shadow-medium);
+}
+
+.action-button-secondary {
+  background: white;
+  color: var(--primary-green);
+  border: 2px solid var(--primary-green);
+  padding: 1rem 2rem;
+  border-radius: var(--radius-large);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-standard);
+}
+
+.action-button-secondary:hover {
+  background: var(--primary-green);
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Additional Information */
+.additional-info {
+  background: white;
+  border-radius: var(--radius-card);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 15px var(--shadow-light);
+  border: 1px solid var(--border-subtle);
+}
+
+.additional-info h3 {
+  color: var(--text-primary);
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.info-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.info-tag {
+  background: rgba(76, 175, 80, 0.1);
+  color: var(--accent-bright);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .results-section {
+    padding-top: 70px;
+  }
+
+  .results-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .status-title {
+    font-size: 1.8rem;
+  }
+
+  .plant-info-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .results-metadata {
+    grid-template-columns: 1fr;
+  }
+
+  .results-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .action-button-primary,
+  .action-button-secondary {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .plant-info-card {
+    padding: 1.5rem;
+  }
+
+  .additional-info {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .results-section {
+    padding-top: 60px;
+    min-height: auto;
+    padding-bottom: 100px;
+  }
+
+  .status-title {
+    font-size: 1.5rem;
+  }
+
+  .results-image {
+    height: 250px;
+  }
+
+  .plant-info-card {
+    padding: 1rem;
+  }
+
+  .plant-info-header {
+    gap: 0.75rem;
+  }
+
+  .plant-name {
+    font-size: 1.3rem;
+  }
+
+  .scientific-name {
+    font-size: 0.9rem;
+  }
+
+  .info-section {
+    padding: 0.75rem;
+  }
+
+  .info-section h3 {
+    font-size: 1rem;
+  }
+
+  .additional-info {
+    padding: 1rem;
+  }
+
+  .additional-info h3 {
+    font-size: 1.1rem;
+  }
+
+  .info-tag {
+    font-size: 0.75rem;
+  }
+}
