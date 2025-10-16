@@ -1,5 +1,4 @@
 import { PlantAnalysisResponse, PlantAnalysisRequest } from '../types/plantAnalysis';
-import { authService } from './authService';
 
 const API_BASE_URL = (process.env.REACT_APP_BACKEND_URL || 'https://plant-imager-backend.onrender.com').replace(/\/$/, '');
 
@@ -32,13 +31,13 @@ class PlantAnalysisService {
     });
 
     try {
-      console.log('Making authenticated request to backend...');
+      console.log('Making request to backend...');
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 second timeout
 
-      // Use the authenticated request method from authService
-      const response = await authService.authenticatedFetch(`${API_BASE_URL}/api/analyze-plant`, {
+      // Use regular fetch instead of authenticatedFetch to allow unauthenticated requests
+      const response = await fetch(`${API_BASE_URL}/api/analyze-plant`, {
         method: 'POST',
         body: formData,
         signal: controller.signal,
@@ -74,12 +73,6 @@ class PlantAnalysisService {
       }
     } catch (error) {
       console.error('Request error:', error);
-      
-      // If it's an authentication error, provide a helpful message
-      if (error instanceof Error && error.message.includes('401')) {
-        throw new Error('Authentication required. Please sign in to analyze plants.');
-      }
-      
       throw error;
     }
   }

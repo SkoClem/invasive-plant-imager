@@ -48,10 +48,10 @@ def chat(message: Message, current_user: Dict[str, Any] = Depends(get_current_us
 async def analyze_plant(
     image: UploadFile = File(...),
     region: str = Form("North America"),
-    current_user: Dict[str, Any] = Depends(get_current_user)
+    current_user: Dict[str, Any] = Depends(get_current_user_optional)
 ):
-    """Analyze plant image for invasive species detection - requires authentication"""
-    print(f"Plant analysis request received from user: {current_user['email']} for region: {region}")
+    """Analyze plant image for invasive species detection - authentication optional"""
+    print(f"Plant analysis request received from user: {current_user['email'] if current_user else 'anonymous'} for region: {region}")
 
     try:
         # Validate image file
@@ -69,9 +69,13 @@ async def analyze_plant(
         # Analyze the image
         parsed_data = imager.analyze_plant_image(base64_image)
 
-        # Add user information to the response for potential future use
-        parsed_data['analyzed_by'] = current_user['uid']
-        parsed_data['user_email'] = current_user['email']
+        # Add user information to the response for potential future use (if authenticated)
+        if current_user:
+            parsed_data['analyzed_by'] = current_user['uid']
+            parsed_data['user_email'] = current_user['email']
+        else:
+            parsed_data['analyzed_by'] = 'anonymous'
+            parsed_data['user_email'] = 'anonymous@example.com'
 
         return parsed_data
 
