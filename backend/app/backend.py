@@ -36,6 +36,7 @@ class Imager:
         self.key, self.name, self.url = self.llm_info
         self.region = region
         self.image_llm = ImageLLM()
+        print(self.name, self.url)
 
     def set_region(self, region: str):
         """Update the region for analysis"""
