@@ -112,19 +112,21 @@ def chat(message: Message, current_user: Dict[str, Any] = Depends(get_current_us
 @router.post("/api/analyze-plant")
 async def analyze_plant(
     image: UploadFile = File(...),
-    region: str = Form("North America"),
+    region: str = Form("Texas"),  # Default to Texas, but will be overridden
     current_user: Dict[str, Any] = Depends(get_current_user_optional)
 ):
-    """Analyze plant image for invasive species detection - authentication optional"""
-    print(f"Plant analysis request received from user: {current_user['email'] if current_user else 'anonymous'} for region: {region}")
+    """Analyze plant image for Texas invasive species detection - authentication optional"""
+    # Always use Texas as the region for analysis
+    texas_region = "Texas"
+    print(f"Plant analysis request received from user: {current_user['email'] if current_user else 'anonymous'} for region: {texas_region}")
 
     try:
         # Validate image file
         if not image.content_type.startswith("image/"):
             raise HTTPException(status_code=400, detail="File must be an image")
 
-        # Set region for analysis
-        imager.set_region(region)
+        # Always set region to Texas for analysis
+        imager.set_region(texas_region)
 
         # Convert uploaded file to base64
         image_data = await image.read()

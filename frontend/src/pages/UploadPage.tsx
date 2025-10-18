@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import RegionSelector from '../components/RegionSelector';
+import React, { useState, useEffect } from 'react';
 
 interface UploadPageProps {
   setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results') => void;
@@ -13,6 +12,11 @@ function UploadPage({ setCurrentPage, startAnalysis, selectedRegion, setSelected
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Set region to Texas on component mount
+  useEffect(() => {
+    setSelectedRegion('United States, Texas');
+  }, [setSelectedRegion]);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -78,17 +82,32 @@ function UploadPage({ setCurrentPage, startAnalysis, selectedRegion, setSelected
           </div>
         </div>
 
-        {/* Region Selection */}
+        {/* Region Display */}
         <div className="region-section">
           <div className="region-header">
-            <h2>Select Your Region</h2>
-            <p className="region-hint">Choose your location for accurate plant identification</p>
+            <h2>Region</h2>
+            <p className="region-hint">Plant identification focused on Texas invasive species</p>
           </div>
-          <div className="region-selector-container">
-            <RegionSelector
-              selectedRegion={selectedRegion}
-              onRegionChange={setSelectedRegion}
-            />
+          <div className="region-display-container">
+            <div className="region-display">
+              <div className="region-icon-wrapper">
+                <span className="country-flag">🇺🇸</span>
+                <svg
+                  className="region-icon"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="20"
+                  height="20"
+                  fill="currentColor"
+                >
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+              </div>
+              <div className="region-text-wrapper">
+                <span className="region-text">United States, Texas</span>
+                <span className="region-subtitle">Fixed region for invasive species detection</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -230,6 +249,56 @@ const styles = `
     font-size: 1.1rem;
   }
 
+  /* Region Display Styles */
+  .region-display-container {
+    margin-bottom: 2rem;
+  }
+
+  .region-display {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: var(--container-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-card);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .region-icon-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .country-flag {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .region-icon {
+    color: var(--accent-bright);
+    flex-shrink: 0;
+  }
+
+  .region-text-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .region-text {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .region-subtitle {
+    font-size: 0.85rem;
+    color: var(--secondary-text);
+  }
+
   .upload-guidelines ul {
     list-style-position: inside;
     color: var(--secondary-text);
@@ -297,6 +366,19 @@ const styles = `
     .region-selector-button {
       padding: 1.2rem 1.5rem;
       min-height: 56px;
+    }
+
+    .region-display {
+      padding: 1rem;
+      gap: 0.75rem;
+    }
+
+    .region-text {
+      font-size: 0.95rem;
+    }
+
+    .region-subtitle {
+      font-size: 0.8rem;
     }
   }
 `;

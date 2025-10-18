@@ -1,8 +1,6 @@
 def paragraph_analysis(region):
-    """Generate paragraph analysis of plant image"""
-    # Focus specifically on Texas invasive species when region is Texas
-    if "texas" in region.lower():
-        return f"""
+    """Generate paragraph analysis of plant image - now focused specifically on Texas"""
+    return f"""
 
 **IDENTITY**
 You are an expert at identifying invasive plant species, with specialized knowledge of Texas invasive flora.
@@ -23,6 +21,10 @@ Focus on invasive species commonly found in Texas, including but not limited to:
 - Japanese Knotweed (Fallopia japonica)
 - Purple Loosestrife (Lythrum salicaria)
 - Alarmingly invasive grasses and aquatic plants
+- Johnsongrass (Sorghum halepense)
+- King Ranch Bluestem (Bothriochloa ischaemum)
+- Arundo (Arundo donax)
+- Chinese Tallow Tree (Triadica sebifera)
 
 **REQUIRED INFORMATION TO INCLUDE:**
 - What species of plant is shown in the image?
@@ -34,27 +36,6 @@ Focus on invasive species commonly found in Texas, including but not limited to:
 
 **RESPONSE FORMAT**
 Provide your response as a single, well-structured paragraph that includes all the required information. Be specific and detailed about Texas ecosystems and native flora.
-"""
-    else:
-        return f"""
-
-**IDENTITY**
-You are an expert at identifying invasive plant species
-
-**TASK**
-The user has provided an image of a plant from {region}.
-Your task is to identify if the plant is invasive or not and provide a detailed paragraph analysis.
-
-**REQUIRED INFORMATION TO INCLUDE:**
-- What species of plant is shown in the image?
-- What specific regions of the world is the plant native to?
-- Is the plant invasive to {region}?
-- If the plant is invasive to {region}, what harmful effects does it have?
-- What are some native alternative plants that are similar in appearance, size, growth habitat?
-- How can the user safely remove the plant if needed?
-
-**RESPONSE FORMAT**
-Provide your response as a single, well-structured paragraph that includes all the required information. Be specific and detailed.
 """
 
 def json_information(analysis_text):
