@@ -67,7 +67,7 @@ class Imager:
             name=self.name,
             prompt=prompt,
             image_data=image_data,
-            max_tokens=400
+            max_tokens=4000
         )
 
         return self.image_llm.get_output(url=self.url, llm_contents=contents)
@@ -80,7 +80,7 @@ class Imager:
             key=self.key,
             name=self.name,
             prompt=prompt,
-            max_tokens=500
+            max_tokens=2000
         )
 
         json_response = self.image_llm.get_output(url=self.url, llm_contents=contents)
@@ -95,6 +95,9 @@ class Imager:
         """Parse LLM response to extract structured data - simplified for clean JSON"""
         try:
             cleaned_response = llm_response.strip()
+            
+            # Debug: Print the raw response to see what we're getting
+            print(f"DEBUG - Raw LLM Response: {cleaned_response}")
 
             # Try to parse as JSON directly
             try:
@@ -106,9 +109,11 @@ class Imager:
             if "```json" in cleaned_response:
                 json_part = cleaned_response.split("```json")[1]
                 json_content = json_part.split("```")[0].strip()
+                print(f"DEBUG - Extracted JSON: {json_content}")
                 return json.loads(json_content)
 
             # If all else fails, return minimal structure
+            print(f"DEBUG - Failed to parse JSON, returning fallback")
             return {
                 "specieIdentified": None,
                 "nativeRegion": None,
@@ -119,6 +124,7 @@ class Imager:
             }
 
         except Exception as e:
+            print(f"DEBUG - Exception in parse_llm_response: {str(e)}")
             return {
                 "specieIdentified": None,
                 "nativeRegion": None,

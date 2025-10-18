@@ -124,8 +124,16 @@ class ImageLLM:
             response.raise_for_status()
 
             result = response.json()
+            
+            # Check if response was truncated due to token limit
+            if result["candidates"][0].get("finishReason") == "MAX_TOKENS":
+                return "Response truncated due to token limit. Please increase max_tokens."
+            
+            # Check if parts exist in the response
+            if "parts" not in result["candidates"][0]["content"]:
+                return f"No content parts in response. Finish reason: {result['candidates'][0].get('finishReason', 'unknown')}"
+            
             output = result["candidates"][0]["content"]["parts"][0]["text"]
-
             return str(output)
 
         except requests.exceptions.HTTPError as e:

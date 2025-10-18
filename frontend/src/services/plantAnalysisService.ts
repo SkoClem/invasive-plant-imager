@@ -34,7 +34,7 @@ class PlantAnalysisService {
       console.log('Making request to backend...');
 
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minute timeout
 
       // Use regular fetch instead of authenticatedFetch to allow unauthenticated requests
       const response = await fetch(`${API_BASE_URL}/api/analyze-plant`, {
@@ -73,6 +73,16 @@ class PlantAnalysisService {
       }
     } catch (error) {
       console.error('Request error:', error);
+      
+      // Provide more specific error messages for common issues
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          throw new Error('Request timed out. The analysis is taking longer than expected. Please try again.');
+        } else if (error.message.includes('Failed to fetch')) {
+          throw new Error('Unable to connect to the server. Please check your internet connection and try again.');
+        }
+      }
+      
       throw error;
     }
   }
