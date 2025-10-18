@@ -2,8 +2,8 @@ import React from 'react';
 
 interface CollectedImage {
   id: string;
-  file: File;
-  preview: string;
+  file?: File; // Made optional since backend doesn't store File objects
+  preview?: string; // Made optional since blob URLs can't be persisted
   status: 'analyzing' | 'completed' | 'error';
   species?: string;
   confidence?: number;
@@ -17,6 +17,8 @@ interface CollectedImage {
 interface CollectionPageProps {
   setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results') => void;
   imageCollection: CollectedImage[];
+  deleteCollectionItem?: (itemId: string) => Promise<void>;
+  clearCollection?: () => Promise<void>;
 }
 
 function CollectionPage({ setCurrentPage, imageCollection }: CollectionPageProps) {

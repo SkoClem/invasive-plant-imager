@@ -1,8 +1,9 @@
 from typing import Dict, Any
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Depends
-from app.schemas import Message, PlantAnalysisRequest, PlantAnalysisResponse, FirebaseLoginRequest, LoginResponse, ProtectedResponse
+from app.schemas import Message, PlantAnalysisRequest, PlantAnalysisResponse, FirebaseLoginRequest, LoginResponse, ProtectedResponse, SaveCollectionRequest, UserCollectionResponse, DeleteCollectionItemRequest
 from app.backend import Imager
 from app.auth import AuthService, get_current_user, get_current_user_optional
+from app.collections import collection_manager
 
 imager = Imager()
 router = APIRouter()
@@ -33,6 +34,70 @@ async def get_current_user_info(current_user: Dict[str, Any] = Depends(get_curre
         message="User authenticated successfully",
         user=current_user
     )
+
+# Collection endpoints
+@router.post("/api/collections/save")
+async def save_collection_item(
+    request: SaveCollectionRequest,
+    current_user: Dict[str, Any] = Depends(get_current_user)
+):
+    """Save an item to user's collection"""
+    try:
+        user_id = current_user['uid']
+        success = collection_manager.add_item_to_collection(user_id, request.collection_item)
+        
+        if success:
+            return {"message": "Collection item saved successfully", "success": True}
+        else:
+            raise HTTPException(status_code=500, detail="Failed to save collection item")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/api/collections", response_model=UserCollectionResponse)
+async def get_user_collection(current_user: Dict[str, Any] = Depends(get_current_user)):
+    """Get user's collection"""
+    try:
+        user_id = current_user['uid']
+        collection = collection_manager.get_user_collection(user_id)
+        
+        return UserCollectionResponse(
+            user_id=user_id,
+            collection=collection,
+            total_items=len(collection)
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.delete("/api/collections/item")
+async def delete_collection_item(
+    request: DeleteCollectionItemRequest,
+    current_user: Dict[str, Any] = Depends(get_current_user)
+):
+    """Delete an item from user's collection"""
+    try:
+        user_id = current_user['uid']
+        success = collection_manager.delete_item_from_collection(user_id, request.item_id)
+        
+        if success:
+            return {"message": "Collection item deleted successfully", "success": True}
+        else:
+            raise HTTPException(status_code=404, detail="Collection item not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.delete("/api/collections/clear")
+async def clear_user_collection(current_user: Dict[str, Any] = Depends(get_current_user)):
+    """Clear all items from user's collection"""
+    try:
+        user_id = current_user['uid']
+        success = collection_manager.clear_user_collection(user_id)
+        
+        if success:
+            return {"message": "Collection cleared successfully", "success": True}
+        else:
+            raise HTTPException(status_code=500, detail="Failed to clear collection")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/api/chat")
 def chat(message: Message, current_user: Dict[str, Any] = Depends(get_current_user_optional)) -> dict[str, str]:

@@ -1,10 +1,10 @@
 import { PlantAnalysisResponse, PlantAnalysisRequest } from '../types/plantAnalysis';
 
-const API_BASE_URL = (process.env.REACT_APP_BACKEND_URL || 'https://plant-imager-backend.onrender.com').replace(/\/$/, '');
+const API_BASE_URL = (process.env.REACT_APP_API_URL || 'http://localhost:8000').replace(/\/$/, '');
 
 console.log('API Base URL:', API_BASE_URL);
-console.log('Environment variable loaded:', !!process.env.REACT_APP_BACKEND_URL);
-console.log('Environment variable value:', process.env.REACT_APP_BACKEND_URL);
+console.log('Environment variable loaded:', !!process.env.REACT_APP_API_URL);
+console.log('Environment variable value:', process.env.REACT_APP_API_URL);
 
 class PlantAnalysisService {
   async analyzePlant(request: PlantAnalysisRequest): Promise<PlantAnalysisResponse> {

@@ -8,16 +8,17 @@ import CollectionPage from './pages/CollectionPage';
 import AboutPage from './pages/AboutPage';
 import LoadingPage from './pages/LoadingPage';
 import ResultsPage from './pages/ResultsPage';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import AuthButton from './components/AuthButton';
+import { collectionService, CollectionItem, PlantInfo as BackendPlantInfo } from './services/collectionService';
 
 type PageType = 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results';
 type DirectionType = 'forward' | 'backward';
 
 interface CollectedImage {
   id: string;
-  file: File;
-  preview: string;
+  file?: File; // Made optional since backend doesn't store File objects
+  preview?: string; // Made optional since blob URLs can't be persisted
   status: 'analyzing' | 'completed' | 'error';
   species?: string;
   confidence?: number;
@@ -37,45 +38,113 @@ function AppContent() {
   const [selectedRegion, setSelectedRegion] = useState<string>('');
   const [imageCollection, setImageCollection] = useState<CollectedImage[]>([]);
   const pageRef = useRef<HTMLDivElement>(null);
+  const { isAuthenticated } = useAuth();
 
-  // Load region and collection from localStorage on component mount
+  // Load region and collection on component mount
   useEffect(() => {
     const savedRegion = localStorage.getItem('selectedRegion');
     if (savedRegion) {
       setSelectedRegion(savedRegion);
     }
 
-    // Load saved collection from localStorage
+    loadCollection();
+  }, [isAuthenticated]);
+
+  // Load collection from backend if authenticated, otherwise from localStorage
+  const loadCollection = async () => {
+    if (isAuthenticated) {
+      try {
+        const backendCollection = await collectionService.getUserCollection();
+        setImageCollection(backendCollection);
+      } catch (error) {
+        console.error('Error loading collection from backend:', error);
+        // Fall back to localStorage if backend fails
+        loadFromLocalStorage();
+      }
+    } else {
+      loadFromLocalStorage();
+    }
+  };
+
+  // Load collection from localStorage
+  const loadFromLocalStorage = () => {
     const savedCollection = localStorage.getItem('imageCollection');
     if (savedCollection) {
       try {
         const parsedCollection = JSON.parse(savedCollection);
-        // Convert timestamp strings back to Date objects and recreate blob URLs
+        // Convert timestamp strings back to Date objects
         const restoredCollection = parsedCollection.map((img: any) => ({
           ...img,
           timestamp: new Date(img.timestamp),
           // Note: File objects and preview URLs cannot be restored from localStorage
-          // These will need to be handled differently for full persistence
         }));
         setImageCollection(restoredCollection);
       } catch (error) {
         console.error('Error loading collection from localStorage:', error);
       }
     }
-  }, []);
+  };
 
-  // Save collection to localStorage whenever it changes
-  useEffect(() => {
-    if (imageCollection.length > 0) {
+  // Save collection to backend if authenticated, otherwise to localStorage
+  const saveCollection = async (collection: CollectedImage[]) => {
+    if (isAuthenticated) {
+      // Save to backend - we'll save individual items as they're added
+      // This function is mainly for localStorage fallback
+      saveToLocalStorage(collection);
+    } else {
+      saveToLocalStorage(collection);
+    }
+  };
+
+  // Save collection to localStorage
+  const saveToLocalStorage = (collection: CollectedImage[]) => {
+    if (collection.length > 0) {
       // Create a serializable version of the collection (without File objects)
-      const serializableCollection = imageCollection.map(img => ({
+      const serializableCollection = collection.map(img => ({
         ...img,
         file: undefined, // Remove File object as it's not serializable
         preview: img.preview && img.preview.startsWith('blob:') ? undefined : img.preview, // Remove blob URLs
       }));
       localStorage.setItem('imageCollection', JSON.stringify(serializableCollection));
     }
-  }, [imageCollection]);
+  };
+
+  // Save collection whenever it changes (for localStorage users)
+  useEffect(() => {
+    if (!isAuthenticated && imageCollection.length > 0) {
+      saveToLocalStorage(imageCollection);
+    }
+  }, [imageCollection, isAuthenticated]);
+
+  // Delete collection item
+  const deleteCollectionItem = async (itemId: string) => {
+    if (isAuthenticated) {
+      try {
+        await collectionService.deleteCollectionItem(itemId);
+      } catch (error) {
+        console.error('Failed to delete item from backend:', error);
+      }
+    }
+    
+    // Update local state
+    setImageCollection(prev => prev.filter(img => img.id !== itemId));
+  };
+
+  // Clear entire collection
+  const clearCollection = async () => {
+    if (isAuthenticated) {
+      try {
+        await collectionService.clearUserCollection();
+      } catch (error) {
+        console.error('Failed to clear collection from backend:', error);
+      }
+    } else {
+      localStorage.removeItem('imageCollection');
+    }
+    
+    // Update local state
+    setImageCollection([]);
+  };
 
   // Save region to localStorage whenever it changes
   const updateSelectedRegion = (region: string) => {
@@ -111,6 +180,22 @@ function AppContent() {
     }, 10);
   };
 
+  // Convert PlantInfo from API format to backend format
+  const convertPlantInfoToBackend = (apiPlantInfo: PlantInfo): BackendPlantInfo => {
+    return {
+      specieIdentified: apiPlantInfo.scientificName || apiPlantInfo.commonName,
+      nativeRegion: apiPlantInfo.region,
+      invasiveOrNot: apiPlantInfo.isInvasive,
+      invasiveEffects: apiPlantInfo.impact,
+      nativeAlternatives: apiPlantInfo.nativeAlternatives.map(alt => ({
+        commonName: alt.commonName,
+        scientificName: alt.scientificName,
+        characteristics: alt.description
+      })),
+      removeInstructions: apiPlantInfo.controlMethods.join('; ')
+    };
+  };
+
   // Start analysis with file and region
   const startAnalysis = (file: File, region: string) => {
     // Add image to collection with analyzing status
@@ -124,34 +209,73 @@ function AppContent() {
       region: region || selectedRegion
     };
     
-    setImageCollection(prev => {
-      const updated = [newImage, ...prev];
-      // Limit collection size to prevent memory issues (keep last 50 images)
-      return updated.slice(0, 50);
-    });
+    const updatedCollection = [newImage, ...imageCollection].slice(0, 50);
+    setImageCollection(updatedCollection);
+    
+    // Save to backend if authenticated
+    if (isAuthenticated) {
+      // Convert to CollectionItem format for backend
+      const collectionItem: CollectionItem = {
+        id: newImage.id,
+        filename: newImage.filename,
+        timestamp: newImage.timestamp,
+        region: newImage.region,
+        status: newImage.status,
+        species: newImage.species,
+        confidence: newImage.confidence,
+        description: newImage.description,
+        plant_data: newImage.plantData ? convertPlantInfoToBackend(newImage.plantData) : undefined
+      };
+      collectionService.saveCollectionItem(collectionItem).catch(error => {
+        console.error('Failed to save to backend:', error);
+      });
+    }
+    
     setPendingAnalysis({ file, region: region || selectedRegion });
     navigateToPage('loading');
   };
 
   // Update image in collection after analysis
-  const updateImageInCollection = (imageId: string, plantData: PlantInfo | null, status: 'completed' | 'error') => {
-    setImageCollection(prev => prev.map(img => {
+  const updateImageInCollection = async (imageId: string, plantData: PlantInfo | null, status: 'completed' | 'error') => {
+    const updatedCollection = imageCollection.map(img => {
       if (img.id === imageId) {
         // Clean up old blob URL to prevent memory leaks
         if (img.preview && img.preview.startsWith('blob:')) {
           URL.revokeObjectURL(img.preview);
         }
-        return {
+        const updatedImg: CollectedImage = {
           ...img,
           status,
-          plantData,
+          plantData: plantData || undefined,
           species: plantData?.commonName || plantData?.scientificName || undefined,
           confidence: 85, // Default confidence since PlantInfo doesn't have this field
           description: plantData?.description || undefined
-        } as CollectedImage;
+        };
+        
+        // Save updated item to backend if authenticated
+        if (isAuthenticated && status === 'completed') {
+          const collectionItem: CollectionItem = {
+            id: updatedImg.id,
+            filename: updatedImg.filename,
+            timestamp: updatedImg.timestamp,
+            region: updatedImg.region,
+            status: updatedImg.status,
+            species: updatedImg.species,
+            confidence: updatedImg.confidence,
+            description: updatedImg.description,
+            plant_data: updatedImg.plantData ? convertPlantInfoToBackend(updatedImg.plantData) : undefined
+          };
+          collectionService.saveCollectionItem(collectionItem).catch(error => {
+            console.error('Failed to update item in backend:', error);
+          });
+        }
+        
+        return updatedImg;
       }
       return img;
-    }));
+    });
+    
+    setImageCollection(updatedCollection);
   };
 
   // Handle swipe navigation (only for main pages)
@@ -206,6 +330,8 @@ function AppContent() {
               return <CollectionPage 
                 setCurrentPage={navigateToPage} 
                 imageCollection={imageCollection}
+                deleteCollectionItem={deleteCollectionItem}
+                clearCollection={clearCollection}
               />;
             case 'about':
               return <AboutPage setCurrentPage={navigateToPage} />;

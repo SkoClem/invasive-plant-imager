@@ -1,6 +1,7 @@
 from enum import Enum
 from typing import Union, Optional, List, Dict, Any
 from pydantic import BaseModel
+from datetime import datetime
 
 class Message(BaseModel):
     message: str
@@ -33,3 +34,34 @@ class UserProfile(BaseModel):
 class ProtectedResponse(BaseModel):
     message: str
     user: UserProfile
+
+# Collection schemas
+class PlantInfo(BaseModel):
+    specieIdentified: Optional[str] = None
+    nativeRegion: Optional[str] = None
+    invasiveOrNot: bool = False
+    invasiveEffects: str = ""
+    nativeAlternatives: List[Dict[str, str]] = []
+    removeInstructions: str = ""
+
+class CollectionItem(BaseModel):
+    id: str
+    filename: str
+    timestamp: datetime
+    region: str
+    status: str  # 'analyzing', 'completed', 'error'
+    species: Optional[str] = None
+    confidence: Optional[float] = None
+    description: Optional[str] = None
+    plant_data: Optional[PlantInfo] = None
+
+class SaveCollectionRequest(BaseModel):
+    collection_item: CollectionItem
+
+class UserCollectionResponse(BaseModel):
+    user_id: str
+    collection: List[CollectionItem]
+    total_items: int
+
+class DeleteCollectionItemRequest(BaseModel):
+    item_id: str
