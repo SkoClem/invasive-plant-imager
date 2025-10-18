@@ -12,8 +12,26 @@ interface LoadingPageProps {
 
 function LoadingPage({ setCurrentPage, setPlantData, pendingAnalysis, updateImageInCollection }: LoadingPageProps) {
   useEffect(() => {
+    console.log('🔄 LoadingPage mounted, checking pendingAnalysis...');
+    console.log('📋 Pending analysis data:', pendingAnalysis);
+    
     if (!pendingAnalysis) {
-      console.error('No pending analysis data available');
+      console.error('❌ No pending analysis data available');
+      alert('No analysis data found. Please try scanning again.');
+      setCurrentPage('upload');
+      return;
+    }
+
+    if (!pendingAnalysis.file) {
+      console.error('❌ No file in pending analysis');
+      alert('No image file found. Please select an image and try again.');
+      setCurrentPage('upload');
+      return;
+    }
+
+    if (!pendingAnalysis.region) {
+      console.error('❌ No region in pending analysis');
+      alert('No region selected. Please select a region and try again.');
       setCurrentPage('upload');
       return;
     }
@@ -40,14 +58,14 @@ function LoadingPage({ setCurrentPage, setPlantData, pendingAnalysis, updateImag
       // Safety timeout - redirect back to upload after 2 minutes
       const safetyTimeout = setTimeout(() => {
         if (isMounted) {
-          console.error('Analysis timed out after 2 minutes');
+          console.error('⏰ Analysis timed out after 2 minutes');
           alert('Analysis is taking too long. Please try again.');
           setCurrentPage('upload');
         }
       }, 120000); // 2 minutes
 
       try {
-        console.log('Making API call to backend...');
+        console.log('📡 Making API call to backend...');
         const result = await plantAnalysisService.analyzePlant({
           image: pendingAnalysis.file,
           region: pendingAnalysis.region
@@ -55,13 +73,13 @@ function LoadingPage({ setCurrentPage, setPlantData, pendingAnalysis, updateImag
 
         if (!isMounted) return;
 
-        console.log('API response received:', result);
+        console.log('✅ API response received:', result);
 
         // Clear safety timeout
         clearTimeout(safetyTimeout);
 
         const plantInfo = convertToPlantInfo(result);
-        console.log('Converted to PlantInfo:', plantInfo);
+        console.log('🔄 Converted to PlantInfo:', plantInfo);
 
         if (isMounted) {
           setPlantData(plantInfo);
@@ -70,9 +88,23 @@ function LoadingPage({ setCurrentPage, setPlantData, pendingAnalysis, updateImag
       } catch (error) {
         if (!isMounted) return;
 
-        console.error('Analysis failed:', error);
+        console.error('❌ Analysis failed:', error);
         clearTimeout(safetyTimeout);
-        alert(`Analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        
+        let errorMessage = 'Unknown error occurred';
+        if (error instanceof Error) {
+          errorMessage = error.message;
+        } else if (typeof error === 'string') {
+          errorMessage = error;
+        }
+        
+        console.error('📝 Error details:', {
+          message: errorMessage,
+          type: typeof error,
+          error: error
+        });
+        
+        alert(`Analysis failed: ${errorMessage}`);
         setCurrentPage('upload');
       }
     };

@@ -2,6 +2,8 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { 
   User, 
   signInWithPopup, 
+  signInWithRedirect,
+  getRedirectResult,
   signOut, 
   onAuthStateChanged,
   UserCredential 
@@ -41,8 +43,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setLoading(true);
       
-      // Step 1: Sign in with Firebase
-      const result = await signInWithPopup(auth, googleProvider);
+      // Detect if we're on mobile device
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      let result: UserCredential;
+      
+      if (isMobile) {
+        // Use redirect for mobile devices to avoid popup blocking
+        await signInWithRedirect(auth, googleProvider);
+        // The result will be handled in the useEffect with getRedirectResult
+        return Promise.resolve({} as UserCredential); // Temporary return
+      } else {
+        // Use popup for desktop
+        result = await signInWithPopup(auth, googleProvider);
+      }
       
       // Step 2: Get Firebase ID token
       const idToken = await result.user.getIdToken();
@@ -99,6 +113,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setLoading(true);
       
       try {
+        // Check for redirect result first (mobile authentication)
+        const redirectResult = await getRedirectResult(auth);
+        if (redirectResult) {
+          console.log('📱 Mobile redirect authentication successful');
+          const idToken = await redirectResult.user.getIdToken();
+          const backendUser = await authService.loginWithFirebaseToken(idToken);
+          setCurrentUser(backendUser);
+          setFirebaseUser(redirectResult.user);
+          setLoading(false);
+          return;
+        }
+        
         if (user) {
           // User is signed in with Firebase
           setFirebaseUser(user);

@@ -44,7 +44,23 @@ function UploadPage({ setCurrentPage, startAnalysis, selectedRegion, setSelected
   };
 
   const handleAnalyzeClick = () => {
-    if (!selectedFile || !selectedRegion) {
+    console.log('🔍 Analyze button clicked - validating inputs...');
+    console.log('📁 Selected file:', selectedFile ? `${selectedFile.name} (${selectedFile.type})` : 'None');
+    console.log('🌍 Selected region:', selectedRegion || 'None');
+
+    if (!selectedFile) {
+      const errorMsg = 'Please select an image first';
+      console.error('❌ Validation failed:', errorMsg);
+      setError(errorMsg);
+      alert(errorMsg);
+      return;
+    }
+
+    if (!selectedRegion) {
+      const errorMsg = 'Please select a region first';
+      console.error('❌ Validation failed:', errorMsg);
+      setError(errorMsg);
+      alert(errorMsg);
       return;
     }
 
