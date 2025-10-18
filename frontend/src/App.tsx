@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useSwipeable } from 'react-swipeable';
 import { PlantInfo } from './types/api';
 import './styles/index.css';
@@ -40,18 +40,8 @@ function AppContent() {
   const pageRef = useRef<HTMLDivElement>(null);
   const { isAuthenticated } = useAuth();
 
-  // Load region and collection on component mount
-  useEffect(() => {
-    const savedRegion = localStorage.getItem('selectedRegion');
-    if (savedRegion) {
-      setSelectedRegion(savedRegion);
-    }
-
-    loadCollection();
-  }, [isAuthenticated]);
-
   // Load collection from backend if authenticated, otherwise from localStorage
-  const loadCollection = async () => {
+  const loadCollection = useCallback(async () => {
     if (isAuthenticated) {
       try {
         const backendCollection = await collectionService.getUserCollection();
@@ -64,7 +54,17 @@ function AppContent() {
     } else {
       loadFromLocalStorage();
     }
-  };
+  }, [isAuthenticated]);
+
+  // Load region and collection on component mount
+  useEffect(() => {
+    const savedRegion = localStorage.getItem('selectedRegion');
+    if (savedRegion) {
+      setSelectedRegion(savedRegion);
+    }
+
+    loadCollection();
+  }, [isAuthenticated, loadCollection]);
 
   // Load collection from localStorage
   const loadFromLocalStorage = () => {
@@ -82,17 +82,6 @@ function AppContent() {
       } catch (error) {
         console.error('Error loading collection from localStorage:', error);
       }
-    }
-  };
-
-  // Save collection to backend if authenticated, otherwise to localStorage
-  const saveCollection = async (collection: CollectedImage[]) => {
-    if (isAuthenticated) {
-      // Save to backend - we'll save individual items as they're added
-      // This function is mainly for localStorage fallback
-      saveToLocalStorage(collection);
-    } else {
-      saveToLocalStorage(collection);
     }
   };
 
