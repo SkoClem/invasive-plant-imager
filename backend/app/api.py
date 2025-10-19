@@ -1,9 +1,11 @@
 from typing import Dict, Any
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Depends
+from fastapi.responses import Response
 from app.schemas import Message, PlantAnalysisRequest, PlantAnalysisResponse, FirebaseLoginRequest, LoginResponse, ProtectedResponse, SaveCollectionRequest, UserCollectionResponse, DeleteCollectionItemRequest
 from app.backend import Imager
 from app.auth import AuthService, get_current_user, get_current_user_optional
 from app.collections import collection_manager
+from app.image_storage import image_storage
 
 imager = Imager()
 router = APIRouter()
@@ -148,3 +150,95 @@ async def analyze_plant(
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+# Image storage endpoints
+@router.post("/api/images/upload")
+async def upload_image(
+    image_id: str = Form(...),
+    image: UploadFile = File(...),
+    current_user: Dict[str, Any] = Depends(get_current_user)
+):
+    """Upload and store an image for the authenticated user"""
+    try:
+        user_id = current_user['uid']
+        
+        # Read image data
+        image_data = await image.read()
+        
+        # Store the image
+        success = image_storage.store_image(
+            user_id=user_id,
+            image_id=image_id,
+            image_data=image_data,
+            filename=image.filename or f"{image_id}.jpg",
+            content_type=image.content_type or "image/jpeg"
+        )
+        
+        if success:
+            return {"message": "Image uploaded successfully", "success": True, "image_id": image_id}
+        else:
+            raise HTTPException(status_code=500, detail="Failed to store image")
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error uploading image: {str(e)}")
+
+@router.get("/api/images/{image_id}")
+async def get_image(
+    image_id: str,
+    current_user: Dict[str, Any] = Depends(get_current_user)
+):
+    """Retrieve an image for the authenticated user"""
+    try:
+        user_id = current_user['uid']
+        
+        image_info = image_storage.get_image(user_id, image_id)
+        
+        if not image_info:
+            raise HTTPException(status_code=404, detail="Image not found")
+        
+        return Response(
+            content=image_info['data'],
+            media_type=image_info['content_type'],
+            headers={
+                "Content-Disposition": f"inline; filename={image_info['filename']}"
+            }
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving image: {str(e)}")
+
+@router.delete("/api/images/{image_id}")
+async def delete_image(
+    image_id: str,
+    current_user: Dict[str, Any] = Depends(get_current_user)
+):
+    """Delete an image for the authenticated user"""
+    try:
+        user_id = current_user['uid']
+        
+        success = image_storage.delete_image(user_id, image_id)
+        
+        if success:
+            return {"message": "Image deleted successfully", "success": True}
+        else:
+            raise HTTPException(status_code=404, detail="Image not found")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error deleting image: {str(e)}")
+
+@router.get("/api/images")
+async def list_user_images(current_user: Dict[str, Any] = Depends(get_current_user)):
+    """List all images for the authenticated user (metadata only)"""
+    try:
+        user_id = current_user['uid']
+        
+        images = image_storage.get_user_image_list(user_id)
+        
+        return {"images": images, "total": len(images)}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error listing images: {str(e)}")

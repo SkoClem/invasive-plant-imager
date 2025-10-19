@@ -21,7 +21,7 @@ interface CollectionPageProps {
   clearCollection?: () => Promise<void>;
 }
 
-function CollectionPage({ setCurrentPage, imageCollection }: CollectionPageProps) {
+function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem }: CollectionPageProps) {
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
@@ -154,6 +154,15 @@ function CollectionPage({ setCurrentPage, imageCollection }: CollectionPageProps
                             <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3c-.79 0-1.5.31-2.04.81l-7.05-4.11c.05-.23.09-.46.09-.7 0-1.66-1.34-3-3-3s-3 1.34-3 3 1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.05 4.11c-.05.23-.09.46-.09.7s.04.47.09.7l-7.05 4.11c-.54-.5-1.25-.81-2.04-.81-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.05 4.11c-.05.23-.09.46-.09.7 0 1.66 1.34 3 3 3s3-1.34 3-3-1.34-3-3-3z"/>
                           </svg>
                         </button>
+                        <button 
+                          className="action-button delete-button" 
+                          title="Remove from collection"
+                          onClick={() => deleteCollectionItem && deleteCollectionItem(image.id)}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                          </svg>
+                        </button>
                       </div>
                     </div>
 
@@ -178,22 +187,82 @@ function CollectionPage({ setCurrentPage, imageCollection }: CollectionPageProps
                     </div>
 
                     <div className="image-details enhanced">
-                      {image.species && (
-                        <h3 className="plant-name">{image.species}</h3>
-                      )}
-                      {image.confidence && (
-                        <div className="confidence-meter">
-                          <div className="confidence-label">Confidence: {image.confidence}%</div>
-                          <div className="confidence-bar">
-                            <div
-                              className="confidence-fill"
-                              style={{ width: `${image.confidence}%` }}
-                            ></div>
-                          </div>
+                      {image.status === 'completed' && image.plantData ? (
+                        <>
+                          <h3 className="plant-name">
+                            {image.plantData.commonName || image.plantData.scientificName || image.species || 'Unknown Plant'}
+                          </h3>
+                          {image.plantData.scientificName && image.plantData.commonName && (
+                            <p className="scientific-name">{image.plantData.scientificName}</p>
+                          )}
+                          {image.plantData.region && (
+                            <div className="native-location">
+                              <span className="location-icon">🌍</span>
+                              <span className="location-text">Native to: {image.plantData.region}</span>
+                            </div>
+                          )}
+                          {image.plantData.isInvasive !== undefined && (
+                            <div className={`invasive-status ${image.plantData.isInvasive ? 'invasive' : 'native'}`}>
+                              <span className="status-icon">{image.plantData.isInvasive ? '🚨' : '✅'}</span>
+                              <span className="status-text">
+                                {image.plantData.isInvasive ? 'Invasive Species' : 'Native Plant'}
+                              </span>
+                            </div>
+                          )}
+                          {image.confidence && (
+                            <div className="confidence-meter">
+                              <div className="confidence-label">Confidence: {image.confidence}%</div>
+                              <div className="confidence-bar">
+                                <div
+                                  className="confidence-fill"
+                                  style={{ width: `${image.confidence}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                          )}
+                          {image.plantData.description && (
+                            <p className="plant-description">{image.plantData.description}</p>
+                          )}
+                        </>
+                      ) : image.status === 'completed' && image.species ? (
+                        <>
+                          <h3 className="plant-name">{image.species}</h3>
+                          {image.confidence && (
+                            <div className="confidence-meter">
+                              <div className="confidence-label">Confidence: {image.confidence}%</div>
+                              <div className="confidence-bar">
+                                <div
+                                  className="confidence-fill"
+                                  style={{ width: `${image.confidence}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                          )}
+                          {image.description && (
+                            <p className="plant-description">{image.description}</p>
+                          )}
+                        </>
+                      ) : image.status === 'analyzing' ? (
+                        <div className="analyzing-status">
+                          <h3 className="plant-name">Analyzing Plant...</h3>
+                          <p className="analyzing-description">
+                            Our AI is identifying this plant and checking its invasive status.
+                          </p>
                         </div>
-                      )}
-                      {image.description && (
-                        <p className="plant-description">{image.description}</p>
+                      ) : image.status === 'error' ? (
+                        <div className="error-status">
+                          <h3 className="plant-name">Analysis Failed</h3>
+                          <p className="error-description">
+                            Unable to identify this plant. Please try scanning again.
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="unknown-status">
+                          <h3 className="plant-name">Unknown Plant</h3>
+                          <p className="unknown-description">
+                            Plant information is not available.
+                          </p>
+                        </div>
                       )}
                       <div className="image-metadata">
                         <div className="metadata-item">

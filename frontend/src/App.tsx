@@ -11,6 +11,7 @@ import ResultsPage from './pages/ResultsPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import AuthButton from './components/AuthButton';
 import { collectionService, CollectionItem, PlantInfo as BackendPlantInfo } from './services/collectionService';
+import { imageService } from './services/imageService';
 
 type PageType = 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results';
 type DirectionType = 'forward' | 'backward';
@@ -34,7 +35,7 @@ function AppContent() {
   const [transitionDirection, setTransitionDirection] = useState<DirectionType>('forward');
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [plantData, setPlantData] = useState<PlantInfo | null>(null);
-  const [pendingAnalysis, setPendingAnalysis] = useState<{ file: File; region: string } | null>(null);
+  const [pendingAnalysis, setPendingAnalysis] = useState<{ file: File; region: string; imageId?: string } | null>(null);
   const [selectedRegion, setSelectedRegion] = useState<string>('');
   const [imageCollection, setImageCollection] = useState<CollectedImage[]>([]);
   const pageRef = useRef<HTMLDivElement>(null);
@@ -45,7 +46,25 @@ function AppContent() {
     if (isAuthenticated) {
       try {
         const backendCollection = await collectionService.getUserCollection();
-        setImageCollection(backendCollection);
+        
+        // For authenticated users, try to load images from backend
+        const collectionWithImages = await Promise.all(
+          backendCollection.map(async (item) => {
+            try {
+              // Try to get the image blob from backend
+              const imageBlob = await imageService.getImageBlob(item.id);
+              return {
+                ...item,
+                preview: imageBlob || undefined
+              };
+            } catch (error) {
+              console.warn(`Could not load image for item ${item.id}:`, error);
+              return item;
+            }
+          })
+        );
+        
+        setImageCollection(collectionWithImages);
       } catch (error) {
         console.error('Error loading collection from backend:', error);
         // Fall back to localStorage if backend fails
@@ -197,37 +216,36 @@ function AppContent() {
       timestamp: new Date(),
       region: region || selectedRegion
     };
-    
-    const updatedCollection = [newImage, ...imageCollection].slice(0, 50);
+
+    const updatedCollection = [...imageCollection, newImage];
     setImageCollection(updatedCollection);
-    
-    // Save to backend if authenticated
-    if (isAuthenticated) {
-      // Convert to CollectionItem format for backend
-      const collectionItem: CollectionItem = {
-        id: newImage.id,
-        filename: newImage.filename,
-        timestamp: newImage.timestamp,
-        region: newImage.region,
-        status: newImage.status,
-        species: newImage.species,
-        confidence: newImage.confidence,
-        description: newImage.description,
-        plant_data: newImage.plantData ? convertPlantInfoToBackend(newImage.plantData) : undefined
-      };
-      collectionService.saveCollectionItem(collectionItem).catch(error => {
-        console.error('Failed to save to backend:', error);
+
+    // Save to localStorage for non-authenticated users
+    if (!isAuthenticated) {
+      saveToLocalStorage(updatedCollection);
+    } else {
+      // For authenticated users, upload the image to backend
+      imageService.uploadImage(newImage.id, file).catch(error => {
+        console.error('Failed to upload image to backend:', error);
       });
     }
     
-    setPendingAnalysis({ file, region: region || selectedRegion });
+    setPendingAnalysis({ file, region: region || selectedRegion, imageId: newImage.id });
     navigateToPage('loading');
   };
 
   // Update image in collection after analysis
   const updateImageInCollection = async (imageId: string, plantData: PlantInfo | null, status: 'completed' | 'error') => {
     const updatedCollection = imageCollection.map(img => {
-      if (img.id === imageId) {
+      if (img.id === imageId || imageId === 'latest') {
+        // If imageId is 'latest', find the most recent analyzing item
+        if (imageId === 'latest') {
+          const analyzingItems = imageCollection.filter(item => item.status === 'analyzing');
+          if (analyzingItems.length === 0 || img.id !== analyzingItems[0].id) {
+            return img; // Skip if this isn't the most recent analyzing item
+          }
+        }
+        
         // Clean up old blob URL to prevent memory leaks
         if (img.preview && img.preview.startsWith('blob:')) {
           URL.revokeObjectURL(img.preview);

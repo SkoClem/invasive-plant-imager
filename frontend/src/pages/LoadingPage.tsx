@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { PlantInfo } from '../types/api';
 import { plantAnalysisService } from '../services/plantAnalysisService';
 import { convertToPlantInfo } from '../utils/dataConversion';
@@ -6,11 +6,21 @@ import { convertToPlantInfo } from '../utils/dataConversion';
 interface LoadingPageProps {
   setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results') => void;
   setPlantData: (data: PlantInfo) => void;
-  pendingAnalysis: { file: File; region: string } | null;
+  pendingAnalysis: { file: File; region: string; imageId?: string } | null;
   updateImageInCollection: (imageId: string, plantData: PlantInfo | null, status: 'completed' | 'error') => void;
 }
 
 function LoadingPage({ setCurrentPage, setPlantData, pendingAnalysis, updateImageInCollection }: LoadingPageProps) {
+  const [progress, setProgress] = useState(0);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [progressMessage, setProgressMessage] = useState('Initializing analysis...');
+
+  const steps = [
+    { title: 'Image Processing', description: 'Enhancing and analyzing your photo', icon: '📸' },
+    { title: 'AI Identification', description: 'Matching plant characteristics', icon: '🤖' },
+    { title: 'Regional Analysis', description: 'Checking invasive status in your area', icon: '🌍' }
+  ];
+
   useEffect(() => {
     console.log('🔄 LoadingPage mounted, checking pendingAnalysis...');
     console.log('📋 Pending analysis data:', pendingAnalysis);
@@ -55,10 +65,51 @@ function LoadingPage({ setCurrentPage, setPlantData, pendingAnalysis, updateImag
       // Show image info in loading screen
       console.log(`📤 Uploading: ${pendingAnalysis.file.name} (${(pendingAnalysis.file.size / 1024 / 1024).toFixed(2)} MB)`);
 
+      // More realistic progress simulation
+      let progressValue = 0;
+      let stepIndex = 0;
+      
+      const progressInterval = setInterval(() => {
+        setProgress(prev => {
+          // Simulate more realistic progress curve
+          if (prev < 30) {
+            // Fast initial progress (image upload/processing)
+            progressValue = prev + Math.random() * 8 + 2;
+          } else if (prev < 60) {
+            // Moderate progress (AI analysis starting)
+            progressValue = prev + Math.random() * 4 + 1;
+          } else if (prev < 85) {
+            // Slower progress (deep AI analysis)
+            progressValue = prev + Math.random() * 2 + 0.5;
+          } else if (prev < 95) {
+            // Very slow progress (final processing)
+            progressValue = prev + Math.random() * 0.8 + 0.2;
+          } else {
+            // Stay at 95-98% until API completes
+            progressValue = Math.min(prev + Math.random() * 0.3, 98);
+          }
+          
+          return Math.min(progressValue, 98); // Cap at 98% until API completes
+        });
+      }, 600); // Slightly faster updates for smoother animation
+
+      // Step progression with better timing
+      const stepInterval = setInterval(() => {
+        setCurrentStep(prev => {
+          const nextStep = Math.min(prev + 1, steps.length - 1);
+          if (nextStep < steps.length) {
+            setProgressMessage(steps[nextStep].description);
+          }
+          return nextStep;
+        });
+      }, 4000); // Slightly longer step duration
+
       // Safety timeout - redirect back to upload after 2 minutes
       const safetyTimeout = setTimeout(() => {
         if (isMounted) {
           console.error('⏰ Analysis timed out after 2 minutes');
+          clearInterval(progressInterval);
+          clearInterval(stepInterval);
           alert('Analysis is taking too long. Please try again.');
           setCurrentPage('upload');
         }
@@ -66,6 +117,11 @@ function LoadingPage({ setCurrentPage, setPlantData, pendingAnalysis, updateImag
 
       try {
         console.log('📡 Making API call to backend...');
+        setProgressMessage('Connecting to AI service...');
+        
+        // Add timestamp to track actual API timing
+        const apiStartTime = Date.now();
+        
         const result = await plantAnalysisService.analyzePlant({
           image: pendingAnalysis.file,
           region: pendingAnalysis.region
@@ -73,7 +129,39 @@ function LoadingPage({ setCurrentPage, setPlantData, pendingAnalysis, updateImag
 
         if (!isMounted) return;
 
-        console.log('✅ API response received:', result);
+        const apiEndTime = Date.now();
+        const apiDuration = apiEndTime - apiStartTime;
+        console.log(`✅ API response received in ${apiDuration}ms (${(apiDuration / 1000).toFixed(1)}s)`);
+
+        // Complete the progress bar smoothly
+        clearInterval(progressInterval);
+        clearInterval(stepInterval);
+        
+        // Animate to 100% over 500ms for smooth completion
+        const completeProgress = () => {
+          let currentProgress = progress;
+          const targetProgress = 100;
+          const animationDuration = 500; // 500ms
+          const steps = 20;
+          const increment = (targetProgress - currentProgress) / steps;
+          const stepDuration = animationDuration / steps;
+          
+          let step = 0;
+          const animationInterval = setInterval(() => {
+            step++;
+            currentProgress += increment;
+            setProgress(Math.min(currentProgress, 100));
+            
+            if (step >= steps || currentProgress >= 100) {
+              clearInterval(animationInterval);
+              setProgress(100);
+            }
+          }, stepDuration);
+        };
+        
+        completeProgress();
+        setCurrentStep(steps.length - 1);
+        setProgressMessage('Analysis complete!');
 
         // Clear safety timeout
         clearTimeout(safetyTimeout);
@@ -82,14 +170,27 @@ function LoadingPage({ setCurrentPage, setPlantData, pendingAnalysis, updateImag
         console.log('🔄 Converted to PlantInfo:', plantInfo);
 
         if (isMounted) {
+          // Update the collection item status to completed using the actual imageId
+          const imageId = pendingAnalysis.imageId || 'latest';
+          updateImageInCollection(imageId, plantInfo, 'completed');
+          
           setPlantData(plantInfo);
-          setCurrentPage('results');
+          
+          // Small delay to show completion
+          setTimeout(() => {
+            setCurrentPage('results');
+          }, 1000);
         }
       } catch (error) {
         if (!isMounted) return;
 
         console.error('❌ Analysis failed:', error);
+        clearInterval(progressInterval);
+        clearInterval(stepInterval);
         clearTimeout(safetyTimeout);
+        
+        setProgress(0);
+        setProgressMessage('Analysis failed');
         
         let errorMessage = 'Unknown error occurred';
         if (error instanceof Error) {
@@ -103,6 +204,10 @@ function LoadingPage({ setCurrentPage, setPlantData, pendingAnalysis, updateImag
           type: typeof error,
           error: error
         });
+        
+        // Update the collection item status to error using the actual imageId
+        const imageId = pendingAnalysis.imageId || 'latest';
+        updateImageInCollection(imageId, null, 'error');
         
         alert(`Analysis failed: ${errorMessage}`);
         setCurrentPage('upload');
@@ -142,46 +247,29 @@ function LoadingPage({ setCurrentPage, setPlantData, pendingAnalysis, updateImag
           </p>
 
           <div className="loading-steps">
-            <div className="loading-step">
-              <div className="step-indicator active">
-                <div className="step-icon">📸</div>
+            {steps.map((step, index) => (
+              <div key={index} className={`loading-step ${index <= currentStep ? 'active' : ''} ${index < currentStep ? 'completed' : ''}`}>
+                <div className="step-icon">{step.icon}</div>
+                <div className="step-content">
+                  <div className="step-title">{step.title}</div>
+                  <div className="step-description">{step.description}</div>
+                </div>
+                {index < currentStep && <div className="step-checkmark">✓</div>}
               </div>
-              <div className="step-text">
-                <div className="step-title">Image Processing</div>
-                <div className="step-description">Enhancing and analyzing your photo</div>
-              </div>
-            </div>
-
-            <div className="loading-step">
-              <div className="step-indicator">
-                <div className="step-icon">🤖</div>
-              </div>
-              <div className="step-text">
-                <div className="step-title">AI Identification</div>
-                <div className="step-description">Matching plant characteristics</div>
-              </div>
-            </div>
-
-            <div className="loading-step">
-              <div className="step-indicator">
-                <div className="step-icon">🌍</div>
-              </div>
-              <div className="step-text">
-                <div className="step-title">Regional Analysis</div>
-                <div className="step-description">Checking invasive status in your area</div>
-              </div>
-            </div>
+            ))}
           </div>
 
           <div className="loading-progress">
-            <div className="progress-bar">
-              <div className="progress-fill"></div>
+            <div className="progress-bar-container">
+              <div className="progress-bar">
+                <div 
+                  className="progress-fill" 
+                  style={{ width: `${progress}%` }}
+                ></div>
+              </div>
+              <div className="progress-percentage">{Math.round(progress)}%</div>
             </div>
-            <p className="progress-text">
-              {pendingAnalysis ?
-                "Waking up the AI service... This may take up to a minute if the service is sleeping." :
-                "This may take a few moments..."}
-            </p>
+            <p className="progress-message">{progressMessage}</p>
           </div>
         </div>
       </div>

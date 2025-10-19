@@ -305,6 +305,17 @@
   color: var(--accent-bright);
 }
 
+/* Delete Button Specific Styles */
+.action-button.delete-button {
+  color: #dc3545;
+}
+
+.action-button.delete-button:hover {
+  background: #dc3545;
+  color: white;
+  transform: scale(1.05);
+}
+
 /* Image Preview Enhanced */
 .image-preview.enhanced {
   position: relative;
@@ -414,6 +425,72 @@
   background: linear-gradient(90deg, var(--accent-bright), var(--primary-green));
   border-radius: 4px;
   transition: width 0.5s ease;
+}
+
+/* Plant Information Styles */
+.scientific-name {
+  color: var(--text-secondary);
+  font-style: italic;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.native-location {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem;
+  background: var(--background-light);
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.location-icon {
+  font-size: 1rem;
+}
+
+.location-text {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.invasive-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.invasive-status.invasive {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.invasive-status.native {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.status-icon {
+  font-size: 1rem;
+}
+
+.analyzing-status, .error-status, .unknown-status {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.analyzing-description, .error-description, .unknown-description {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
 }
 
 .plant-description {
