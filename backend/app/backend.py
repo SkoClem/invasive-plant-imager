@@ -3,7 +3,7 @@ import base64
 import json
 import re
 llm = LLM()
-from app.prompts import paragraph_analysis, json_information
+from app.prompts import paragraph_analysis, json_information, optimized_analysis
 from dotenv import load_dotenv
 #TODO: get environment variables without dotenv package
 load_dotenv(override=True)
@@ -43,7 +43,12 @@ class Imager:
         self.region = region
 
     def analyze_plant_image(self, image_path_or_data: str)->dict:
-        """Analyze plant image for invasive species using two-step approach"""
+        """Analyze plant image for invasive species using optimized single-step approach"""
+        # Single optimized API call that returns JSON directly
+        return self._get_optimized_analysis(image_path_or_data)
+
+    def analyze_plant_image_legacy(self, image_path_or_data: str)->dict:
+        """Legacy two-step analysis (kept for fallback)"""
         # Step 1: Get paragraph analysis
         paragraph_response = self._get_paragraph_analysis(image_path_or_data)
 
@@ -51,6 +56,27 @@ class Imager:
         json_response = self._convert_to_json(paragraph_response)
 
         return json_response
+
+    def _get_optimized_analysis(self, image_path_or_data: str)->dict:
+        """Get optimized single-step analysis that returns JSON directly"""
+        # Check if input is base64 data or file path
+        if image_path_or_data.startswith('data:image') or len(image_path_or_data) > 100:  # Likely base64
+            image_data = image_path_or_data
+        else:  # Likely file path
+            image_data = self._image_to_base64(image_path_or_data)
+
+        prompt = optimized_analysis(self.region)
+
+        contents = self.image_llm.llm_contents(
+            key=self.key,
+            name=self.name,
+            prompt=prompt,
+            image_data=image_data,
+            max_tokens=1500  # Further reduced for faster processing
+        )
+
+        json_response = self.image_llm.get_output(url=self.url, llm_contents=contents)
+        return self.parse_llm_response(json_response)
 
     def _get_paragraph_analysis(self, image_path_or_data: str)->str:
         """Get paragraph analysis from LLM"""

@@ -1,3 +1,28 @@
+def optimized_analysis(region):
+    """Single-step optimized analysis that outputs JSON directly"""
+    return f"""You are an expert botanist specializing in invasive species identification for {region}.
+
+Analyze the plant image and return ONLY a valid JSON object with this exact structure:
+
+{{
+  "specieIdentified": "species name or null",
+  "nativeRegion": "native region/country where this plant naturally occurs", 
+  "invasiveOrNot": boolean,
+  "invasiveEffects": "effects description or empty string",
+  "nativeAlternatives": [
+    {{
+      "commonName": "name",
+      "scientificName": "scientific name", 
+      "characteristics": "brief description"
+    }}
+  ],
+  "removeInstructions": "removal instructions or empty string"
+}}
+
+IMPORTANT: Always include the plant's native region/country in the "nativeRegion" field, regardless of whether it's invasive in {region} or not. This helps users understand where the plant naturally belongs.
+
+Focus on invasive species identification for {region}, but provide native region information for all plants. Be concise but accurate. Return only the JSON, no other text."""
+
 def paragraph_analysis(region):
     """Generate paragraph analysis of plant image - now focused specifically on Texas"""
     return f"""

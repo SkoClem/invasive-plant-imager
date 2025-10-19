@@ -83,8 +83,8 @@ def test_plant_analysis():
         print(f"❌ Unexpected Error: {e}")
         return False
 
-def test_different_regions():
-    """Test the API with different regions"""
+def test_texas_region():
+    """Test the API with Texas region (the only supported region)"""
     base_url = "http://localhost:8000"
     image_path = "invasive.png"
 
@@ -92,38 +92,43 @@ def test_different_regions():
         print(f"❌ Test image not found: {image_path}")
         return False
 
-    regions = ["North America", "Europe", "Asia", "Australia"]
-    print("\nTesting different regions...")
+    print("\nTesting Texas region analysis...")
     print("=" * 40)
 
-    for region in regions:
-        try:
-            with open(image_path, 'rb') as image_file:
-                files = {
-                    'image': (image_path, image_file, 'image/png')
-                }
-                data = {
-                    'region': region
-                }
+    try:
+        with open(image_path, 'rb') as image_file:
+            files = {
+                'image': (image_path, image_file, 'image/png')
+            }
+            data = {
+                'region': 'Texas'  # Only test Texas since it's hardcoded in the backend
+            }
 
-                print(f"\n📍 Testing region: {region}")
-                response = requests.post(
-                    f"{base_url}/api/analyze-plant",
-                    files=files,
-                    data=data,
-                    timeout=60
-                )
+            print(f"\n📍 Testing Texas invasive species detection")
+            response = requests.post(
+                f"{base_url}/api/analyze-plant",
+                files=files,
+                data=data,
+                timeout=60
+            )
 
-                if response.status_code == 200:
-                    result = response.json()
-                    print(f"   ✅ Success - Is invasive: {result.get('invasiveOrNot', 'Unknown')}")
-                else:
-                    print(f"   ❌ Failed: {response.status_code}")
+            if response.status_code == 200:
+                result = response.json()
+                print(f"   ✅ Success - Is invasive: {result.get('invasiveOrNot', 'Unknown')}")
+                print(f"   📋 Plant: {result.get('plantName', 'Unknown')}")
+                if 'nativeRegion' in result:
+                    print(f"   🌍 Native to: {result.get('nativeRegion', 'Unknown')}")
+                return True
+            else:
+                print(f"   ❌ Failed - Status: {response.status_code}")
+                return False
 
-        except Exception as e:
-            print(f"   ❌ Error testing {region}: {e}")
-
-    return True
+    except requests.exceptions.Timeout:
+        print(f"   ❌ Timeout for Texas region test")
+        return False
+    except Exception as e:
+        print(f"   ❌ Error during Texas region test: {e}")
+        return False
 
 def test_server_health():
     """Check if server is running"""
@@ -199,7 +204,7 @@ if __name__ == "__main__":
 
     # Test different regions
     if success:
-        test_different_regions()
+        test_texas_region()
 
     if success:
         print("\n✅ Testing completed successfully!")
