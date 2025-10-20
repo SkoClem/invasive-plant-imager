@@ -72,7 +72,7 @@ class Imager:
             name=self.name,
             prompt=prompt,
             image_data=image_data,
-            max_tokens=1200  # Increased from 800 to provide more room for complete responses
+            max_tokens=3000  # Significantly increased to prevent truncation issues
         )
 
         json_response = self.image_llm.get_output(url=self.url, llm_contents=contents)
@@ -93,7 +93,7 @@ class Imager:
             name=self.name,
             prompt=prompt,
             image_data=image_data,
-            max_tokens=2000  # Reduced from 4000
+            max_tokens=3500  # Increased to prevent truncation
         )
 
         return self.image_llm.get_output(url=self.url, llm_contents=contents)
@@ -106,7 +106,7 @@ class Imager:
             key=self.key,
             name=self.name,
             prompt=prompt,
-            max_tokens=1000  # Reduced from 2000
+            max_tokens=2000  # Increased to prevent truncation
         )
 
         json_response = self.image_llm.get_output(url=self.url, llm_contents=contents)
