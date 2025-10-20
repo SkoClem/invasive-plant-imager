@@ -138,9 +138,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           } else {
             // No valid backend session, need to re-authenticate
             console.log('🔄 Re-authenticating with backend...');
-            const idToken = await user.getIdToken();
-            const newBackendUser = await authService.loginWithFirebaseToken(idToken);
-            setCurrentUser(newBackendUser);
+            try {
+              const idToken = await user.getIdToken();
+              const newBackendUser = await authService.loginWithFirebaseToken(idToken);
+              setCurrentUser(newBackendUser);
+            } catch (authError) {
+              console.error('❌ Re-authentication failed:', authError);
+              // If re-authentication fails, sign out completely
+              await signOut(auth);
+              setFirebaseUser(null);
+              setCurrentUser(null);
+              authService.logout();
+            }
           }
         } else {
           // User is signed out
