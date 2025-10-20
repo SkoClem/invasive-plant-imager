@@ -44,18 +44,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setLoading(true);
       console.log('🚀 Starting Google sign-in process...');
       
-      // Detect if we're on mobile device
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      // Enhanced mobile detection
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                       (window.innerWidth <= 768) ||
+                       ('ontouchstart' in window);
       console.log('📱 Device type:', isMobile ? 'Mobile' : 'Desktop');
+      console.log('📱 User agent:', navigator.userAgent);
+      console.log('📱 Window width:', window.innerWidth);
+      console.log('📱 Touch support:', 'ontouchstart' in window);
       
       let result: UserCredential;
       
       if (isMobile) {
         // Use redirect for mobile devices to avoid popup blocking
         console.log('📱 Using redirect authentication for mobile...');
-        await signInWithRedirect(auth, googleProvider);
-        // The result will be handled in the useEffect with getRedirectResult
-        return Promise.resolve({} as UserCredential); // Temporary return
+        try {
+          await signInWithRedirect(auth, googleProvider);
+          // The result will be handled in the useEffect with getRedirectResult
+          return Promise.resolve({} as UserCredential); // Temporary return
+        } catch (redirectError) {
+          console.error('❌ Mobile redirect failed:', redirectError);
+          throw redirectError;
+        }
       } else {
         // Try popup first for desktop, with fallback to redirect
         console.log('🖥️ Attempting popup authentication for desktop...');

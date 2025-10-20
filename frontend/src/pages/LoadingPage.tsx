@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { PlantInfo } from '../types/api';
 import { plantAnalysisService } from '../services/plantAnalysisService';
 import { convertToPlantInfo } from '../utils/dataConversion';
@@ -14,6 +14,9 @@ function LoadingPage({ setCurrentPage, setPlantData, pendingAnalysis, updateImag
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState(0);
   const [progressMessage, setProgressMessage] = useState('Initializing analysis...');
+  
+  // Use ref to prevent duplicate API calls in React.StrictMode
+  const hasStartedAnalysis = useRef(false);
 
   const steps = useMemo(() => [
     { title: 'Image Processing', description: 'Enhancing and analyzing your photo', icon: '📸' },
@@ -24,6 +27,12 @@ function LoadingPage({ setCurrentPage, setPlantData, pendingAnalysis, updateImag
   useEffect(() => {
     console.log('🔄 LoadingPage mounted, checking pendingAnalysis...');
     console.log('📋 Pending analysis data:', pendingAnalysis);
+    
+    // Prevent duplicate analysis in React.StrictMode
+    if (hasStartedAnalysis.current) {
+      console.log('⚠️ Analysis already started, skipping duplicate call');
+      return;
+    }
     
     if (!pendingAnalysis) {
       console.error('❌ No pending analysis data available');
@@ -45,6 +54,9 @@ function LoadingPage({ setCurrentPage, setPlantData, pendingAnalysis, updateImag
       setCurrentPage('upload');
       return;
     }
+
+    // Mark that analysis has started
+    hasStartedAnalysis.current = true;
 
     // Flag to prevent multiple requests
     let isMounted = true;
@@ -218,6 +230,8 @@ function LoadingPage({ setCurrentPage, setPlantData, pendingAnalysis, updateImag
     // Cleanup function
     return () => {
       isMounted = false;
+      // Reset the flag when component unmounts so it can start fresh if remounted
+      hasStartedAnalysis.current = false;
     };
   }, [pendingAnalysis, setCurrentPage, setPlantData, updateImageInCollection, progress, steps]);
 

@@ -20,8 +20,17 @@ const app = initializeApp(firebaseConfig);
 // Initialize Firebase Authentication and get a reference to the service
 export const auth = getAuth(app);
 
-// Initialize Google Auth Provider
+// Initialize Google Auth Provider with additional scopes and custom parameters
 export const googleProvider = new GoogleAuthProvider();
+
+// Add scopes for better user info
+googleProvider.addScope('profile');
+googleProvider.addScope('email');
+
+// Set custom parameters for better mobile experience
+googleProvider.setCustomParameters({
+  prompt: 'select_account'
+});
 
 // Initialize Cloud Firestore and get a reference to the service
 export const db = getFirestore(app);

@@ -137,9 +137,17 @@ class Imager:
                     "removeInstructions": "Unable to provide removal instructions due to incomplete analysis."
                 }
 
-            # Check for common truncation indicators
-            truncation_indicators = ["hgh^{-1}", "```", "...", "truncated", "incomplete"]
-            if any(indicator in cleaned_response.lower() for indicator in truncation_indicators):
+            # Check for common truncation indicators (excluding markdown code blocks)
+            truncation_indicators = ["...", "truncated", "incomplete"]
+            # Check for incomplete JSON structure (missing closing braces)
+            json_incomplete = False
+            if "```json" in cleaned_response:
+                json_part = cleaned_response.split("```json")[1].split("```")[0].strip()
+                open_braces = json_part.count('{')
+                close_braces = json_part.count('}')
+                json_incomplete = open_braces > close_braces
+            
+            if any(indicator in cleaned_response.lower() for indicator in truncation_indicators) or json_incomplete:
                 print(f"DEBUG - Detected potential truncation in response")
                 # Try to extract partial JSON if possible
                 if "```json" in cleaned_response:
