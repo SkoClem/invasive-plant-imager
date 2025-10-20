@@ -219,7 +219,7 @@ function LoadingPage({ setCurrentPage, setPlantData, pendingAnalysis, updateImag
     return () => {
       isMounted = false;
     };
-  }, [pendingAnalysis, setCurrentPage, setPlantData, updateImageInCollection]);
+  }, [pendingAnalysis, setCurrentPage, setPlantData, updateImageInCollection, progress, steps]);
 
   return (
     <section className="loading-section">
