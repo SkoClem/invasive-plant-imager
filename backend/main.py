@@ -25,4 +25,19 @@ async def global_exception_handler(request: Request, exc: Exception):
         headers={"Access-Control-Allow-Origin": "*"}
     )
 
+@app.get("/")
+async def root():
+    """Root endpoint to confirm the API is running"""
+    return {
+        "message": "Plant Imager Backend API is running",
+        "status": "healthy",
+        "version": "1.0.0",
+        "endpoints": {
+            "authentication": "/api/auth/login",
+            "plant_analysis": "/api/analyze-plant",
+            "chat": "/api/chat",
+            "collections": "/api/collections"
+        }
+    }
+
 app.include_router(router)

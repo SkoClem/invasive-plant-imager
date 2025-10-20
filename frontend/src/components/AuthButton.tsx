@@ -7,7 +7,7 @@ interface AuthButtonProps {
 }
 
 const AuthButton: React.FC<AuthButtonProps> = ({ className = '', variant = 'default' }) => {
-  const { currentUser, signInWithGoogle, logout } = useAuth();
+  const { currentUser, firebaseUser, signInWithGoogle, logout, isAuthenticated } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
 
@@ -39,7 +39,18 @@ const AuthButton: React.FC<AuthButtonProps> = ({ className = '', variant = 'defa
     setShowUserMenu(!showUserMenu);
   };
 
-  if (currentUser) {
+  // Use isAuthenticated from context instead of just checking currentUser
+  // This handles both development (requires backend) and production (Firebase only) modes
+  if (isAuthenticated) {
+    // Get user info from currentUser (backend) or fallback to firebaseUser
+    const userInfo = currentUser || {
+      name: firebaseUser?.displayName,
+      displayName: firebaseUser?.displayName,
+      picture: firebaseUser?.photoURL,
+      photoURL: firebaseUser?.photoURL,
+      email: firebaseUser?.email
+    };
+
     if (variant === 'compact') {
       return (
         <div className={`auth-container compact ${className}`}>
@@ -50,11 +61,11 @@ const AuthButton: React.FC<AuthButtonProps> = ({ className = '', variant = 'defa
             aria-haspopup="true"
           >
             <img
-              src={currentUser.picture || currentUser.photoURL || '/default-avatar.png'}
+              src={userInfo.picture || userInfo.photoURL || '/default-avatar.png'}
               alt="Profile"
               className="user-avatar"
             />
-            <span className="user-name">{currentUser.name || currentUser.displayName}</span>
+            <span className="user-name">{userInfo.name || userInfo.displayName}</span>
             <svg className="menu-arrow" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
               <path d="M7 10l5 5 5-5z"/>
             </svg>
@@ -64,13 +75,13 @@ const AuthButton: React.FC<AuthButtonProps> = ({ className = '', variant = 'defa
             <div className="user-dropdown-menu">
               <div className="user-info-header">
                 <img
-                  src={currentUser.picture || currentUser.photoURL || '/default-avatar.png'}
+                  src={userInfo.picture || userInfo.photoURL || '/default-avatar.png'}
                   alt="Profile"
                   className="user-avatar-large"
                 />
                 <div className="user-details">
-                  <span className="user-name-large">{currentUser.name || currentUser.displayName}</span>
-                  <span className="user-email">{currentUser.email}</span>
+                  <span className="user-name-large">{userInfo.name || userInfo.displayName}</span>
+                  <span className="user-email">{userInfo.email}</span>
                 </div>
               </div>
               <div className="menu-divider"></div>
@@ -95,14 +106,14 @@ const AuthButton: React.FC<AuthButtonProps> = ({ className = '', variant = 'defa
         <div className="user-info">
           <div className="user-avatar-wrapper">
             <img
-              src={currentUser.picture || currentUser.photoURL || '/default-avatar.png'}
+              src={userInfo.picture || userInfo.photoURL || '/default-avatar.png'}
               alt="Profile"
               className="user-avatar"
             />
             <div className="online-indicator"></div>
           </div>
           <div className="user-text">
-            <span className="user-name">{currentUser.name || currentUser.displayName}</span>
+            <span className="user-name">{userInfo.name || userInfo.displayName}</span>
             <span className="user-status">Signed in</span>
           </div>
         </div>
