@@ -233,6 +233,7 @@ function LoadingPage({ setCurrentPage, setPlantData, pendingAnalysis, updateImag
       // Reset the flag when component unmounts so it can start fresh if remounted
       hasStartedAnalysis.current = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingAnalysis, setCurrentPage, setPlantData, updateImageInCollection]);
 
   return (
