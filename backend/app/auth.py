@@ -81,11 +81,11 @@ class AuthService:
     def create_jwt_token(user_info: Dict[str, Any]) -> str:
         """Create JWT token for authenticated user"""
         payload = {
-            'uid': user_info['uid'],
-            'email': user_info['email'],
-            'name': user_info['name'],
-            'picture': user_info['picture'],
-            'email_verified': user_info['email_verified'],
+            'uid': user_info.get('uid'),
+            'email': user_info.get('email'),
+            'name': user_info.get('name'),
+            'picture': user_info.get('picture'),
+            'email_verified': user_info.get('email_verified', False),
             'exp': datetime.utcnow() + timedelta(hours=JWT_EXPIRATION_HOURS),
             'iat': datetime.utcnow()
         }
@@ -97,7 +97,17 @@ class AuthService:
         """Verify JWT token and return user info"""
         try:
             payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
-            return payload
+            
+            # Ensure all required fields are present for ProtectedResponse schema
+            user_data = {
+                'uid': payload.get('uid'),
+                'email': payload.get('email'),
+                'name': payload.get('name'),
+                'picture': payload.get('picture'),
+                'email_verified': payload.get('email_verified', False)
+            }
+            
+            return user_data
         except jwt.ExpiredSignatureError:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
