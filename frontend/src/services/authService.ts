@@ -1,4 +1,19 @@
-const API_BASE_URL = (process.env.REACT_APP_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+// Determine API base URL with production fallback
+const getApiBaseUrl = () => {
+  // In production, try to use the backend URL from environment
+  if (process.env.NODE_ENV === 'production') {
+    // If no backend URL is configured, show a helpful error
+    if (!process.env.REACT_APP_API_URL || process.env.REACT_APP_API_URL.includes('localhost')) {
+      console.error('❌ Production backend URL not configured. Please set REACT_APP_API_URL environment variable.');
+      // Return a placeholder that will cause requests to fail gracefully
+      return 'https://backend-not-configured.example.com';
+    }
+  }
+  
+  return (process.env.REACT_APP_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 export interface LoginResponse {
   access_token: string;

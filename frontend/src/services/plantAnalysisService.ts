@@ -1,8 +1,24 @@
 import { PlantAnalysisResponse, PlantAnalysisRequest } from '../types/plantAnalysis';
 
-const API_BASE_URL = (process.env.REACT_APP_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+// Determine API base URL with production fallback
+const getApiBaseUrl = () => {
+  // In production, try to use the backend URL from environment
+  if (process.env.NODE_ENV === 'production') {
+    // If no backend URL is configured, show a helpful error
+    if (!process.env.REACT_APP_API_URL || process.env.REACT_APP_API_URL.includes('localhost')) {
+      console.error('❌ Production backend URL not configured. Please set REACT_APP_API_URL environment variable.');
+      // Return a placeholder that will cause requests to fail gracefully
+      return 'https://backend-not-configured.example.com';
+    }
+  }
+  
+  return (process.env.REACT_APP_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 console.log('API Base URL:', API_BASE_URL);
+console.log('Environment:', process.env.NODE_ENV);
 console.log('Environment variable loaded:', !!process.env.REACT_APP_API_URL);
 console.log('Environment variable value:', process.env.REACT_APP_API_URL);
 
@@ -32,6 +48,11 @@ class PlantAnalysisService {
 
     try {
       console.log('Making request to backend...');
+
+      // Show user-friendly error if backend is not configured
+      if (API_BASE_URL.includes('backend-not-configured')) {
+        throw new Error('Backend service is not available. Please check your internet connection and try again.');
+      }
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minute timeout
@@ -72,18 +93,22 @@ class PlantAnalysisService {
         throw new Error('Invalid JSON response from server');
       }
     } catch (error) {
-      console.error('Request error:', error);
+      console.error('❌ Plant analysis request failed:', error);
       
-      // Provide more specific error messages for common issues
+      // Handle different types of errors with user-friendly messages
       if (error instanceof Error) {
         if (error.name === 'AbortError') {
           throw new Error('Request timed out. The analysis is taking longer than expected. Please try again.');
-        } else if (error.message.includes('Failed to fetch')) {
-          throw new Error('Unable to connect to the server. Please check your internet connection and try again.');
+        } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+          throw new Error('Unable to connect to the analysis service. Please check your internet connection and try again.');
+        } else if (error.message.includes('backend-not-configured')) {
+          throw error; // Re-throw the user-friendly message
+        } else {
+          throw new Error(`Analysis failed: ${error.message}`);
         }
+      } else {
+        throw new Error('An unexpected error occurred during analysis. Please try again.');
       }
-      
-      throw error;
     }
   }
 }

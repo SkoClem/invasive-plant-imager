@@ -117,10 +117,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const redirectResult = await getRedirectResult(auth);
         if (redirectResult) {
           console.log('📱 Mobile redirect authentication successful');
-          const idToken = await redirectResult.user.getIdToken();
-          const backendUser = await authService.loginWithFirebaseToken(idToken);
-          setCurrentUser(backendUser);
-          setFirebaseUser(redirectResult.user);
+          try {
+            const idToken = await redirectResult.user.getIdToken();
+            const backendUser = await authService.loginWithFirebaseToken(idToken);
+            setCurrentUser(backendUser);
+            setFirebaseUser(redirectResult.user);
+            console.log('✅ Mobile authentication complete:', backendUser);
+          } catch (backendError) {
+            console.error('❌ Mobile backend authentication failed:', backendError);
+            // If backend fails, still set Firebase user but show error
+            setFirebaseUser(redirectResult.user);
+            setCurrentUser(null);
+          }
           setLoading(false);
           return;
         }
@@ -130,22 +138,45 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setFirebaseUser(user);
           
           // Check if we have a valid backend session
-          const backendUser = await authService.getCurrentUser();
-          
-          if (backendUser) {
-            // Valid backend session exists
-            setCurrentUser(backendUser);
-          } else {
-            // No valid backend session, need to re-authenticate
-            console.log('🔄 Re-authenticating with backend...');
-            try {
-              const idToken = await user.getIdToken();
-              const newBackendUser = await authService.loginWithFirebaseToken(idToken);
-              setCurrentUser(newBackendUser);
-            } catch (authError) {
-              console.error('❌ Re-authentication failed:', authError);
-              // If re-authentication fails, sign out completely
-              await signOut(auth);
+          try {
+            const backendUser = await authService.getCurrentUser();
+            
+            if (backendUser) {
+              // Valid backend session exists
+              setCurrentUser(backendUser);
+              console.log('✅ Existing backend session found:', backendUser);
+            } else {
+              // No valid backend session, need to re-authenticate
+              console.log('🔄 Re-authenticating with backend...');
+              try {
+                const idToken = await user.getIdToken();
+                const newBackendUser = await authService.loginWithFirebaseToken(idToken);
+                setCurrentUser(newBackendUser);
+                console.log('✅ Re-authentication successful:', newBackendUser);
+              } catch (authError) {
+                console.error('❌ Re-authentication failed:', authError);
+                // If re-authentication fails due to network issues, keep Firebase user
+                // but don't sign out completely in production
+                if (process.env.NODE_ENV === 'production') {
+                  console.log('🔄 Production mode: keeping Firebase user despite backend failure');
+                  setCurrentUser(null); // Clear backend user but keep Firebase user
+                } else {
+                  // In development, sign out completely
+                  await signOut(auth);
+                  setFirebaseUser(null);
+                  setCurrentUser(null);
+                  authService.logout();
+                }
+              }
+            }
+          } catch (error) {
+            console.error('❌ Backend connection error:', error);
+            // In production, don't sign out due to network issues
+            if (process.env.NODE_ENV === 'production') {
+              console.log('🔄 Production mode: keeping Firebase user despite backend connection error');
+              setCurrentUser(null); // Clear backend user but keep Firebase user
+            } else {
+              // In development, clear everything
               setFirebaseUser(null);
               setCurrentUser(null);
               authService.logout();
@@ -177,12 +208,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     loading,
     signInWithGoogle,
     logout,
-    isAuthenticated: currentUser !== null && authService.isAuthenticated()
+    // In production, consider user authenticated if they have Firebase auth even without backend
+    isAuthenticated: process.env.NODE_ENV === 'production' 
+      ? (firebaseUser !== null) 
+      : (currentUser !== null && authService.isAuthenticated())
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 };
