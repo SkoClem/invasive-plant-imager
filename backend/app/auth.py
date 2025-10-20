@@ -84,6 +84,8 @@ class AuthService:
             'uid': user_info['uid'],
             'email': user_info['email'],
             'name': user_info['name'],
+            'picture': user_info['picture'],
+            'email_verified': user_info['email_verified'],
             'exp': datetime.utcnow() + timedelta(hours=JWT_EXPIRATION_HOURS),
             'iat': datetime.utcnow()
         }

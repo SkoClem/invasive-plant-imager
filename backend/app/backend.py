@@ -72,7 +72,7 @@ class Imager:
             name=self.name,
             prompt=prompt,
             image_data=image_data,
-            max_tokens=800  # Reduced from 1500 to prevent token limit issues
+            max_tokens=1200  # Increased from 800 to provide more room for complete responses
         )
 
         json_response = self.image_llm.get_output(url=self.url, llm_contents=contents)
@@ -124,6 +124,18 @@ class Imager:
             
             # Debug: Print the raw response to see what we're getting
             print(f"DEBUG - Raw LLM Response: {cleaned_response}")
+
+            # Check if response was truncated due to token limit
+            if "Response truncated due to token limit" in cleaned_response:
+                print(f"DEBUG - Response was truncated, returning fallback")
+                return {
+                    "specieIdentified": "Analysis incomplete - response truncated",
+                    "nativeRegion": "Unknown",
+                    "invasiveOrNot": False,
+                    "invasiveEffects": "Analysis was incomplete due to response length limits. Please try again.",
+                    "nativeAlternatives": [],
+                    "removeInstructions": "Unable to provide removal instructions due to incomplete analysis."
+                }
 
             # Try to parse as JSON directly
             try:
