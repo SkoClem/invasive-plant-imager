@@ -72,7 +72,7 @@ class Imager:
             name=self.name,
             prompt=prompt,
             image_data=image_data,
-            max_tokens=4000  # Increased to prevent truncation issues
+            max_tokens=8000  # Increased significantly to prevent truncation issues
         )
 
         json_response = self.image_llm.get_output(url=self.url, llm_contents=contents)
@@ -132,14 +132,63 @@ class Imager:
                     "specieIdentified": "Analysis incomplete - response truncated",
                     "nativeRegion": "Unknown",
                     "invasiveOrNot": False,
-                    "invasiveEffects": "Analysis was incomplete due to response length limits. Please try again.",
+                    "invasiveEffects": "Analysis was incomplete due to response length limits. Please try again with a different image or contact support.",
                     "nativeAlternatives": [],
                     "removeInstructions": "Unable to provide removal instructions due to incomplete analysis."
                 }
 
+            # Check for common truncation indicators
+            truncation_indicators = ["hgh^{-1}", "```", "...", "truncated", "incomplete"]
+            if any(indicator in cleaned_response.lower() for indicator in truncation_indicators):
+                print(f"DEBUG - Detected potential truncation in response")
+                # Try to extract partial JSON if possible
+                if "```json" in cleaned_response:
+                    try:
+                        json_part = cleaned_response.split("```json")[1]
+                        json_content = json_part.split("```")[0].strip()
+                        # Remove any trailing incomplete text
+                        if json_content.endswith('"'):
+                            # Find the last complete field
+                            lines = json_content.split('\n')
+                            complete_lines = []
+                            for line in lines:
+                                if line.strip().endswith(',') or line.strip().endswith('{') or line.strip().endswith('}'):
+                                    complete_lines.append(line)
+                                elif '"' in line and ':' in line and (line.strip().endswith('"') or line.strip().endswith('",') or line.strip().endswith('",')):
+                                    complete_lines.append(line)
+                                else:
+                                    break
+                            
+                            # Reconstruct JSON
+                            if complete_lines:
+                                json_content = '\n'.join(complete_lines)
+                                if not json_content.strip().endswith('}'):
+                                    json_content += '\n}'
+                                
+                                try:
+                                    partial_data = json.loads(json_content)
+                                    print(f"DEBUG - Successfully extracted partial JSON")
+                                    # Fill in missing fields with defaults
+                                    default_response = {
+                                        "specieIdentified": "Unknown species",
+                                        "nativeRegion": "Unknown",
+                                        "invasiveOrNot": False,
+                                        "invasiveEffects": "Analysis incomplete",
+                                        "nativeAlternatives": [],
+                                        "removeInstructions": "Analysis incomplete"
+                                    }
+                                    default_response.update(partial_data)
+                                    return default_response
+                                except json.JSONDecodeError:
+                                    pass
+                    except:
+                        pass
+
             # Try to parse as JSON directly
             try:
-                return json.loads(cleaned_response)
+                parsed_json = json.loads(cleaned_response)
+                print(f"DEBUG - Extracted JSON: {parsed_json}")
+                return parsed_json
             except json.JSONDecodeError:
                 pass
 
@@ -147,27 +196,33 @@ class Imager:
             if "```json" in cleaned_response:
                 json_part = cleaned_response.split("```json")[1]
                 json_content = json_part.split("```")[0].strip()
-                print(f"DEBUG - Extracted JSON: {json_content}")
-                return json.loads(json_content)
+                
+                try:
+                    parsed_json = json.loads(json_content)
+                    print(f"DEBUG - Extracted JSON: {parsed_json}")
+                    return parsed_json
+                except json.JSONDecodeError as e:
+                    print(f"DEBUG - JSON parsing failed: {e}")
+                    print(f"DEBUG - Attempted to parse: {json_content[:200]}...")
 
-            # If all else fails, return minimal structure
-            print(f"DEBUG - Failed to parse JSON, returning fallback")
+            # If all parsing fails, return error response
+            print(f"DEBUG - All parsing methods failed, returning error response")
             return {
-                "specieIdentified": None,
-                "nativeRegion": None,
+                "specieIdentified": "Parsing error",
+                "nativeRegion": "Unknown",
                 "invasiveOrNot": False,
-                "invasiveEffects": "Could not parse JSON response",
+                "invasiveEffects": "Unable to parse the analysis response. Please try again.",
                 "nativeAlternatives": [],
-                "removeInstructions": ""
+                "removeInstructions": "Unable to provide removal instructions due to parsing error."
             }
 
         except Exception as e:
-            print(f"DEBUG - Exception in parse_llm_response: {str(e)}")
+            print(f"DEBUG - Exception in parse_llm_response: {e}")
             return {
-                "specieIdentified": None,
-                "nativeRegion": None,
+                "specieIdentified": "Error",
+                "nativeRegion": "Unknown", 
                 "invasiveOrNot": False,
-                "invasiveEffects": f"Error: {str(e)}",
+                "invasiveEffects": f"An error occurred during analysis: {str(e)}",
                 "nativeAlternatives": [],
-                "removeInstructions": ""
+                "removeInstructions": "Unable to provide removal instructions due to error."
             }

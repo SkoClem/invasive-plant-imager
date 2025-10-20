@@ -1,11 +1,12 @@
 from typing import Dict, Any
-from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Depends
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Depends, Request
 from fastapi.responses import Response
 from app.schemas import Message, PlantAnalysisRequest, PlantAnalysisResponse, FirebaseLoginRequest, LoginResponse, ProtectedResponse, SaveCollectionRequest, UserCollectionResponse, DeleteCollectionItemRequest
 from app.backend import Imager
 from app.auth import AuthService, get_current_user, get_current_user_optional
 from app.collections import collection_manager
 from app.image_storage import image_storage
+from app.rate_limiter import rate_limiter
 
 imager = Imager()
 router = APIRouter()
@@ -113,6 +114,7 @@ def chat(message: Message, current_user: Dict[str, Any] = Depends(get_current_us
 
 @router.post("/api/analyze-plant")
 async def analyze_plant(
+    request: Request,
     image: UploadFile = File(...),
     region: str = Form("Texas"),  # Default to Texas, but will be overridden
     current_user: Dict[str, Any] = Depends(get_current_user_optional)
@@ -121,9 +123,17 @@ async def analyze_plant(
     # Always use Texas as the region for analysis
     texas_region = "Texas"
     user_identifier = current_user.get('email') if current_user else 'anonymous'
+    client_ip = request.client.host if request.client else "unknown"
+    
     print(f"Plant analysis request received from user: {user_identifier} for region: {texas_region}")
 
+    # Rate limiting check
+    rate_limit_key = rate_limiter.get_rate_limit_key(user_identifier, client_ip)
+    
     try:
+        # Check rate limits before processing
+        rate_limiter.check_rate_limit(rate_limit_key)
+        
         # Validate image file
         if not image.content_type.startswith("image/"):
             raise HTTPException(status_code=400, detail="File must be an image")
@@ -137,19 +147,38 @@ async def analyze_plant(
         base64_image = base64.b64encode(image_data).decode('utf-8')
 
         # Analyze the image
-        parsed_data = imager.analyze_plant_image(base64_image)
+        try:
+            parsed_data = imager.analyze_plant_image(base64_image)
+            
+            # Record successful request
+            rate_limiter.record_success(rate_limit_key)
+            
+            # Add user information to the response for potential future use (if authenticated)
+            if current_user:
+                parsed_data['analyzed_by'] = current_user['uid']
+                parsed_data['user_email'] = current_user['email']
+            else:
+                parsed_data['analyzed_by'] = 'anonymous'
+                parsed_data['user_email'] = 'anonymous@example.com'
 
-        # Add user information to the response for potential future use (if authenticated)
-        if current_user:
-            parsed_data['analyzed_by'] = current_user['uid']
-            parsed_data['user_email'] = current_user['email']
-        else:
-            parsed_data['analyzed_by'] = 'anonymous'
-            parsed_data['user_email'] = 'anonymous@example.com'
+            return parsed_data
+            
+        except Exception as analysis_error:
+            # Record failure for rate limiting
+            rate_limiter.record_failure(rate_limit_key)
+            print(f"❌ Plant analysis failed for user {user_identifier}: {str(analysis_error)}")
+            raise HTTPException(
+                status_code=500, 
+                detail=f"Plant analysis failed: {str(analysis_error)}"
+            )
 
-        return parsed_data
-
+    except HTTPException:
+        # Re-raise HTTP exceptions (like rate limiting)
+        raise
     except Exception as e:
+        # Record failure for any other unexpected errors
+        rate_limiter.record_failure(rate_limit_key)
+        print(f"❌ Unexpected error in plant analysis for user {user_identifier}: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 # Image storage endpoints

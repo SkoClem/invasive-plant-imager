@@ -273,9 +273,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signInWithGoogle,
     logout,
     // In production, consider user authenticated if they have Firebase auth even without backend
-    isAuthenticated: process.env.NODE_ENV === 'production' 
-      ? (firebaseUser !== null) 
-      : (currentUser !== null && authService.isAuthenticated())
+    // Add debug logging to help troubleshoot mobile authentication issues
+    isAuthenticated: (() => {
+      const isProduction = process.env.NODE_ENV === 'production';
+      const hasFirebaseUser = firebaseUser !== null;
+      const hasCurrentUser = currentUser !== null;
+      const isAuthServiceAuthenticated = authService.isAuthenticated();
+      
+      const result = isProduction 
+        ? hasFirebaseUser 
+        : (hasCurrentUser && isAuthServiceAuthenticated);
+      
+      // Debug logging for mobile authentication troubleshooting
+      console.log('Authentication State Debug:', {
+        isProduction,
+        hasFirebaseUser,
+        hasCurrentUser,
+        isAuthServiceAuthenticated,
+        result,
+        firebaseUserEmail: firebaseUser?.email,
+        currentUserEmail: currentUser?.email
+      });
+      
+      return result;
+    })()
   };
 
   return (
