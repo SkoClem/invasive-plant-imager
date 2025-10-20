@@ -60,7 +60,8 @@ class LLM:
         payload, headers = llm_contents[0], llm_contents[1]
         
         try:
-            response = requests.post(url, json=payload, headers=headers)
+            # Add timeout to prevent hanging - 60 seconds should be sufficient for most LLM responses
+            response = requests.post(url, json=payload, headers=headers, timeout=60)
             response.raise_for_status()
             
             result = response.json()
@@ -76,6 +77,8 @@ class LLM:
             
         except requests.exceptions.HTTPError as e:
             return f"HTTP Error: {e}\nResponse Content: {e.response.text}"
+        except requests.exceptions.Timeout:
+            return f"Request timed out after 60 seconds. The LLM service may be overloaded. Please try again later."
         except (KeyError, IndexError) as e:
             return f"Error parsing API response: {e}\nResponse JSON: {result}"
         except Exception as e:
@@ -120,7 +123,8 @@ class ImageLLM:
     def get_output(self, url, llm_contents, mode='default'):
         payload, headers = llm_contents[0], llm_contents[1]
         try:
-            response = requests.post(url, json=payload, headers=headers)
+            # Add timeout to prevent hanging - 60 seconds should be sufficient for most LLM responses
+            response = requests.post(url, json=payload, headers=headers, timeout=60)
             response.raise_for_status()
 
             result = response.json()
@@ -138,6 +142,8 @@ class ImageLLM:
 
         except requests.exceptions.HTTPError as e:
             return f"HTTP Error: {e}\nResponse Content: {e.response.text}"
+        except requests.exceptions.Timeout:
+            return f"Request timed out after 60 seconds. The LLM service may be overloaded. Please try again later."
         except (KeyError, IndexError) as e:
             return f"Error parsing API response: {e}\nResponse JSON: {result}"
         except Exception as e:
@@ -165,7 +171,8 @@ class Gemini:
     def get_output(self, url, llm_contents, mode='default'):
         payload, headers = llm_contents[0], llm_contents[1]
         try:
-            response = requests.post(url, json=payload, headers=headers)
+            # Add timeout to prevent hanging - 60 seconds should be sufficient for most LLM responses
+            response = requests.post(url, json=payload, headers=headers, timeout=60)
             response.raise_for_status()
             
             result = response.json()
@@ -175,6 +182,8 @@ class Gemini:
             
         except requests.exceptions.HTTPError as e:
             return f"HTTP Error: {e}\nResponse Content: {e.response.text}"
+        except requests.exceptions.Timeout:
+            return f"Request timed out after 60 seconds. The LLM service may be overloaded. Please try again later."
         except (KeyError, IndexError) as e:
             return f"Error parsing API response: {e}\nResponse JSON: {result}"
         except Exception as e:
