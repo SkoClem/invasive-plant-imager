@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { PlantInfo } from '../types/api';
 import { plantAnalysisService } from '../services/plantAnalysisService';
 import { convertToPlantInfo } from '../utils/dataConversion';
@@ -15,11 +15,11 @@ function LoadingPage({ setCurrentPage, setPlantData, pendingAnalysis, updateImag
   const [currentStep, setCurrentStep] = useState(0);
   const [progressMessage, setProgressMessage] = useState('Initializing analysis...');
 
-  const steps = [
+  const steps = useMemo(() => [
     { title: 'Image Processing', description: 'Enhancing and analyzing your photo', icon: '📸' },
     { title: 'AI Identification', description: 'Matching plant characteristics', icon: '🤖' },
     { title: 'Regional Analysis', description: 'Checking invasive status in your area', icon: '🌍' }
-  ];
+  ], []);
 
   useEffect(() => {
     console.log('🔄 LoadingPage mounted, checking pendingAnalysis...');
@@ -67,7 +67,6 @@ function LoadingPage({ setCurrentPage, setPlantData, pendingAnalysis, updateImag
 
       // More realistic progress simulation
       let progressValue = 0;
-      let stepIndex = 0;
       
       const progressInterval = setInterval(() => {
         setProgress(prev => {
@@ -220,7 +219,7 @@ function LoadingPage({ setCurrentPage, setPlantData, pendingAnalysis, updateImag
     return () => {
       isMounted = false;
     };
-  }, [pendingAnalysis, setCurrentPage, setPlantData]);
+  }, [pendingAnalysis, setCurrentPage, setPlantData, progress, steps, updateImageInCollection]);
 
   return (
     <section className="loading-section">
