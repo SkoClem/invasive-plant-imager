@@ -120,7 +120,8 @@ async def analyze_plant(
     """Analyze plant image for Texas invasive species detection - authentication optional"""
     # Always use Texas as the region for analysis
     texas_region = "Texas"
-    print(f"Plant analysis request received from user: {current_user['email'] if current_user else 'anonymous'} for region: {texas_region}")
+    user_identifier = current_user.get('email') if current_user else 'anonymous'
+    print(f"Plant analysis request received from user: {user_identifier} for region: {texas_region}")
 
     try:
         # Validate image file
