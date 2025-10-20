@@ -70,27 +70,27 @@ function LoadingPage({ setCurrentPage, setPlantData, pendingAnalysis, updateImag
       
       const progressInterval = setInterval(() => {
         setProgress(prev => {
-          // Simulate more realistic progress curve
-          if (prev < 30) {
-            // Fast initial progress (image upload/processing)
-            progressValue = prev + Math.random() * 8 + 2;
-          } else if (prev < 60) {
+          // Simulate more realistic progress curve - slower overall
+          if (prev < 20) {
+            // Slower initial progress (image upload/processing)
+            progressValue = prev + Math.random() * 3 + 1;
+          } else if (prev < 40) {
             // Moderate progress (AI analysis starting)
-            progressValue = prev + Math.random() * 4 + 1;
-          } else if (prev < 85) {
-            // Slower progress (deep AI analysis)
             progressValue = prev + Math.random() * 2 + 0.5;
-          } else if (prev < 95) {
+          } else if (prev < 70) {
+            // Slower progress (deep AI analysis)
+            progressValue = prev + Math.random() * 1.5 + 0.3;
+          } else if (prev < 85) {
             // Very slow progress (final processing)
             progressValue = prev + Math.random() * 0.8 + 0.2;
           } else {
-            // Stay at 95-98% until API completes
-            progressValue = Math.min(prev + Math.random() * 0.3, 98);
+            // Stay at 85-92% until API completes - more realistic
+            progressValue = Math.min(prev + Math.random() * 0.4, 92);
           }
           
-          return Math.min(progressValue, 98); // Cap at 98% until API completes
+          return Math.min(progressValue, 92); // Cap at 92% until API completes
         });
-      }, 600); // Slightly faster updates for smoother animation
+      }, 1200); // Slower updates - every 1.2 seconds for more realistic feel
 
       // Step progression with better timing
       const stepInterval = setInterval(() => {
@@ -101,7 +101,7 @@ function LoadingPage({ setCurrentPage, setPlantData, pendingAnalysis, updateImag
           }
           return nextStep;
         });
-      }, 4000); // Slightly longer step duration
+      }, 6000); // Longer step duration - 6 seconds per step
 
       // Safety timeout - redirect back to upload after 2 minutes
       const safetyTimeout = setTimeout(() => {

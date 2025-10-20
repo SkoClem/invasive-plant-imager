@@ -52,14 +52,19 @@ function AppContent() {
           backendCollection.map(async (item) => {
             try {
               // Try to get the image blob from backend
-              const imageBlob = await imageService.getImageBlob(item.id);
+              const imageBlob = await imageService.getImage(item.id);
+              const preview = imageBlob ? URL.createObjectURL(imageBlob) : undefined;
               return {
                 ...item,
-                preview: imageBlob || undefined
+                preview
               };
             } catch (error) {
               console.warn(`Could not load image for item ${item.id}:`, error);
-              return item;
+              // Return item without preview if image loading fails
+              return {
+                ...item,
+                preview: undefined
+              };
             }
           })
         );
@@ -220,14 +225,20 @@ function AppContent() {
     const updatedCollection = [...imageCollection, newImage];
     setImageCollection(updatedCollection);
 
-    // Save to localStorage for non-authenticated users
-    if (!isAuthenticated) {
-      saveToLocalStorage(updatedCollection);
-    } else {
-      // For authenticated users, upload the image to backend
-      imageService.uploadImage(newImage.id, file).catch(error => {
+    // For authenticated users, upload the image to backend
+    if (isAuthenticated) {
+      imageService.uploadImage(newImage.id, file).then(success => {
+        if (success) {
+          console.log(`✅ Image ${newImage.id} uploaded successfully to backend`);
+        } else {
+          console.error(`❌ Failed to upload image ${newImage.id} to backend`);
+        }
+      }).catch(error => {
         console.error('Failed to upload image to backend:', error);
       });
+    } else {
+      // Save to localStorage for non-authenticated users
+      saveToLocalStorage(updatedCollection);
     }
     
     setPendingAnalysis({ file, region: region || selectedRegion, imageId: newImage.id });
@@ -398,7 +409,7 @@ function AppContent() {
         >
           <div className="tab-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-              <path d="M9 3L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-3.17L15 3H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+              <path d="M9 3L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-3.17L15 3H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5 5z"/>
               <circle cx="12" cy="13" r="3"/>
             </svg>
           </div>

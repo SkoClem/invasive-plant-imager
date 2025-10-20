@@ -38,15 +38,46 @@ class ImageService {
   }
 
   /**
-   * Get an image URL for display
+   * Get image URL for display
    */
   getImageUrl(imageId: string): string {
     const token = authService.getAccessToken();
     if (!token) {
-      throw new Error('User not authenticated');
+      return '';
     }
+    
+    return `${API_BASE_URL}/api/images/${imageId}?token=${encodeURIComponent(token)}`;
+  }
 
-    return `${API_BASE_URL}/api/images/${imageId}?token=${token}`;
+  /**
+   * Get an image from storage
+   */
+  async getImage(imageId: string): Promise<Blob | null> {
+    try {
+      const token = authService.getAccessToken();
+      if (!token) {
+        throw new Error('User not authenticated');
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/images/${imageId}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return null; // Image not found
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.blob();
+    } catch (error) {
+      console.error('Error getting image:', error);
+      return null;
+    }
   }
 
   /**
