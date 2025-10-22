@@ -1,0 +1,589 @@
+/* Learn Page Styles */
+
+.learn-section {
+  padding: 7rem 0 2rem 0;
+  min-height: calc(100vh - 120px);
+}
+
+.learn-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.learn-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.learn-header .subtitle {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Tab Navigation */
+.learn-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid var(--border-light);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.learn-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.learn-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--text-secondary);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-standard);
+  white-space: nowrap;
+}
+
+.learn-tab:hover {
+  color: var(--text-primary);
+  background-color: var(--background-light);
+}
+
+.learn-tab.active {
+  color: var(--primary-green);
+  border-bottom-color: var(--primary-green);
+  background-color: var(--background-light);
+}
+
+.tab-icon {
+  font-size: 1.2rem;
+}
+
+.tab-label {
+  font-size: 0.95rem;
+}
+
+/* Content Area */
+.learn-content {
+  margin-bottom: 3rem;
+}
+
+.learn-section-content h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+}
+
+.content-intro {
+  margin-bottom: 2rem;
+}
+
+.content-intro p {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Content Grid */
+.content-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.content-card {
+  background: var(--container-bg);
+  border-radius: var(--radius-card);
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px var(--shadow-light);
+  border: 1px solid var(--border-subtle);
+  transition: all var(--transition-standard);
+}
+
+.content-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px var(--shadow-medium);
+}
+
+.content-card h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.content-card p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Plant Cards */
+.plants-grid {
+  display: grid;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.plant-card {
+  background: var(--container-bg);
+  border-radius: var(--radius-card);
+  padding: 2rem;
+  box-shadow: 0 4px 15px var(--shadow-light);
+  border: 1px solid var(--border-subtle);
+}
+
+.plant-card-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border-light);
+}
+
+.plant-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.scientific-name {
+  font-style: italic;
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.plant-description {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.plant-details {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.detail-section h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+}
+
+.detail-section ul {
+  list-style-type: disc;
+  margin-left: 1.5rem;
+  color: var(--text-secondary);
+}
+
+.detail-section li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.alternatives-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.alternative-item {
+  background: var(--background-light);
+  padding: 1rem;
+  border-radius: var(--radius-smooth);
+  border-left: 4px solid var(--primary-green);
+}
+
+.alternative-item strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.scientific-name-small {
+  font-style: italic;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-left: 0.5rem;
+}
+
+.benefits {
+  margin-top: 0.5rem;
+}
+
+.benefit-tag {
+  display: inline-block;
+  background: rgba(76, 175, 80, 0.1);
+  color: var(--primary-green);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Resource Cards */
+.resources-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.resource-card {
+  background: var(--container-bg);
+  border-radius: var(--radius-card);
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px var(--shadow-light);
+  border: 1px solid var(--border-subtle);
+  transition: all var(--transition-standard);
+}
+
+.resource-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px var(--shadow-medium);
+}
+
+.resource-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.resource-type-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.resource-title-section {
+  flex: 1;
+}
+
+.resource-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem 0;
+}
+
+.resource-type {
+  display: inline-block;
+  background: var(--background-light);
+  color: var(--text-secondary);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.resource-description {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.benefits-section,
+.eligibility-section {
+  margin-bottom: 1rem;
+}
+
+.benefits-section h4,
+.eligibility-section h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.contact-info {
+  border-top: 1px solid var(--border-light);
+  padding-top: 1rem;
+}
+
+.contact-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.contact-label {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.contact-link,
+.contact-text {
+  color: var(--primary-green);
+  text-decoration: none;
+}
+
+.contact-link:hover {
+  text-decoration: underline;
+}
+
+/* Education Cards */
+.education-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.education-card {
+  background: var(--container-bg);
+  border-radius: var(--radius-card);
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px var(--shadow-light);
+  border: 1px solid var(--border-subtle);
+}
+
+.education-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.education-header h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  flex: 1;
+}
+
+.grade-level {
+  background: var(--background-light);
+  color: var(--text-secondary);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.education-description {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.education-details {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.duration,
+.type {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.objectives h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.objectives ul {
+  list-style-type: disc;
+  margin-left: 1.5rem;
+  color: var(--text-secondary);
+}
+
+.objectives li {
+  margin-bottom: 0.25rem;
+  line-height: 1.4;
+}
+
+/* Climate and Impact Sections */
+.climate-resilience-section,
+.community-impact-section {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 2px solid var(--border-light);
+}
+
+.climate-resilience-section h3,
+.community-impact-section h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+}
+
+.climate-grid,
+.impact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.climate-card,
+.impact-card {
+  background: var(--container-bg);
+  border-radius: var(--radius-card);
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px var(--shadow-light);
+  border: 1px solid var(--border-subtle);
+}
+
+.climate-card h4,
+.impact-card h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+}
+
+.climate-card p,
+.impact-card p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Additional Info */
+.additional-info {
+  margin-top: 2rem;
+}
+
+.info-card {
+  background: var(--container-bg);
+  border-radius: var(--radius-card);
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px var(--shadow-light);
+  border: 1px solid var(--border-subtle);
+}
+
+.info-card h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.info-card p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.info-card ul {
+  list-style-type: disc;
+  margin-left: 1.5rem;
+  color: var(--text-secondary);
+}
+
+.info-card li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+/* Call to Action */
+.learn-cta {
+  text-align: center;
+  background: var(--container-bg);
+  border-radius: var(--radius-card);
+  padding: 2rem;
+  box-shadow: 0 4px 15px var(--shadow-light);
+  border: 1px solid var(--border-subtle);
+}
+
+.learn-cta h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.learn-cta p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .learn-section {
+    padding: 3rem 0 2rem 0;
+  }
+
+  .learn-header h1 {
+    font-size: 2rem;
+  }
+
+  .learn-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+
+  .learn-tab {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .plants-grid {
+    gap: 1.5rem;
+  }
+
+  .plant-card {
+    padding: 1.5rem;
+  }
+
+  .resources-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .education-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .climate-grid,
+  .impact-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .learn-section {
+    padding: 2rem 0 1rem 0;
+  }
+
+  .learn-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .learn-tab {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .plant-card {
+    padding: 1rem;
+  }
+
+  .resource-card,
+  .education-card {
+    padding: 1rem;
+  }
+
+  .learn-cta {
+    padding: 1.5rem;
+  }
+}

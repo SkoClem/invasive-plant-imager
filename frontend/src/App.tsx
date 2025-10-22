@@ -6,6 +6,7 @@ import HomePage from './pages/HomePage';
 import UploadPage from './pages/UploadPage';
 import CollectionPage from './pages/CollectionPage';
 import AboutPage from './pages/AboutPage';
+import LearnPage from './pages/LearnPage';
 import LoadingPage from './pages/LoadingPage';
 import ResultsPage from './pages/ResultsPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -13,7 +14,7 @@ import AuthButton from './components/AuthButton';
 import { collectionService, CollectionItem, PlantInfo as BackendPlantInfo } from './services/collectionService';
 import { imageService } from './services/imageService';
 
-type PageType = 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results';
+type PageType = 'home' | 'upload' | 'collection' | 'about' | 'learn' | 'loading' | 'results';
 type DirectionType = 'forward' | 'backward';
 
 interface CollectedImage {
@@ -166,7 +167,7 @@ function AppContent() {
   };
 
   // Define the order of pages for swipe navigation
-  const pageOrder: PageType[] = ['home', 'upload', 'collection', 'about'];
+  const pageOrder: PageType[] = ['home', 'upload', 'collection', 'learn', 'about'];
   // Note: loading and results pages are not in swipe navigation as they're part of the upload flow
 
   // Handle page navigation with direction detection
@@ -353,6 +354,8 @@ function AppContent() {
               />;
             case 'about':
               return <AboutPage setCurrentPage={navigateToPage} />;
+            case 'learn':
+              return <LearnPage setCurrentPage={navigateToPage} />;
             case 'loading':
               return <LoadingPage
                 setCurrentPage={navigateToPage}
@@ -427,6 +430,17 @@ function AppContent() {
           <span className="tab-label">Collection</span>
         </button>
           <button
+          className={`tab-item ${currentPage === 'learn' ? 'active' : ''}`}
+          onClick={() => navigateToPage('learn')}
+        >
+          <div className="tab-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+              <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
+            </svg>
+          </div>
+          <span className="tab-label">Learn</span>
+        </button>
+        <button
           className={`tab-item ${currentPage === 'about' ? 'active' : ''}`}
           onClick={() => navigateToPage('about')}
         >

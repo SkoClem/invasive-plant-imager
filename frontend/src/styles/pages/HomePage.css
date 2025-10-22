@@ -26,7 +26,7 @@
 }
 
 .hero-header.enhanced {
-  padding: 1rem 0 2rem;
+  padding: 7rem 0 2rem;
 }
 
 .header-content {
@@ -68,7 +68,7 @@
   justify-content: center;
   min-height: calc(70vh - 200px);
   text-align: center;
-  padding: 2rem;
+  padding: 7rem 2rem 2rem;
   position: relative;
   z-index: 1;
 }
@@ -327,7 +327,7 @@
   }
 
   .hero-content {
-    padding: 1rem;
+    padding: 3rem 1rem 1rem;
     min-height: calc(70vh - 150px);
   }
 
@@ -368,7 +368,7 @@
 
 @media (max-width: 480px) {
   .hero-content {
-    padding: 0.5rem;
+    padding: 2rem 0.5rem 0.5rem;
   }
 
   .hero-title.enhanced {

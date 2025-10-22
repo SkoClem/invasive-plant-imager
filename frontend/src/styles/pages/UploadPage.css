@@ -1,7 +1,7 @@
 /* UploadPage Specific Styles */
 
 .upload-section {
-  margin-top: 100px !important;
+  margin-top: 120px !important;
   min-height: auto !important;
   height: auto !important;
   background: linear-gradient(135deg, var(--bg-primary), white);
@@ -267,7 +267,7 @@
 /* Responsive Design */
 @media (max-width: 768px) {
   .upload-section {
-    padding-top: 70px;
+    padding-top: 90px;
     min-height: auto;
     padding-bottom: 120px;
   }

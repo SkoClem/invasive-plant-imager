@@ -10,15 +10,6 @@ function HomePage({ setCurrentPage }: HomePageProps) {
       {/* Hero Section */}
       <section className="hero enhanced">
         <div className="container">
-          <div className="hero-header enhanced">
-            <div className="header-content">
-              <div className="app-title">
-                <h1 className="app-logo">🌿 Invasive Plant Imager</h1>
-                <p className="app-tagline">AI-Powered Plant Identification</p>
-              </div>
-            </div>
-          </div>
-
           <div className="hero-content">
             <div className="hero-text">
               <h1 className="hero-title enhanced">Identify Invasive Plants Instantly</h1>
