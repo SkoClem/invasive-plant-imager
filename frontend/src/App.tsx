@@ -383,7 +383,7 @@ function AppContent() {
           className="navbar-logo"
           onClick={() => navigateToPage('home')}
         >
-          Invasive Plant Imager
+          InvasiScan
         </button>
         <AuthButton variant="compact" />
       </nav>

@@ -17,7 +17,7 @@ function AboutPage({ setCurrentPage }: AboutPageProps) {
           <div className="about-text">
             <h2>Our Story</h2>
             <p>
-              Invasive Plant Imager was created by a team of environmental scientists and software engineers who recognized
+              InvasiScan was created by a team of environmental scientists and software engineers who recognized
               the need for an accessible tool to help people identify potentially harmful invasive plant species.
             </p>
             <p>
