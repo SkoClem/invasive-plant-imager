@@ -1,26 +1,84 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { PlantInfo } from '../types/api';
 
 interface ResultsPageProps {
   setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results') => void;
+  resultItem?: {
+    id: string;
+    preview?: string;
+    status: 'analyzing' | 'completed' | 'error';
+    species?: string;
+    confidence?: number;
+    description?: string;
+    filename: string;
+    region: string;
+    plantData?: PlantInfo;
+  };
 }
 
-const ResultsPage: React.FC<ResultsPageProps> = ({ setCurrentPage }) => {
+const ResultsPage: React.FC<ResultsPageProps> = ({ setCurrentPage, resultItem }) => {
   const { isAuthenticated } = useAuth();
+
+  const showDetailedResult = resultItem && resultItem.status === 'completed';
 
   return (
     <section className="results-section">
       <div className="container">
-        <div className="results-header non-invasive">
-          <div className="status-icon">✅</div>
+        <div className={`results-header ${showDetailedResult && resultItem?.plantData?.isInvasive ? 'invasive' : 'non-invasive'}`}>
+          <div className="status-icon">{showDetailedResult && resultItem?.plantData?.isInvasive ? '🚨' : '✅'}</div>
           <div className="status-content">
             <h1 className="status-title">Analysis Complete</h1>
           </div>
         </div>
 
-        <div className="info-section">
-          <p>Your scan has been saved to your collection automatically.</p>
-        </div>
+        {showDetailedResult ? (
+          <div className="results-content">
+            {resultItem?.preview && (
+              <div className="results-image">
+                <img src={resultItem.preview} alt={resultItem.filename} />
+              </div>
+            )}
+
+            <div className="results-details">
+              <h2 className="plant-name">
+                {resultItem.plantData?.commonName || resultItem.plantData?.scientificName || resultItem.species || 'Unknown Plant'}
+              </h2>
+              {resultItem.plantData?.scientificName && resultItem.plantData?.commonName && (
+                <p className="scientific-name">{resultItem.plantData.scientificName}</p>
+              )}
+              {resultItem.plantData?.region && (
+                <div className="native-location">
+                  <span className="location-icon">🌍</span>
+                  <span className="location-text">Native to: {resultItem.plantData.region}</span>
+                </div>
+              )}
+              {resultItem.plantData?.isInvasive !== undefined && (
+                <div className={`invasive-status ${resultItem.plantData.isInvasive ? 'invasive' : 'native'}`}>
+                  <span className="status-icon">{resultItem.plantData.isInvasive ? '🚨' : '✅'}</span>
+                  <span className="status-text">
+                    {resultItem.plantData.isInvasive ? 'Invasive Species' : 'Native Plant'}
+                  </span>
+                </div>
+              )}
+              {resultItem.confidence && (
+                <div className="confidence-meter">
+                  <div className="confidence-label">Confidence: {resultItem.confidence}%</div>
+                  <div className="confidence-bar">
+                    <div className="confidence-fill" style={{ width: `${resultItem.confidence}%` }}></div>
+                  </div>
+                </div>
+              )}
+              {resultItem.plantData?.description && (
+                <p className="plant-description">{resultItem.plantData.description}</p>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="info-section">
+            <p>Your scan has been saved to your collection automatically.</p>
+          </div>
+        )}
 
         <div className="results-actions">
           <button

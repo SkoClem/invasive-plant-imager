@@ -35,10 +35,11 @@ function AppContent() {
   const [currentPage, setCurrentPage] = useState<PageType>('home');
   const [transitionDirection, setTransitionDirection] = useState<DirectionType>('forward');
   const [isTransitioning, setIsTransitioning] = useState(false);
-
+  
   const [pendingAnalysis, setPendingAnalysis] = useState<{ file: File; region: string; imageId?: string } | null>(null);
   const [selectedRegion, setSelectedRegion] = useState<string>('');
   const [imageCollection, setImageCollection] = useState<CollectedImage[]>([]);
+  const [lastResultId, setLastResultId] = useState<string | null>(null);
   const pageRef = useRef<HTMLDivElement>(null);
   const { isAuthenticated } = useAuth();
 
@@ -259,10 +260,7 @@ function AppContent() {
           }
         }
         
-        // Clean up old blob URL to prevent memory leaks
-        if (img.preview && img.preview.startsWith('blob:')) {
-          URL.revokeObjectURL(img.preview);
-        }
+        // Do not revoke blob URLs here to keep preview visible in collection
         const updatedImg: CollectedImage = {
           ...img,
           status,
@@ -271,6 +269,11 @@ function AppContent() {
           confidence: 85, // Default confidence since PlantInfo doesn't have this field
           description: plantData?.description || undefined
         };
+        
+        // Track latest result for immediate ResultsPage display
+        if (status === 'completed') {
+          setLastResultId(updatedImg.id);
+        }
         
         // Save updated item to backend if authenticated
         if (isAuthenticated && status === 'completed') {
@@ -364,7 +367,7 @@ function AppContent() {
                 updateImageInCollection={updateImageInCollection}
               />;
             case 'results':
-              return <ResultsPage setCurrentPage={navigateToPage} />;
+              return <ResultsPage setCurrentPage={navigateToPage} resultItem={imageCollection.find(img => img.id === lastResultId)} />;
             default:
               return <HomePage
                 setCurrentPage={navigateToPage}
