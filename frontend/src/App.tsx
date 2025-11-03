@@ -98,11 +98,13 @@ function AppContent() {
     if (savedCollection) {
       try {
         const parsedCollection = JSON.parse(savedCollection);
-        // Convert timestamp strings back to Date objects
+        const previewMapRaw = localStorage.getItem('imagePreviewMap');
+        const previewMap: Record<string, string> = previewMapRaw ? JSON.parse(previewMapRaw) : {};
+        // Convert timestamp strings back to Date objects and attach preview from map if missing
         const restoredCollection = parsedCollection.map((img: any) => ({
           ...img,
           timestamp: new Date(img.timestamp),
-          // preview (data URL) is restored as-is if present
+          preview: img.preview || previewMap[img.id] || undefined,
         }));
         setImageCollection(restoredCollection);
       } catch (error) {
@@ -121,14 +123,28 @@ function AppContent() {
         // Keep data URLs; strip blob: URLs as they are not restorable
         preview: img.preview && img.preview.startsWith('blob:') ? undefined : img.preview,
       }));
+
+      // Maintain a separate preview map to recover previews for items that may have been saved without them previously
+      const previewMap: Record<string, string> = {};
+      serializableCollection.forEach(img => {
+        if (img.preview && typeof img.preview === 'string' && img.preview.startsWith('data:image')) {
+          previewMap[img.id] = img.preview;
+        }
+      });
+
       try {
         localStorage.setItem('imageCollection', JSON.stringify(serializableCollection));
+        localStorage.setItem('imagePreviewMap', JSON.stringify(previewMap));
       } catch (err) {
         console.error('Failed to save collection to localStorage:', err);
         // As a fallback, try saving without previews if quota is exceeded
         try {
           const fallbackCollection = serializableCollection.map(img => ({ ...img, preview: undefined }));
           localStorage.setItem('imageCollection', JSON.stringify(fallbackCollection));
+          // Attempt to trim preview map by only storing the most recent preview
+          const recent = collection[collection.length - 1];
+          const recentPreview = recent.preview && !recent.preview.startsWith('blob:') ? recent.preview : undefined;
+          localStorage.setItem('imagePreviewMap', JSON.stringify(recentPreview && recent.id ? { [recent.id]: recentPreview } : {}));
         } catch (err2) {
           console.error('Fallback save without previews also failed:', err2);
         }

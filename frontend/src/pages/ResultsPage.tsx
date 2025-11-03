@@ -34,10 +34,10 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ setCurrentPage, resultItem })
 
         {showDetailedResult ? (
           <div className="results-content">
-            {resultItem?.preview && (
-              <div className="results-image">
-                <img src={resultItem.preview} alt={resultItem.filename} />
-              </div>
+            {resultItem?.preview ? (
+              <img className="results-image" src={resultItem.preview} alt={resultItem.filename} />
+            ) : (
+              <div className="results-image placeholder">Image not available</div>
             )}
 
             <div className="results-details">
