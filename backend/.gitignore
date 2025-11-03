@@ -6,3 +6,5 @@ __pycache__/
 # Firebase service account keys (sensitive)
 *firebase*adminsdk*.json
 *.json
+venv/
+.venv/

@@ -211,21 +211,22 @@ function AppContent() {
   };
 
   // Start analysis with file and region
-  const startAnalysis = (file: File, region: string) => {
+  const startAnalysis = (file: File, region: string, previewDataUrl?: string | null) => {
     // Add image to collection with analyzing status
+    const useDataUrl = !isAuthenticated && previewDataUrl && typeof previewDataUrl === 'string';
     const newImage: CollectedImage = {
       id: Date.now().toString(),
       file,
-      preview: URL.createObjectURL(file),
+      preview: useDataUrl ? previewDataUrl! : URL.createObjectURL(file),
       status: 'analyzing',
       filename: file.name,
       timestamp: new Date(),
       region: region || selectedRegion
     };
-
+  
     const updatedCollection = [...imageCollection, newImage];
     setImageCollection(updatedCollection);
-
+  
     // For authenticated users, upload the image to backend
     if (isAuthenticated) {
       imageService.uploadImage(newImage.id, file).then(success => {
@@ -238,7 +239,7 @@ function AppContent() {
         console.error('Failed to upload image to backend:', error);
       });
     } else {
-      // Save to localStorage for non-authenticated users
+      // Save to localStorage for non-authenticated users, preserving data URL preview
       saveToLocalStorage(updatedCollection);
     }
     
@@ -364,7 +365,7 @@ function AppContent() {
                 updateImageInCollection={updateImageInCollection}
               />;
             case 'results':
-              return <ResultsPage setCurrentPage={navigateToPage} plantData={plantData} />;
+              return <ResultsPage setCurrentPage={navigateToPage} />;
             default:
               return <HomePage
                 setCurrentPage={navigateToPage}

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 interface UploadPageProps {
   setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results') => void;
-  startAnalysis: (file: File, region: string) => void;
+  startAnalysis: (file: File, region: string, previewDataUrl?: string | null) => void;
   selectedRegion: string;
   setSelectedRegion: (region: string) => void;
 }
@@ -81,7 +81,8 @@ function UploadPage({ setCurrentPage, startAnalysis, selectedRegion, setSelected
     console.log('📤 File will be sent directly to backend - no temporary server storage');
 
     // Start the analysis process - will navigate to loading page
-    startAnalysis(selectedFile, selectedRegion);
+    // Pass imagePreview (base64 data URL) so local collections can persist preview
+    startAnalysis(selectedFile, selectedRegion, imagePreview);
   };
 
   const triggerFileInput = () => {

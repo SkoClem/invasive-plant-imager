@@ -3,6 +3,7 @@ import json
 import requests
 #TODO: get environment variables without dotenv package
 from dotenv import load_dotenv
+from typing import Optional
 
 class LLM:
     def __init__(self):
@@ -19,8 +20,8 @@ class LLM:
     def agent(self,identity:str,
               purpose:str,
               output_style:str,
-              agent_context:str|None=None, 
-              notes:str|None=None)->str:
+              agent_context:Optional[str]=None, 
+              notes:Optional[str]=None)->str:
         agent_context = "None" if agent_context is None else agent_context
         notes = "None" if notes is None else notes
         return f"""

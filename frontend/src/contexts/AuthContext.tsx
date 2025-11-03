@@ -168,15 +168,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  // New: Handle redirect result on initial mount (mobile flow)
   useEffect(() => {
-    console.log('🔄 Setting up authentication state listener...');
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setLoading(true);
-      console.log('🔄 Auth state changed:', user ? `User: ${user.email}` : 'No user');
-      
+    const handleRedirectResult = async () => {
       try {
-        // Check for redirect result first (mobile authentication)
-        console.log('📱 Checking for redirect result...');
+        console.log('📱 Checking for redirect result on mount...');
         const redirectResult = await getRedirectResult(auth);
         if (redirectResult) {
           console.log('📱 Mobile redirect authentication successful:', redirectResult.user.email);
@@ -195,12 +191,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setCurrentUser(null);
             console.log('🔄 Mobile: Firebase user set, backend failed');
           }
-          setLoading(false);
-          return;
         } else {
-          console.log('📱 No redirect result found');
+          console.log('📱 No redirect result found on mount');
         }
-        
+      } catch (error) {
+        console.error('❌ Error handling redirect result:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    handleRedirectResult();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Listen for Firebase auth state changes (non-redirect flow)
+  useEffect(() => {
+    console.log('🔄 Setting up authentication state listener...');
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setLoading(true);
+      console.log('🔄 Auth state changed:', user ? `User: ${user.email}` : 'No user');
+      
+      try {
         if (user) {
           // User is signed in with Firebase
           console.log('✅ Firebase user found:', user.email);
@@ -274,6 +286,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     });
 
     return unsubscribe;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const value: AuthContextType = {

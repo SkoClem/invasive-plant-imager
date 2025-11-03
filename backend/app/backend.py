@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 #TODO: get environment variables without dotenv package
 load_dotenv(override=True)
 print(llm)
+from typing import Optional
 
 class Generate:
     def __init__(self):
@@ -18,8 +19,8 @@ class Generate:
         
     def __call__(self,
                  prompt:str,
-                 system_prompt:str|None=None,
-                 max_tokens:int|None=None,
+                 system_prompt:Optional[str]=None,
+                 max_tokens:Optional[int]=None,
                  mode:str="default")->str:
         if mode == "gemini":
             self.LLM = Gemini()
@@ -44,7 +45,6 @@ class Imager:
 
     def analyze_plant_image(self, image_path_or_data: str)->dict:
         """Analyze plant image for invasive species using optimized single-step approach"""
-        # Single optimized API call that returns JSON directly
         return self._get_optimized_analysis(image_path_or_data)
 
     def analyze_plant_image_legacy(self, image_path_or_data: str)->dict:
@@ -79,142 +79,52 @@ class Imager:
         return self.parse_llm_response(json_response)
 
     def _get_paragraph_analysis(self, image_path_or_data: str)->str:
-        """Get paragraph analysis from LLM"""
-        # Check if input is base64 data or file path
-        if image_path_or_data.startswith('data:image') or len(image_path_or_data) > 100:  # Likely base64
-            image_data = image_path_or_data
-        else:  # Likely file path
-            image_data = self._image_to_base64(image_path_or_data)
-
+        """Get paragraph analysis from image"""
         prompt = paragraph_analysis(self.region)
 
         contents = self.image_llm.llm_contents(
             key=self.key,
             name=self.name,
             prompt=prompt,
-            image_data=image_data,
-            max_tokens=3500  # Increased to prevent truncation
+            image_data=image_path_or_data,
+            max_tokens=8000
         )
 
-        return self.image_llm.get_output(url=self.url, llm_contents=contents)
+        output = self.image_llm.get_output(url=self.url, llm_contents=contents)
+        return output
 
-    def _convert_to_json(self, analysis_text: str)->dict:
-        """Convert paragraph analysis to structured JSON"""
-        prompt = json_information(analysis_text)
-
-        contents = self.image_llm.llm_contents(
-            key=self.key,
-            name=self.name,
+    def _convert_to_json(self, paragraph_response: str)->dict:
+        """Convert paragraph response to JSON format using optimized prompts"""
+        prompt = json_information(self.region, paragraph_response)
+        generator = Generate()
+        json_response = generator(
             prompt=prompt,
-            max_tokens=3000  # Increased to prevent truncation
+            system_prompt=None,
+            max_tokens=8000,
+            mode="default"
         )
-
-        json_response = self.image_llm.get_output(url=self.url, llm_contents=contents)
         return self.parse_llm_response(json_response)
 
-    def _image_to_base64(self, image_path: str) -> str:
-        """Convert image file to base64 string"""
-        with open(image_path, "rb") as image_file:
-            return base64.b64encode(image_file.read()).decode('utf-8')
-
-    def parse_llm_response(self, llm_response: str) -> dict:
-        """Parse LLM response to extract structured data - simplified for clean JSON"""
+    def parse_llm_response(self, response_text: str)->dict:
+        """Parse LLM response and extract JSON content"""
         try:
-            cleaned_response = llm_response.strip()
+            cleaned_response = response_text.strip()
+            cleaned_response = re.sub(r"```json|```", "", cleaned_response)
+            cleaned_response = cleaned_response.replace('\n', ' ').replace('\r', ' ')
             
-            # Debug: Print the raw response to see what we're getting
-            print(f"DEBUG - Raw LLM Response: {cleaned_response}")
+            # If response looks like JSON, parse it immediately
+            if cleaned_response.startswith('{') and cleaned_response.endswith('}'):
+                return json.loads(cleaned_response)
 
-            # Check if response was truncated due to token limit
-            if "Response truncated due to token limit" in cleaned_response:
-                print(f"DEBUG - Response was truncated, returning fallback")
-                return {
-                    "specieIdentified": "Analysis incomplete - response truncated",
-                    "nativeRegion": "Unknown",
-                    "invasiveOrNot": False,
-                    "invasiveEffects": "Analysis was incomplete due to response length limits. Please try again with a different image or contact support.",
-                    "nativeAlternatives": [],
-                    "removeInstructions": "Unable to provide removal instructions due to incomplete analysis."
-                }
+            # Try to find JSON anywhere in the response
+            json_match = re.search(r"\{.*\}", cleaned_response)
+            if json_match:
+                possible_json = json_match.group(0)
+                # Attempt to parse it, and handle any trailing commas or minor issues
+                possible_json = re.sub(r",\s*\}", "}", possible_json)
+                return json.loads(possible_json)
 
-            # Check for common truncation indicators (excluding markdown code blocks)
-            truncation_indicators = ["...", "truncated", "incomplete"]
-            # Check for incomplete JSON structure (missing closing braces)
-            json_incomplete = False
-            if "```json" in cleaned_response:
-                json_part = cleaned_response.split("```json")[1].split("```")[0].strip()
-                open_braces = json_part.count('{')
-                close_braces = json_part.count('}')
-                json_incomplete = open_braces > close_braces
-            
-            if any(indicator in cleaned_response.lower() for indicator in truncation_indicators) or json_incomplete:
-                print(f"DEBUG - Detected potential truncation in response")
-                # Try to extract partial JSON if possible
-                if "```json" in cleaned_response:
-                    try:
-                        json_part = cleaned_response.split("```json")[1]
-                        json_content = json_part.split("```")[0].strip()
-                        # Remove any trailing incomplete text
-                        if json_content.endswith('"'):
-                            # Find the last complete field
-                            lines = json_content.split('\n')
-                            complete_lines = []
-                            for line in lines:
-                                if line.strip().endswith(',') or line.strip().endswith('{') or line.strip().endswith('}'):
-                                    complete_lines.append(line)
-                                elif '"' in line and ':' in line and (line.strip().endswith('"') or line.strip().endswith('",') or line.strip().endswith('",')):
-                                    complete_lines.append(line)
-                                else:
-                                    break
-                            
-                            # Reconstruct JSON
-                            if complete_lines:
-                                json_content = '\n'.join(complete_lines)
-                                if not json_content.strip().endswith('}'):
-                                    json_content += '\n}'
-                                
-                                try:
-                                    partial_data = json.loads(json_content)
-                                    print(f"DEBUG - Successfully extracted partial JSON")
-                                    # Fill in missing fields with defaults
-                                    default_response = {
-                                        "specieIdentified": "Unknown species",
-                                        "nativeRegion": "Unknown",
-                                        "invasiveOrNot": False,
-                                        "invasiveEffects": "Analysis incomplete",
-                                        "nativeAlternatives": [],
-                                        "removeInstructions": "Analysis incomplete"
-                                    }
-                                    default_response.update(partial_data)
-                                    return default_response
-                                except json.JSONDecodeError:
-                                    pass
-                    except:
-                        pass
-
-            # Try to parse as JSON directly
-            try:
-                parsed_json = json.loads(cleaned_response)
-                print(f"DEBUG - Extracted JSON: {parsed_json}")
-                return parsed_json
-            except json.JSONDecodeError:
-                pass
-
-            # Look for JSON in markdown blocks
-            if "```json" in cleaned_response:
-                json_part = cleaned_response.split("```json")[1]
-                json_content = json_part.split("```")[0].strip()
-                
-                try:
-                    parsed_json = json.loads(json_content)
-                    print(f"DEBUG - Extracted JSON: {parsed_json}")
-                    return parsed_json
-                except json.JSONDecodeError as e:
-                    print(f"DEBUG - JSON parsing failed: {e}")
-                    print(f"DEBUG - Attempted to parse: {json_content[:200]}...")
-
-            # If all parsing fails, return error response
-            print(f"DEBUG - All parsing methods failed, returning error response")
+            # If no JSON found, return a structured error
             return {
                 "specieIdentified": "Parsing error",
                 "nativeRegion": "Unknown",
@@ -224,6 +134,17 @@ class Imager:
                 "removeInstructions": "Unable to provide removal instructions due to parsing error."
             }
 
+        except json.JSONDecodeError as e:
+            print(f"DEBUG - JSON parsing failed: {e}")
+            print(f"DEBUG - Attempted to parse: {response_text[:200]}...")
+            return {
+                "specieIdentified": "Parsing error",
+                "nativeRegion": "Unknown",
+                "invasiveOrNot": False,
+                "invasiveEffects": "Unable to parse the analysis response. Please try again.",
+                "nativeAlternatives": [],
+                "removeInstructions": "Unable to provide removal instructions due to parsing error."
+            }
         except Exception as e:
             print(f"DEBUG - Exception in parse_llm_response: {e}")
             return {
@@ -234,3 +155,12 @@ class Imager:
                 "nativeAlternatives": [],
                 "removeInstructions": "Unable to provide removal instructions due to error."
             }
+
+    def _image_to_base64(self, image_path: str)->str:
+        """Convert image file to base64 string"""
+        try:
+            with open(image_path, "rb") as image_file:
+                encoded_string = base64.b64encode(image_file.read()).decode("utf-8")
+                return encoded_string
+        except Exception as e:
+            return f"Error reading image file: {e}"
