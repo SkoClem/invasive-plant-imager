@@ -102,7 +102,7 @@ function AppContent() {
         const restoredCollection = parsedCollection.map((img: any) => ({
           ...img,
           timestamp: new Date(img.timestamp),
-          // Note: File objects and preview URLs cannot be restored from localStorage
+          // preview (data URL) is restored as-is if present
         }));
         setImageCollection(restoredCollection);
       } catch (error) {
@@ -118,9 +118,21 @@ function AppContent() {
       const serializableCollection = collection.map(img => ({
         ...img,
         file: undefined, // Remove File object as it's not serializable
-        preview: img.preview && img.preview.startsWith('blob:') ? undefined : img.preview, // Remove blob URLs
+        // Keep data URLs; strip blob: URLs as they are not restorable
+        preview: img.preview && img.preview.startsWith('blob:') ? undefined : img.preview,
       }));
-      localStorage.setItem('imageCollection', JSON.stringify(serializableCollection));
+      try {
+        localStorage.setItem('imageCollection', JSON.stringify(serializableCollection));
+      } catch (err) {
+        console.error('Failed to save collection to localStorage:', err);
+        // As a fallback, try saving without previews if quota is exceeded
+        try {
+          const fallbackCollection = serializableCollection.map(img => ({ ...img, preview: undefined }));
+          localStorage.setItem('imageCollection', JSON.stringify(fallbackCollection));
+        } catch (err2) {
+          console.error('Fallback save without previews also failed:', err2);
+        }
+      }
     }
   };
 
