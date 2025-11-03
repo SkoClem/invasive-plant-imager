@@ -5,12 +5,11 @@ import { convertToPlantInfo } from '../utils/dataConversion';
 
 interface LoadingPageProps {
   setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results') => void;
-  setPlantData: (data: PlantInfo) => void;
   pendingAnalysis: { file: File; region: string; imageId?: string } | null;
   updateImageInCollection: (imageId: string, plantData: PlantInfo | null, status: 'completed' | 'error') => void;
 }
 
-function LoadingPage({ setCurrentPage, setPlantData, pendingAnalysis, updateImageInCollection }: LoadingPageProps) {
+function LoadingPage({ setCurrentPage, pendingAnalysis, updateImageInCollection }: LoadingPageProps) {
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState(0);
   const [progressMessage, setProgressMessage] = useState('Initializing analysis...');
@@ -185,8 +184,6 @@ function LoadingPage({ setCurrentPage, setPlantData, pendingAnalysis, updateImag
           const imageId = pendingAnalysis.imageId || 'latest';
           updateImageInCollection(imageId, plantInfo, 'completed');
           
-          setPlantData(plantInfo);
-          
           // Small delay to show completion
           setTimeout(() => {
             setCurrentPage('results');
@@ -234,7 +231,7 @@ function LoadingPage({ setCurrentPage, setPlantData, pendingAnalysis, updateImag
       hasStartedAnalysis.current = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pendingAnalysis, setCurrentPage, setPlantData, updateImageInCollection]);
+  }, [pendingAnalysis, setCurrentPage, updateImageInCollection]);
 
   return (
     <section className="loading-section">

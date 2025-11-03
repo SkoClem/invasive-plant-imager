@@ -35,7 +35,7 @@ function AppContent() {
   const [currentPage, setCurrentPage] = useState<PageType>('home');
   const [transitionDirection, setTransitionDirection] = useState<DirectionType>('forward');
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [plantData, setPlantData] = useState<PlantInfo | null>(null);
+
   const [pendingAnalysis, setPendingAnalysis] = useState<{ file: File; region: string; imageId?: string } | null>(null);
   const [selectedRegion, setSelectedRegion] = useState<string>('');
   const [imageCollection, setImageCollection] = useState<CollectedImage[]>([]);
@@ -360,7 +360,6 @@ function AppContent() {
             case 'loading':
               return <LoadingPage
                 setCurrentPage={navigateToPage}
-                setPlantData={setPlantData}
                 pendingAnalysis={pendingAnalysis}
                 updateImageInCollection={updateImageInCollection}
               />;
