@@ -255,8 +255,8 @@ function AppContent() {
   
     const updatedCollection = [...imageCollection, newImage];
     setImageCollection(updatedCollection);
-+   // Set lastResultId immediately so ResultsPage can resolve the item reliably
-+   setLastResultId(newImage.id);
+    // Set lastResultId immediately so ResultsPage can resolve the item reliably
+    setLastResultId(newImage.id);
   
     // For authenticated users, upload the image to backend
     if (isAuthenticated) {
