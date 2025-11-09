@@ -40,20 +40,6 @@ function LoadingPage({ setCurrentPage, pendingAnalysis, updateImageInCollection 
       return;
     }
 
-    if (!pendingAnalysis.file) {
-      console.error('❌ No file in pending analysis');
-      alert('No image file found. Please select an image and try again.');
-      setCurrentPage('upload');
-      return;
-    }
-
-    if (!pendingAnalysis.region) {
-      console.error('❌ No region in pending analysis');
-      alert('No region selected. Please select a region and try again.');
-      setCurrentPage('upload');
-      return;
-    }
-
     // Mark that analysis has started
     hasStartedAnalysis.current = true;
 
@@ -66,168 +52,78 @@ function LoadingPage({ setCurrentPage, pendingAnalysis, updateImageInCollection 
       if (hasMadeRequest || !isMounted) return;
       hasMadeRequest = true;
 
-      console.log('🌱 Starting analysis with:', {
-        fileName: pendingAnalysis.file.name,
-        fileSize: `${(pendingAnalysis.file.size / 1024 / 1024).toFixed(2)} MB`,
-        fileType: pendingAnalysis.file.type,
-        region: pendingAnalysis.region
-      });
-
-      // Show image info in loading screen
-      console.log(`📤 Uploading: ${pendingAnalysis.file.name} (${(pendingAnalysis.file.size / 1024 / 1024).toFixed(2)} MB)`);
-
-      // More realistic progress simulation
+      // Faster, smoother progress simulation
       let progressValue = 0;
-      
       const progressInterval = setInterval(() => {
         setProgress(prev => {
-          // Simulate more realistic progress curve - slower overall
-          if (prev < 20) {
-            // Slower initial progress (image upload/processing)
-            progressValue = prev + Math.random() * 3 + 1;
-          } else if (prev < 40) {
-            // Moderate progress (AI analysis starting)
-            progressValue = prev + Math.random() * 2 + 0.5;
-          } else if (prev < 70) {
-            // Slower progress (deep AI analysis)
-            progressValue = prev + Math.random() * 1.5 + 0.3;
+          if (prev < 50) {
+            progressValue = prev + Math.random() * 6 + 3; // rapid initial
           } else if (prev < 85) {
-            // Very slow progress (final processing)
-            progressValue = prev + Math.random() * 0.8 + 0.2;
+            progressValue = prev + Math.random() * 4 + 2; // moderate
+          } else if (prev < 98) {
+            progressValue = prev + Math.random() * 1.5 + 0.5; // final
           } else {
-            // Stay at 85-92% until API completes - more realistic
-            progressValue = Math.min(prev + Math.random() * 0.4, 92);
+            progressValue = 98;
           }
-          
-          return Math.min(progressValue, 92); // Cap at 92% until API completes
+          return Math.min(98, progressValue);
         });
-      }, 1200); // Slower updates - every 1.2 seconds for more realistic feel
+      }, 200);
 
-      // Step progression with better timing
       const stepInterval = setInterval(() => {
-        setCurrentStep(prev => {
-          const nextStep = Math.min(prev + 1, steps.length - 1);
-          if (nextStep < steps.length) {
-            setProgressMessage(steps[nextStep].description);
-          }
-          return nextStep;
-        });
-      }, 6000); // Longer step duration - 6 seconds per step
+        setCurrentStep(prev => Math.min(prev + 1, 2));
+      }, 800);
 
-      // Safety timeout - redirect back to upload after 2 minutes
+      // Hard safety timeout shortened
       const safetyTimeout = setTimeout(() => {
-        if (isMounted) {
-          console.error('⏰ Analysis timed out after 2 minutes');
-          clearInterval(progressInterval);
-          clearInterval(stepInterval);
-          alert('Analysis is taking too long. Please try again.');
-          setCurrentPage('upload');
-        }
-      }, 120000); // 2 minutes
-
-      try {
-        console.log('📡 Making API call to backend...');
-        setProgressMessage('Connecting to AI service...');
-        
-        // Add timestamp to track actual API timing
-        const apiStartTime = Date.now();
-        
-        const result = await plantAnalysisService.analyzePlant({
-          image: pendingAnalysis.file,
-          region: pendingAnalysis.region
-        });
-
         if (!isMounted) return;
-
-        const apiEndTime = Date.now();
-        const apiDuration = apiEndTime - apiStartTime;
-        console.log(`✅ API response received in ${apiDuration}ms (${(apiDuration / 1000).toFixed(1)}s)`);
-
-        // Complete the progress bar smoothly
         clearInterval(progressInterval);
         clearInterval(stepInterval);
-        
-        // Animate to 100% over 500ms for smooth completion
-        const completeProgress = () => {
-          let currentProgress = progress;
-          const targetProgress = 100;
-          const animationDuration = 500; // 500ms
-          const steps = 20;
-          const increment = (targetProgress - currentProgress) / steps;
-          const stepDuration = animationDuration / steps;
-          
-          let step = 0;
-          const animationInterval = setInterval(() => {
-            step++;
-            currentProgress += increment;
-            setProgress(Math.min(currentProgress, 100));
-            
-            if (step >= steps || currentProgress >= 100) {
-              clearInterval(animationInterval);
-              setProgress(100);
-            }
-          }, stepDuration);
-        };
-        
-        completeProgress();
-        setCurrentStep(steps.length - 1);
+        setProgress(100);
+        setProgressMessage('Finalizing...');
+      }, 20_000);
+
+      try {
+        setProgressMessage('Uploading image...');
+        const apiStart = Date.now();
+        const result = await plantAnalysisService.analyzePlant({
+          image: pendingAnalysis.file,
+          region: pendingAnalysis.region,
+        });
+        const apiDuration = Date.now() - apiStart;
+        console.log(`✅ API response in ${(apiDuration/1000).toFixed(1)}s`);
+
+        clearInterval(progressInterval);
+        clearInterval(stepInterval);
+        clearTimeout(safetyTimeout);
+        setProgress(100);
+        setCurrentStep(2);
         setProgressMessage('Analysis complete!');
 
-        // Clear safety timeout
-        clearTimeout(safetyTimeout);
-
         const plantInfo = convertToPlantInfo(result);
-        console.log('🔄 Converted to PlantInfo:', plantInfo);
-
-        if (isMounted) {
-          // Update the collection item status to completed using the actual imageId
-          const imageId = pendingAnalysis.imageId || 'latest';
-          updateImageInCollection(imageId, plantInfo, 'completed');
-          
-          // Small delay to show completion
-          setTimeout(() => {
-            setCurrentPage('results');
-          }, 1000);
-        }
+        const imageId = pendingAnalysis.imageId || 'latest';
+        // Await collection update to ensure latest result is available
+        await updateImageInCollection(imageId, plantInfo, 'completed');
+        // Navigate promptly to results
+        setCurrentPage('results');
       } catch (error) {
         if (!isMounted) return;
-
         console.error('❌ Analysis failed:', error);
         clearInterval(progressInterval);
         clearInterval(stepInterval);
         clearTimeout(safetyTimeout);
-        
         setProgress(0);
         setProgressMessage('Analysis failed');
-        
-        let errorMessage = 'Unknown error occurred';
-        if (error instanceof Error) {
-          errorMessage = error.message;
-        } else if (typeof error === 'string') {
-          errorMessage = error;
-        }
-        
-        console.error('📝 Error details:', {
-          message: errorMessage,
-          type: typeof error,
-          error: error
-        });
-        
-        // Update the collection item status to error using the actual imageId
         const imageId = pendingAnalysis.imageId || 'latest';
-        updateImageInCollection(imageId, null, 'error');
-        
-        alert(`Analysis failed: ${errorMessage}`);
+        await updateImageInCollection(imageId, null, 'error');
+        alert(`Analysis failed: ${error instanceof Error ? error.message : String(error)}`);
         setCurrentPage('upload');
       }
     };
 
     performAnalysis();
 
-    // Cleanup function
     return () => {
       isMounted = false;
-      // Reset the flag when component unmounts so it can start fresh if remounted
       hasStartedAnalysis.current = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

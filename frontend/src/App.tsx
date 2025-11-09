@@ -255,6 +255,8 @@ function AppContent() {
   
     const updatedCollection = [...imageCollection, newImage];
     setImageCollection(updatedCollection);
++   // Set lastResultId immediately so ResultsPage can resolve the item reliably
++   setLastResultId(newImage.id);
   
     // For authenticated users, upload the image to backend
     if (isAuthenticated) {
@@ -395,7 +397,10 @@ function AppContent() {
                 updateImageInCollection={updateImageInCollection}
               />;
             case 'results':
-              return <ResultsPage setCurrentPage={navigateToPage} resultItem={imageCollection.find(img => img.id === lastResultId)} />;
+              const fallbackResult = imageCollection.find(img => img.id === lastResultId) 
+              || [...imageCollection].reverse().find(img => img.status === 'completed')
+              || imageCollection[imageCollection.length - 1];
+              return <ResultsPage setCurrentPage={navigateToPage} resultItem={fallbackResult} />;
             default:
               return <HomePage
                 setCurrentPage={navigateToPage}
