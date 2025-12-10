@@ -166,13 +166,25 @@ function AppContent() {
     if (hasBackendSession) {
       try {
         await collectionService.deleteCollectionItem(itemId);
+        // Also delete any associated stored image for full removal
+        try {
+          await imageService.deleteImage(itemId);
+        } catch (error) {
+          console.warn('Failed to delete stored image for item:', itemId, error);
+        }
       } catch (error) {
         console.error('Failed to delete item from backend:', error);
       }
     }
     
-    // Update local state
-    setImageCollection(prev => prev.filter(img => img.id !== itemId));
+    // Revoke any blob URLs and update local state
+    setImageCollection(prev => {
+      const target = prev.find(img => img.id === itemId);
+      if (target && target.preview && target.preview.startsWith('blob:')) {
+        try { URL.revokeObjectURL(target.preview); } catch {}
+      }
+      return prev.filter(img => img.id !== itemId);
+    });
   };
 
   // Clear entire collection
@@ -181,6 +193,11 @@ function AppContent() {
     if (hasBackendSession) {
       try {
         await collectionService.clearUserCollection();
+        try {
+          await imageService.clearUserImages();
+        } catch (error) {
+          console.warn('Failed to clear stored images:', error);
+        }
       } catch (error) {
         console.error('Failed to clear collection from backend:', error);
       }
@@ -188,8 +205,15 @@ function AppContent() {
       localStorage.removeItem('imageCollection');
     }
     
-    // Update local state
-    setImageCollection([]);
+    // Revoke any blob URLs and update local state
+    setImageCollection(prev => {
+      prev.forEach(img => {
+        if (img.preview && img.preview.startsWith('blob:')) {
+          try { URL.revokeObjectURL(img.preview); } catch {}
+        }
+      });
+      return [];
+    });
   };
 
   // Save region to localStorage whenever it changes

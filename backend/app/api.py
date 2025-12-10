@@ -82,6 +82,12 @@ async def delete_collection_item(
         success = collection_manager.delete_item_from_collection(user_id, request.item_id)
         
         if success:
+            # Also delete any associated stored image to fully remove user ties
+            try:
+                image_storage.delete_image(user_id, request.item_id)
+            except Exception:
+                # Swallow errors to ensure collection deletion response remains successful
+                pass
             return {"message": "Collection item deleted successfully", "success": True}
         else:
             raise HTTPException(status_code=404, detail="Collection item not found")
@@ -94,6 +100,11 @@ async def clear_user_collection(current_user: Dict[str, Any] = Depends(get_curre
     try:
         user_id = current_user['uid']
         success = collection_manager.clear_user_collection(user_id)
+        # Also clear all stored images
+        try:
+            image_storage.clear_user_images(user_id)
+        except Exception:
+            pass
         
         if success:
             return {"message": "Collection cleared successfully", "success": True}
@@ -230,7 +241,9 @@ async def get_image(
             content=image_info['data'],
             media_type=image_info['content_type'],
             headers={
-                "Content-Disposition": f"inline; filename={image_info['filename']}"
+                "Content-Disposition": f"inline; filename={image_info['filename']}",
+                # Cache short-term to reduce repeated fetch latency
+                "Cache-Control": "public, max-age=300"
             }
         )
         
@@ -259,6 +272,19 @@ async def delete_image(
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error deleting image: {str(e)}")
+
+@router.delete("/api/images")
+async def clear_images(current_user: Dict[str, Any] = Depends(get_current_user)):
+    """Delete all stored images for the authenticated user"""
+    try:
+        user_id = current_user['uid']
+        success = image_storage.clear_user_images(user_id)
+        if success:
+            return {"message": "All images deleted successfully", "success": True}
+        else:
+            raise HTTPException(status_code=500, detail="Failed to delete user images")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error clearing images: {str(e)}")
 
 @router.get("/api/images")
 async def list_user_images(current_user: Dict[str, Any] = Depends(get_current_user)):

@@ -182,6 +182,35 @@ class ImageService {
       return {};
     }
   }
+
+  /**
+   * Clear all images for the current user
+   */
+  async clearUserImages(): Promise<boolean> {
+    try {
+      const token = authService.getAccessToken();
+      if (!token) {
+        throw new Error('User not authenticated');
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/images`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      return result.success;
+    } catch (error) {
+      console.error('Error clearing user images:', error);
+      return false;
+    }
+  }
 }
 
 export const imageService = new ImageService();
