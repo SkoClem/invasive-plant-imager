@@ -343,9 +343,14 @@ function AppContent() {
             description: updatedImg.description,
             plant_data: updatedImg.plantData ? convertPlantInfoToBackend(updatedImg.plantData) : undefined
           };
-          collectionService.saveCollectionItem(collectionItem).catch(error => {
-            console.error('Failed to update item in backend:', error);
-          });
+          collectionService.saveCollectionItem(collectionItem)
+            .then(() => {
+              // Notify UI to refresh rewards (coins)
+              try { window.dispatchEvent(new Event('rewards-updated')); } catch {}
+            })
+            .catch(error => {
+              console.error('Failed to update item in backend:', error);
+            });
         }
         
         return updatedImg;

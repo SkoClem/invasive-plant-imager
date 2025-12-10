@@ -7,6 +7,7 @@ from app.auth import AuthService, get_current_user, get_current_user_optional
 from app.collections import collection_manager
 from app.image_storage import image_storage
 from app.rate_limiter import rate_limiter
+from app.rewards import rewards_manager
 
 imager = Imager()
 router = APIRouter()
@@ -168,10 +169,29 @@ async def analyze_plant(
             if current_user:
                 parsed_data['analyzed_by'] = current_user['uid']
                 parsed_data['user_email'] = current_user['email']
+
+                # Award coin only for NEW invasive species scans
+                try:
+                    is_invasive = bool(parsed_data.get('invasiveOrNot', False))
+                    species = str(parsed_data.get('specieIdentified') or '').strip()
+                    if is_invasive and species:
+                        awarded, total_coins = rewards_manager.award_species_if_new(current_user['uid'], species)
+                        parsed_data['coinAwarded'] = awarded
+                        parsed_data['coins'] = total_coins
+                    else:
+                        # Return current coin count even if nothing was awarded
+                        user_rewards = rewards_manager.get_user_rewards(current_user['uid'])
+                        parsed_data['coinAwarded'] = False
+                        parsed_data['coins'] = int(user_rewards.get('coins', 0))
+                except Exception as e:
+                    # Non-fatal: do not block analysis response on rewards errors
+                    parsed_data['coinAwarded'] = False
+                    parsed_data['coins'] = 0
+                    print(f"Rewards processing error: {e}")
             else:
                 parsed_data['analyzed_by'] = 'anonymous'
                 parsed_data['user_email'] = 'anonymous@example.com'
-
+            
             return parsed_data
             
         except Exception as analysis_error:
@@ -191,6 +211,17 @@ async def analyze_plant(
         rate_limiter.record_failure(rate_limit_key)
         print(f"❌ Unexpected error in plant analysis for user {user_identifier}: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+# Rewards endpoints
+@router.get("/api/rewards")
+async def get_rewards(current_user: Dict[str, Any] = Depends(get_current_user)):
+    """Get current user's rewards (coin count and awarded species list)"""
+    try:
+        user_id = current_user['uid']
+        data = rewards_manager.get_user_rewards(user_id)
+        return {"coins": int(data.get('coins', 0)), "awarded_species": data.get('awarded_species', [])}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching rewards: {str(e)}")
 
 # Image storage endpoints
 @router.post("/api/images/upload")

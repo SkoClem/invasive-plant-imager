@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { rewardsService } from '../services/rewardsService';
 
 interface AuthButtonProps {
   className?: string;
@@ -10,6 +11,7 @@ const AuthButton: React.FC<AuthButtonProps> = ({ className = '', variant = 'defa
   const { currentUser, firebaseUser, signInWithGoogle, logout, isAuthenticated } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [coinCount, setCoinCount] = useState<number>(0);
 
   const handleSignIn = async () => {
     setIsLoading(true);
@@ -39,6 +41,32 @@ const AuthButton: React.FC<AuthButtonProps> = ({ className = '', variant = 'defa
     setShowUserMenu(!showUserMenu);
   };
 
+  // Fetch rewards when authenticated, and refresh on custom event
+  useEffect(() => {
+    let mounted = true;
+    const fetchRewards = async () => {
+      if (!isAuthenticated) {
+        setCoinCount(0);
+        return;
+      }
+      try {
+        const data = await rewardsService.getRewards();
+        if (mounted) setCoinCount(data.coins || 0);
+      } catch (err) {
+        // Non-fatal
+        if (mounted) setCoinCount(0);
+      }
+    };
+    fetchRewards();
+
+    const onRewardsUpdated = () => fetchRewards();
+    window.addEventListener('rewards-updated', onRewardsUpdated);
+    return () => {
+      mounted = false;
+      window.removeEventListener('rewards-updated', onRewardsUpdated);
+    };
+  }, [isAuthenticated]);
+
   // Use isAuthenticated from context instead of just checking currentUser
   // This handles both development (requires backend) and production (Firebase only) modes
   if (isAuthenticated) {
@@ -66,6 +94,22 @@ const AuthButton: React.FC<AuthButtonProps> = ({ className = '', variant = 'defa
               className="user-avatar"
             />
             <span className="user-name">{userInfo.name || userInfo.displayName}</span>
+            <span className="user-coins" title="Coins earned from new invasive scans">
+              <svg
+                aria-hidden
+                className="clover-icon"
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                style={{ marginLeft: 8 }}
+              >
+                <path
+                  fill="#DAA520"
+                  d="M12 2c1.8 0 3.2 1.3 3.5 3 .3-1.7 1.7-3 3.5-3 2 0 3.5 1.5 3.5 3.5 0 1.9-1.4 3.4-3.2 3.5 1.8.1 3.2 1.6 3.2 3.5 0 2-1.5 3.5-3.5 3.5-1.8 0-3.2-1.3-3.5-3-.3 1.7-1.7 3-3.5 3-2 0-3.5-1.5-3.5-3.5 0-1.9 1.4-3.4 3.2-3.5-1.8-.1-3.2-1.6-3.2-3.5C8.5 3.5 10 2 12 2zm0 10.5c.6 0 1 .4 1 1v7h-2v-7c0-.6.4-1 1-1z"
+                />
+              </svg>
+              <span className="coin-count" style={{ marginLeft: 4 }}>{coinCount}</span>
+            </span>
             <svg className="menu-arrow" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
               <path d="M7 10l5 5 5-5z"/>
             </svg>
@@ -152,9 +196,7 @@ const AuthButton: React.FC<AuthButtonProps> = ({ className = '', variant = 'defa
         title="Sign in with Google"
       >
         {isLoading ? (
-          <svg className="loading-spinner" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
-          </svg>
+          <span className="sign-in-text">Signing in...</span>
         ) : (
           <svg className="google-icon" viewBox="0 0 24 24" width="20" height="20">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -175,10 +217,7 @@ const AuthButton: React.FC<AuthButtonProps> = ({ className = '', variant = 'defa
     >
       {isLoading ? (
         <>
-          <svg className="loading-spinner" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
-          </svg>
-          Signing in...
+          <span className="sign-in-text">Signing in...</span>
         </>
       ) : (
         <>
