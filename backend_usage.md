@@ -2,6 +2,15 @@
 
 This guide explains how to use the invasive plant imager backend API from a TypeScript React frontend.
 
+## Persistent Image Storage
+
+Images uploaded by authenticated users are stored in Firebase Cloud Storage when configured, ensuring availability across devices and deployments. To enable:
+
+- Set `FIREBASE_STORAGE_BUCKET` in the backend environment (e.g., `your-project-id.appspot.com`).
+- Provide Firebase Admin credentials via `FIREBASE_SERVICE_ACCOUNT_JSON` or `FIREBASE_SERVICE_ACCOUNT_PATH`.
+
+If Cloud Storage is not configured, the backend falls back to local JSON file storage under `backend/user_images/`, which is not durable in serverless environments.
+
 ## API Endpoint
 
 ### Analyze Plant Image
