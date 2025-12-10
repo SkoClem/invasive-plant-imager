@@ -6,9 +6,7 @@ interface CollectedImage {
   preview?: string; // Made optional since blob URLs can't be persisted
   status: 'analyzing' | 'completed' | 'error';
   species?: string;
-  confidence?: number;
   description?: string;
-  filename: string;
   timestamp: Date;
   region: string;
   plantData?: any;
@@ -22,6 +20,7 @@ interface CollectionPageProps {
 }
 
 function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem }: CollectionPageProps) {
+  const [viewMode, setViewMode] = React.useState<'mobile' | 'desktop'>('mobile');
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
@@ -124,16 +123,24 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem 
                 <span className="button-text">Add New Plant</span>
               </button>
               <div className="view-options">
-                <button className="view-button active">
+                <button
+                  className={`view-button ${viewMode === 'mobile' ? 'active' : ''}`}
+                  onClick={() => setViewMode('mobile')}
+                  title="Mobile view"
+                >
                   <span className="view-icon">📱</span>
                 </button>
-                <button className="view-button">
+                <button
+                  className={`view-button ${viewMode === 'desktop' ? 'active' : ''}`}
+                  onClick={() => setViewMode('desktop')}
+                  title="Desktop view"
+                >
                   <span className="view-icon">🖥️</span>
                 </button>
               </div>
             </div>
 
-            <div className="collection-grid enhanced">
+            <div className={`collection-grid enhanced ${viewMode === 'desktop' ? 'desktop-view' : ''}`}>
               {imageCollection.map((image) => {
                 const statusInfo = getStatusColor(image.status);
                 return (
@@ -169,7 +176,10 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem 
                     <div className="image-preview enhanced">
                       {image.preview ? (
                         <>
-                          <img src={image.preview} alt={image.filename} />
+                          <img
+                            src={image.preview}
+                            alt={`Plant image - ${image.plantData?.commonName || image.plantData?.scientificName || image.species || 'Unknown'}`}
+                          />
                           <div className="image-overlay">
                             <button className="overlay-button">
                               <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
@@ -192,7 +202,7 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem 
                           <h3 className="plant-name">
                             {image.plantData.commonName || image.plantData.scientificName || image.species || 'Unknown Plant'}
                           </h3>
-                          {image.plantData.scientificName && image.plantData.commonName && (
+                          {image.plantData.scientificName && (
                             <p className="scientific-name">{image.plantData.scientificName}</p>
                           )}
                           {image.plantData.region && (
@@ -209,17 +219,6 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem 
                               </span>
                             </div>
                           )}
-                          {image.confidence && (
-                            <div className="confidence-meter">
-                              <div className="confidence-label">Confidence: {image.confidence}%</div>
-                              <div className="confidence-bar">
-                                <div
-                                  className="confidence-fill"
-                                  style={{ width: `${image.confidence}%` }}
-                                ></div>
-                              </div>
-                            </div>
-                          )}
                           {image.plantData.description && (
                             <p className="plant-description">{image.plantData.description}</p>
                           )}
@@ -227,17 +226,6 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem 
                       ) : image.status === 'completed' && image.species ? (
                         <>
                           <h3 className="plant-name">{image.species}</h3>
-                          {image.confidence && (
-                            <div className="confidence-meter">
-                              <div className="confidence-label">Confidence: {image.confidence}%</div>
-                              <div className="confidence-bar">
-                                <div
-                                  className="confidence-fill"
-                                  style={{ width: `${image.confidence}%` }}
-                                ></div>
-                              </div>
-                            </div>
-                          )}
                           {image.description && (
                             <p className="plant-description">{image.description}</p>
                           )}
@@ -265,10 +253,6 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem 
                         </div>
                       )}
                       <div className="image-metadata">
-                        <div className="metadata-item">
-                          <span className="metadata-icon">📄</span>
-                          <span className="metadata-text">{image.filename}</span>
-                        </div>
                         <div className="metadata-item">
                           <span className="metadata-icon">🕒</span>
                           <span className="metadata-text">{formatDate(image.timestamp)}</span>

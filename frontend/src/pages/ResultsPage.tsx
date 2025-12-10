@@ -9,9 +9,7 @@ interface ResultsPageProps {
     preview?: string;
     status: 'analyzing' | 'completed' | 'error';
     species?: string;
-    confidence?: number;
     description?: string;
-    filename: string;
     region: string;
     plantData?: PlantInfo;
   };
@@ -35,7 +33,11 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ setCurrentPage, resultItem })
         {showDetailedResult ? (
           <div className="results-content">
             {resultItem?.preview ? (
-              <img className="results-image" src={resultItem.preview} alt={resultItem.filename} />
+              <img
+                className="results-image"
+                src={resultItem.preview}
+                alt={`Plant image - ${resultItem.plantData?.commonName || resultItem.plantData?.scientificName || resultItem.species || 'Unknown'}`}
+              />
             ) : (
               <div className="results-image placeholder">Image not available</div>
             )}
@@ -44,7 +46,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ setCurrentPage, resultItem })
               <h2 className="plant-name">
                 {resultItem.plantData?.commonName || resultItem.plantData?.scientificName || resultItem.species || 'Unknown Plant'}
               </h2>
-              {resultItem.plantData?.scientificName && resultItem.plantData?.commonName && (
+              {resultItem.plantData?.scientificName && (
                 <p className="scientific-name">{resultItem.plantData.scientificName}</p>
               )}
               {resultItem.plantData?.region && (
@@ -59,14 +61,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ setCurrentPage, resultItem })
                   <span className="status-text">
                     {resultItem.plantData.isInvasive ? 'Invasive Species' : 'Native Plant'}
                   </span>
-                </div>
-              )}
-              {resultItem.confidence && (
-                <div className="confidence-meter">
-                  <div className="confidence-label">Confidence: {resultItem.confidence}%</div>
-                  <div className="confidence-bar">
-                    <div className="confidence-fill" style={{ width: `${resultItem.confidence}%` }}></div>
-                  </div>
                 </div>
               )}
               {resultItem.plantData?.description && (

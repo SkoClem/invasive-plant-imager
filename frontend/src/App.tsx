@@ -23,9 +23,7 @@ interface CollectedImage {
   preview?: string; // Made optional since blob URLs can't be persisted
   status: 'analyzing' | 'completed' | 'error';
   species?: string;
-  confidence?: number;
   description?: string;
-  filename: string;
   timestamp: Date;
   region: string;
   plantData?: PlantInfo;
@@ -248,7 +246,6 @@ function AppContent() {
       file,
       preview: useDataUrl ? previewDataUrl! : URL.createObjectURL(file),
       status: 'analyzing',
-      filename: file.name,
       timestamp: new Date(),
       region: region || selectedRegion
     };
@@ -296,7 +293,6 @@ function AppContent() {
           status,
           plantData: plantData || undefined,
           species: plantData?.commonName || plantData?.scientificName || undefined,
-          confidence: 85, // Default confidence since PlantInfo doesn't have this field
           description: plantData?.description || undefined
         };
         
@@ -309,12 +305,10 @@ function AppContent() {
         if (isAuthenticated && status === 'completed') {
           const collectionItem: CollectionItem = {
             id: updatedImg.id,
-            filename: updatedImg.filename,
             timestamp: updatedImg.timestamp,
             region: updatedImg.region,
             status: updatedImg.status,
             species: updatedImg.species,
-            confidence: updatedImg.confidence,
             description: updatedImg.description,
             plant_data: updatedImg.plantData ? convertPlantInfoToBackend(updatedImg.plantData) : undefined
           };

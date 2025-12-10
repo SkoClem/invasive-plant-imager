@@ -32,12 +32,10 @@ export interface PlantInfo {
 
 export interface CollectionItem {
   id: string;
-  filename: string;
   timestamp: Date;
   region: string;
   status: 'analyzing' | 'completed' | 'error';
   species?: string;
-  confidence?: number;
   description?: string;
   plant_data?: PlantInfo;
 }

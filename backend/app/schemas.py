@@ -46,14 +46,15 @@ class PlantInfo(BaseModel):
 
 class CollectionItem(BaseModel):
     id: str
-    filename: str
     timestamp: datetime
     region: str
     status: str  # 'analyzing', 'completed', 'error'
     species: Optional[str] = None
-    confidence: Optional[float] = None
     description: Optional[str] = None
     plant_data: Optional[PlantInfo] = None
+
+    class Config:
+        extra = 'ignore'
 
 class SaveCollectionRequest(BaseModel):
     collection_item: CollectionItem

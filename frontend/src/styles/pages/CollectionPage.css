@@ -300,6 +300,16 @@
   transition: all var(--transition-standard);
 }
 
+/* Ensure scientific names are bold for clarity */
+.scientific-name {
+  font-weight: 700;
+}
+
+/* Desktop view layout for collection grid */
+.collection-grid.enhanced.desktop-view {
+  grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+}
+
 .action-button:hover {
   background: var(--bg-primary);
   color: var(--accent-bright);
@@ -396,7 +406,7 @@
 
 .plant-name {
   font-size: 1.3rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 1rem;
 }
