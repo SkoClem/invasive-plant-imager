@@ -13,6 +13,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import AuthButton from './components/AuthButton';
 import { collectionService, CollectionItem, PlantInfo as BackendPlantInfo } from './services/collectionService';
 import { imageService } from './services/imageService';
+import { authService } from './services/authService';
 
 type PageType = 'home' | 'upload' | 'collection' | 'about' | 'learn' | 'loading' | 'results';
 type DirectionType = 'forward' | 'backward';
@@ -41,9 +42,10 @@ function AppContent() {
   const pageRef = useRef<HTMLDivElement>(null);
   const { isAuthenticated } = useAuth();
 
-  // Load collection from backend if authenticated, otherwise from localStorage
+  // Load collection from backend if backend JWT is present, otherwise from localStorage
   const loadCollection = useCallback(async () => {
-    if (isAuthenticated) {
+    const hasBackendSession = authService.isAuthenticated();
+    if (hasBackendSession) {
       try {
         const backendCollection = await collectionService.getUserCollection();
         
@@ -152,14 +154,16 @@ function AppContent() {
 
   // Save collection whenever it changes (for localStorage users)
   useEffect(() => {
-    if (!isAuthenticated && imageCollection.length > 0) {
+    const hasBackendSession = authService.isAuthenticated();
+    if (!hasBackendSession && imageCollection.length > 0) {
       saveToLocalStorage(imageCollection);
     }
   }, [imageCollection, isAuthenticated]);
 
   // Delete collection item
   const deleteCollectionItem = async (itemId: string) => {
-    if (isAuthenticated) {
+    const hasBackendSession = authService.isAuthenticated();
+    if (hasBackendSession) {
       try {
         await collectionService.deleteCollectionItem(itemId);
       } catch (error) {
@@ -173,7 +177,8 @@ function AppContent() {
 
   // Clear entire collection
   const clearCollection = async () => {
-    if (isAuthenticated) {
+    const hasBackendSession = authService.isAuthenticated();
+    if (hasBackendSession) {
       try {
         await collectionService.clearUserCollection();
       } catch (error) {
@@ -240,7 +245,8 @@ function AppContent() {
   // Start analysis with file and region
   const startAnalysis = (file: File, region: string, previewDataUrl?: string | null) => {
     // Add image to collection with analyzing status
-    const useDataUrl = !isAuthenticated && previewDataUrl && typeof previewDataUrl === 'string';
+    const hasBackendSession = authService.isAuthenticated();
+    const useDataUrl = !hasBackendSession && previewDataUrl && typeof previewDataUrl === 'string';
     const newImage: CollectedImage = {
       id: Date.now().toString(),
       file,
@@ -255,8 +261,8 @@ function AppContent() {
     // Set lastResultId immediately so ResultsPage can resolve the item reliably
     setLastResultId(newImage.id);
   
-    // For authenticated users, upload the image to backend
-    if (isAuthenticated) {
+    // For users with backend session, upload the image to backend
+    if (hasBackendSession) {
       imageService.uploadImage(newImage.id, file).then(success => {
         if (success) {
           console.log(`✅ Image ${newImage.id} uploaded successfully to backend`);
@@ -301,8 +307,9 @@ function AppContent() {
           setLastResultId(updatedImg.id);
         }
         
-        // Save updated item to backend if authenticated
-        if (isAuthenticated && status === 'completed') {
+        // Save updated item to backend if backend session exists
+        const hasBackendSession = authService.isAuthenticated();
+        if (hasBackendSession && status === 'completed') {
           const collectionItem: CollectionItem = {
             id: updatedImg.id,
             timestamp: updatedImg.timestamp,
