@@ -2,8 +2,10 @@
 User Collections Management Module
 
 This module handles user collection storage and retrieval.
-For now, we'll use a simple in-memory storage with JSON file persistence.
-In production, this should be replaced with a proper database.
+
+Production-grade persistence:
+- Prefer Firebase Firestore via Admin SDK for durable, cross-device storage
+- Fallback to JSON file persistence locally when Firestore is unavailable
 """
 
 import json
@@ -12,7 +14,14 @@ from typing import Dict, List, Optional
 from datetime import datetime
 from app.schemas import CollectionItem, PlantInfo
 
-class CollectionManager:
+# Try to initialize Firestore client via Firebase Admin SDK
+try:
+    from firebase_admin import firestore
+    _firestore_client = firestore.client()
+except Exception as _e:
+    _firestore_client = None
+
+class FileCollectionManager:
     def __init__(self, storage_file: str = "user_collections.json"):
         self.storage_file = storage_file
         self.collections: Dict[str, List[Dict]] = {}
@@ -128,5 +137,96 @@ class CollectionManager:
             print(f"Error clearing user collection: {e}")
             return False
 
-# Global collection manager instance
-collection_manager = CollectionManager()
+class FirestoreCollectionManager:
+    """Firestore-backed collection manager for durable, cross-login persistence"""
+    def __init__(self, client):
+        self.client = client
+        self.collection_name = "user_collections"
+
+    def _doc_ref(self, user_id: str):
+        return self.client.collection(self.collection_name).document(user_id)
+
+    def add_item_to_collection(self, user_id: str, collection_item: CollectionItem) -> bool:
+        try:
+            doc_ref = self._doc_ref(user_id)
+            snapshot = doc_ref.get()
+            data = snapshot.to_dict() if snapshot.exists else {}
+            items: List[Dict] = data.get("items", [])
+
+            item_dict = collection_item.dict()
+
+            # Update or insert
+            existing_index = next((i for i, it in enumerate(items) if it.get('id') == collection_item.id), None)
+            if existing_index is not None:
+                items[existing_index] = item_dict
+            else:
+                items.insert(0, item_dict)
+
+            # Limit size
+            if len(items) > 100:
+                items = items[:100]
+
+            doc_ref.set({"items": items})
+            return True
+        except Exception as e:
+            print(f"Error adding item to Firestore collection: {e}")
+            return False
+
+    def get_user_collection(self, user_id: str) -> List[CollectionItem]:
+        try:
+            doc_ref = self._doc_ref(user_id)
+            snapshot = doc_ref.get()
+            if not snapshot.exists:
+                return []
+            data = snapshot.to_dict() or {}
+            items = data.get("items", [])
+
+            collection_items: List[CollectionItem] = []
+            for item_dict in items:
+                # Handle timestamp conversion: Firestore may return datetime or string
+                ts = item_dict.get('timestamp')
+                if isinstance(ts, str):
+                    try:
+                        item_dict['timestamp'] = datetime.fromisoformat(ts.replace('Z', '+00:00'))
+                    except Exception:
+                        # If parse fails, use current time as fallback
+                        item_dict['timestamp'] = datetime.utcnow()
+                # Plant data
+                if item_dict.get('plant_data') and isinstance(item_dict['plant_data'], dict):
+                    item_dict['plant_data'] = PlantInfo(**item_dict['plant_data'])
+                collection_items.append(CollectionItem(**item_dict))
+            return collection_items
+        except Exception as e:
+            print(f"Error getting Firestore user collection: {e}")
+            return []
+
+    def delete_item_from_collection(self, user_id: str, item_id: str) -> bool:
+        try:
+            doc_ref = self._doc_ref(user_id)
+            snapshot = doc_ref.get()
+            data = snapshot.to_dict() if snapshot.exists else {}
+            items: List[Dict] = data.get("items", [])
+            original_length = len(items)
+            items = [it for it in items if it.get('id') != item_id]
+            if len(items) < original_length:
+                doc_ref.set({"items": items})
+                return True
+            return False
+        except Exception as e:
+            print(f"Error deleting item from Firestore collection: {e}")
+            return False
+
+    def clear_user_collection(self, user_id: str) -> bool:
+        try:
+            doc_ref = self._doc_ref(user_id)
+            doc_ref.set({"items": []})
+            return True
+        except Exception as e:
+            print(f"Error clearing Firestore user collection: {e}")
+            return False
+
+# Global collection manager instance: prefer Firestore, fallback to file
+if _firestore_client is not None:
+    collection_manager = FirestoreCollectionManager(_firestore_client)
+else:
+    collection_manager = FileCollectionManager()
