@@ -178,7 +178,7 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem 
                         <>
                           <img
                             src={image.preview}
-                            alt={`Plant image - ${image.plantData?.commonName || image.plantData?.scientificName || image.species || 'Unknown'}`}
+                            alt={`${image.plantData?.commonName || image.plantData?.scientificName || image.species || 'Unknown'}`}
                           />
                           <div className="image-overlay">
                             <button className="overlay-button">

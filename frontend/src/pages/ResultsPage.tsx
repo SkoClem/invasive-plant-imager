@@ -36,7 +36,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ setCurrentPage, resultItem })
               <img
                 className="results-image"
                 src={resultItem.preview}
-                alt={`Plant image - ${resultItem.plantData?.commonName || resultItem.plantData?.scientificName || resultItem.species || 'Unknown'}`}
+                alt={`${resultItem.plantData?.commonName || resultItem.plantData?.scientificName || resultItem.species || 'Unknown'}`}
               />
             ) : (
               <div className="results-image placeholder">Image not available</div>
