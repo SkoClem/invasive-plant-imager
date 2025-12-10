@@ -80,7 +80,7 @@ function AppContent() {
     } else {
       loadFromLocalStorage();
     }
-  }, [isAuthenticated]);
+  }, []);
 
   // Load region and collection on component mount
   useEffect(() => {
