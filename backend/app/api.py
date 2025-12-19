@@ -58,7 +58,7 @@ async def save_collection_item(
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/api/collections", response_model=UserCollectionResponse)
-async def get_user_collection(current_user: Dict[str, Any] = Depends(get_current_user)):
+async def get_user_collection(request: Request, current_user: Dict[str, Any] = Depends(get_current_user)):
     """Get user's collection"""
     try:
         user_id = current_user['uid']
@@ -73,6 +73,10 @@ async def get_user_collection(current_user: Dict[str, Any] = Depends(get_current
                     url = image_storage.get_image_url(user_id, image_id)
                     if url:
                         item['image_url'] = url
+                    else:
+                        # Fallback for local storage: construct full API URL
+                        base_url = str(request.base_url).rstrip('/')
+                        item['image_url'] = f"{base_url}/api/images/{image_id}"
         
         return UserCollectionResponse(
             user_id=user_id,

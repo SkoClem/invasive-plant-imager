@@ -108,7 +108,7 @@ const AuthButton: React.FC<AuthButtonProps> = ({ className = '', variant = 'defa
                   d="M12 2c1.8 0 3.2 1.3 3.5 3 .3-1.7 1.7-3 3.5-3 2 0 3.5 1.5 3.5 3.5 0 1.9-1.4 3.4-3.2 3.5 1.8.1 3.2 1.6 3.2 3.5 0 2-1.5 3.5-3.5 3.5-1.8 0-3.2-1.3-3.5-3-.3 1.7-1.7 3-3.5 3-2 0-3.5-1.5-3.5-3.5 0-1.9 1.4-3.4 3.2-3.5-1.8-.1-3.2-1.6-3.2-3.5C8.5 3.5 10 2 12 2zm0 10.5c.6 0 1 .4 1 1v7h-2v-7c0-.6.4-1 1-1z"
                 />
               </svg>
-              <span className="coin-count" style={{ marginLeft: 4 }}>{coinCount}</span>
+              <span className="coin-count" style={{ marginLeft: 4, color: '#333', fontWeight: 'bold' }}>{coinCount}</span>
             </span>
             <svg className="menu-arrow" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
               <path d="M7 10l5 5 5-5z"/>
