@@ -1,4 +1,5 @@
 import { PlantAnalysisResponse, PlantAnalysisRequest } from '../types/plantAnalysis';
+import { authService } from './authService';
 
 const API_BASE_URL = (process.env.REACT_APP_API_URL || 'http://localhost:8000').replace(/\/$/, '');
 
@@ -36,9 +37,17 @@ class PlantAnalysisService {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minute timeout
 
+      const headers: HeadersInit = {};
+      const token = await authService.getAccessToken();
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       // Use regular fetch instead of authenticatedFetch to allow unauthenticated requests
+      // But include Authorization header if available to support user rewards
       const response = await fetch(`${API_BASE_URL}/api/analyze-plant`, {
         method: 'POST',
+        headers,
         body: formData,
         signal: controller.signal,
         // Don't set Content-Type header when using FormData - browser sets it automatically with boundary

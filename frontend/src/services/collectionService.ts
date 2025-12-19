@@ -38,6 +38,7 @@ export interface CollectionItem {
   species?: string;
   description?: string;
   plant_data?: PlantInfo;
+  image_url?: string;
 }
 
 export interface UserCollectionResponse {

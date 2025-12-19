@@ -99,6 +99,12 @@ function LoadingPage({ setCurrentPage, pendingAnalysis, updateImageInCollection 
         setCurrentStep(2);
         setProgressMessage('Analysis complete!');
 
+        // Dispatch event if coins were updated/awarded
+        if (result.coinAwarded || typeof result.coins === 'number') {
+          console.log('💰 Coins updated from analysis:', result.coins);
+          window.dispatchEvent(new Event('rewards-updated'));
+        }
+
         const plantInfo = convertToPlantInfo(result);
         const imageId = pendingAnalysis.imageId || 'latest';
         // Await collection update to ensure latest result is available

@@ -12,7 +12,7 @@ import json
 import os
 import base64
 from typing import Dict, Optional, List
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Try to initialize Firebase Cloud Storage via Admin SDK
 try:
@@ -166,7 +166,8 @@ class ImageStorageManager:
                     'filename': image_info['filename'],
                     'content_type': image_info['content_type'],
                     'stored_at': image_info['stored_at'],
-                    'size': image_info['size']
+                    'size': image_info['size'],
+                    'url': None # Local storage doesn't support public URLs
                 }
             
             return metadata
@@ -174,6 +175,10 @@ class ImageStorageManager:
         except Exception as e:
             print(f"Error getting image list for user {user_id}: {e}")
             return {}
+            
+    def get_image_url(self, user_id: str, image_id: str) -> Optional[str]:
+        """Get a direct URL for the image if supported (e.g. signed URL)"""
+        return None
 
 class CloudStorageImageManager:
     """Firebase Cloud Storage-backed image manager for durable persistence"""
@@ -256,17 +261,34 @@ class CloudStorageImageManager:
             for blob in blobs:
                 # Extract image_id from path
                 image_id = blob.name.split('/')[-1]
+                
+                # Generate signed URL
+                url = None
+                try:
+                    url = blob.generate_signed_url(expiration=timedelta(hours=1), method='GET')
+                except Exception:
+                    pass
+
                 info = {
                     "filename": (blob.metadata or {}).get("filename", image_id),
                     "content_type": blob.content_type or "application/octet-stream",
                     "stored_at": (blob.metadata or {}).get("stored_at", datetime.utcnow().isoformat()),
                     "size": blob.size or 0,
+                    "url": url
                 }
                 metadata[image_id] = info
             return metadata
         except Exception as e:
             print(f"Error listing images for user {user_id} from Cloud Storage: {e}")
             return {}
+
+    def get_image_url(self, user_id: str, image_id: str) -> Optional[str]:
+        try:
+            blob = self.bucket.blob(self._blob_path(user_id, image_id))
+            return blob.generate_signed_url(expiration=timedelta(hours=1), method='GET')
+        except Exception as e:
+            print(f"Error generating signed URL: {e}")
+            return None
 
 # Global instance: prefer Cloud Storage, fallback to file-based JSON storage
 if _storage_bucket is not None:

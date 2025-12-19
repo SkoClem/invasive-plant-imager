@@ -52,6 +52,7 @@ class CollectionItem(BaseModel):
     species: Optional[str] = None
     description: Optional[str] = None
     plant_data: Optional[PlantInfo] = None
+    image_url: Optional[str] = None
 
     class Config:
         extra = 'ignore'

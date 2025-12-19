@@ -11,6 +11,8 @@ export interface PlantAnalysisResponse {
   invasiveEffects: string;
   nativeAlternatives: NativeAlternative[];
   removeInstructions: string;
+  coins?: number;
+  coinAwarded?: boolean;
 }
 
 export interface PlantAnalysisRequest {

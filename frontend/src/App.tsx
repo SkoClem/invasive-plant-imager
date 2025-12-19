@@ -22,6 +22,7 @@ interface CollectedImage {
   id: string;
   file?: File; // Made optional since backend doesn't store File objects
   preview?: string; // Made optional since blob URLs can't be persisted
+  image_url?: string; // Direct URL from backend (e.g. signed URL)
   status: 'analyzing' | 'completed' | 'error';
   species?: string;
   description?: string;
@@ -50,10 +51,20 @@ function AppContent() {
         const backendCollection = await collectionService.getUserCollection();
         
         // For authenticated users, try to load images from backend
+        // Optimized: Use direct URLs if available to avoid heavy blob fetching
         const collectionWithImages = await Promise.all(
           backendCollection.map(async (item) => {
+            // If backend provides a direct URL (e.g. signed URL), use it
+            if (item.image_url) {
+              return {
+                ...item,
+                image_url: item.image_url,
+                preview: item.image_url
+              };
+            }
+
             try {
-              // Try to get the image blob from backend
+              // Fallback: try to get the image blob from backend (legacy/local mode)
               const imageBlob = await imageService.getImage(item.id);
               const preview = imageBlob ? URL.createObjectURL(imageBlob) : undefined;
               return {

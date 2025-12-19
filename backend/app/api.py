@@ -64,6 +64,16 @@ async def get_user_collection(current_user: Dict[str, Any] = Depends(get_current
         user_id = current_user['uid']
         collection = collection_manager.get_user_collection(user_id)
         
+        # Inject image URLs for each item
+        for item in collection:
+            if isinstance(item, dict):
+                image_id = item.get('id')
+                if image_id:
+                    # Get signed URL if available (Cloud Storage), or None (Local)
+                    url = image_storage.get_image_url(user_id, image_id)
+                    if url:
+                        item['image_url'] = url
+        
         return UserCollectionResponse(
             user_id=user_id,
             collection=collection,
@@ -214,9 +224,12 @@ async def analyze_plant(
 
 # Rewards endpoints
 @router.get("/api/rewards")
-async def get_rewards(current_user: Dict[str, Any] = Depends(get_current_user)):
+async def get_rewards(response: Response, current_user: Dict[str, Any] = Depends(get_current_user)):
     """Get current user's rewards (coin count and awarded species list)"""
     try:
+        # Prevent caching of rewards data
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        
         user_id = current_user['uid']
         data = rewards_manager.get_user_rewards(user_id)
         return {"coins": int(data.get('coins', 0)), "awarded_species": data.get('awarded_species', [])}
