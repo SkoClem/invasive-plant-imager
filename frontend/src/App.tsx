@@ -267,6 +267,8 @@ function AppContent() {
       specieIdentified: apiPlantInfo.scientificName || apiPlantInfo.commonName,
       nativeRegion: apiPlantInfo.region,
       invasiveOrNot: apiPlantInfo.isInvasive,
+      confidenceScore: apiPlantInfo.confidenceScore,
+      confidenceReasoning: apiPlantInfo.confidenceReasoning,
       invasiveEffects: apiPlantInfo.impact,
       nativeAlternatives: apiPlantInfo.nativeAlternatives.map(alt => ({
         commonName: alt.commonName,

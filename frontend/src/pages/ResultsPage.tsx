@@ -63,6 +63,28 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ setCurrentPage, resultItem })
                   </span>
                 </div>
               )}
+              
+              {resultItem.plantData?.confidenceScore !== undefined && (
+                <div className="confidence-section">
+                  <div className="confidence-header">
+                    <span className="confidence-label">Confidence Score:</span>
+                    <div className="confidence-badge-wrapper">
+                      <span className={`confidence-badge ${
+                        resultItem.plantData.confidenceScore >= 80 ? 'high' : 
+                        resultItem.plantData.confidenceScore >= 50 ? 'medium' : 'low'
+                      }`}>
+                        {resultItem.plantData.confidenceScore}%
+                      </span>
+                    </div>
+                  </div>
+                  {resultItem.plantData.confidenceReasoning && (
+                    <p className="confidence-reasoning">
+                      <span className="reasoning-label">Analysis:</span> {resultItem.plantData.confidenceReasoning}
+                    </p>
+                  )}
+                </div>
+              )}
+
               {resultItem.plantData?.description && (
                 <p className="plant-description">{resultItem.plantData.description}</p>
               )}

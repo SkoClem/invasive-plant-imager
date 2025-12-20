@@ -43,9 +43,9 @@ class Imager:
         """Update the region for analysis"""
         self.region = region
 
-    def analyze_plant_image(self, image_path_or_data: str)->dict:
+    def analyze_plant_image(self, image_path_or_data: str, date: str = None, season: str = None)->dict:
         """Analyze plant image for invasive species using optimized single-step approach"""
-        return self._get_optimized_analysis(image_path_or_data)
+        return self._get_optimized_analysis(image_path_or_data, date, season)
 
     def analyze_plant_image_legacy(self, image_path_or_data: str)->dict:
         """Legacy two-step analysis (kept for fallback)"""
@@ -57,7 +57,7 @@ class Imager:
 
         return json_response
 
-    def _get_optimized_analysis(self, image_path_or_data: str)->dict:
+    def _get_optimized_analysis(self, image_path_or_data: str, date: str = None, season: str = None)->dict:
         """Get optimized single-step analysis that returns JSON directly"""
         # Check if input is base64 data or file path
         if image_path_or_data.startswith('data:image') or len(image_path_or_data) > 100:  # Likely base64
@@ -65,7 +65,7 @@ class Imager:
         else:  # Likely file path
             image_data = self._image_to_base64(image_path_or_data)
 
-        prompt = optimized_analysis(self.region)
+        prompt = optimized_analysis(self.region, date, season)
 
         contents = self.image_llm.llm_contents(
             key=self.key,

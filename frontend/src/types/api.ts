@@ -8,6 +8,8 @@ export interface PlantInfo {
   scientificName: string;
   commonName: string;
   isInvasive: boolean;
+  confidenceScore?: number;
+  confidenceReasoning?: string;
   description: string;
   impact: string;
   nativeAlternatives: NativeAlternative[];

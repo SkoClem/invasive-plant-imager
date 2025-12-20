@@ -21,6 +21,8 @@ export interface PlantInfo {
   specieIdentified?: string;
   nativeRegion?: string;
   invasiveOrNot: boolean;
+  confidenceScore?: number;
+  confidenceReasoning?: string;
   invasiveEffects: string;
   nativeAlternatives: Array<{
     commonName: string;

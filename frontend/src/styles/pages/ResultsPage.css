@@ -395,3 +395,73 @@
     font-size: 0.75rem;
   }
 }
+
+/* Confidence Section Styles */
+.confidence-section {
+  background-color: var(--container-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  padding: 1.25rem;
+  margin: 1.5rem 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.confidence-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.confidence-label {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.confidence-badge-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.confidence-badge {
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.confidence-badge.high {
+  background-color: rgba(76, 175, 80, 0.15);
+  color: #2e7d32;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.confidence-badge.medium {
+  background-color: rgba(255, 152, 0, 0.15);
+  color: #ef6c00;
+  border: 1px solid rgba(255, 152, 0, 0.3);
+}
+
+.confidence-badge.low {
+  background-color: rgba(244, 67, 54, 0.15);
+  color: #c62828;
+  border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+.confidence-reasoning {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--secondary-text);
+  margin: 0;
+  background-color: rgba(0, 0, 0, 0.02);
+  padding: 0.75rem;
+  border-radius: 8px;
+}
+
+.reasoning-label {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-right: 0.25rem;
+}

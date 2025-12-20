@@ -8,6 +8,8 @@ export interface PlantAnalysisResponse {
   specieIdentified: string | null;
   nativeRegion: string | null;
   invasiveOrNot: boolean;
+  confidenceScore?: number;
+  confidenceReasoning?: string;
   invasiveEffects: string;
   nativeAlternatives: NativeAlternative[];
   removeInstructions: string;

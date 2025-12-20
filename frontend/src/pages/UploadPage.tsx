@@ -17,10 +17,22 @@ function UploadPage({ setCurrentPage, startAnalysis, selectedRegion, setSelected
   const [inputMode, setInputMode] = useState<InputMode>('camera');
   const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
 
-  // Set region to Texas on component mount
+  const texasRegions = [
+    'North Texas',
+    'Central Texas',
+    'East Texas',
+    'West Texas',
+    'South Texas',
+    'Gulf Coast',
+    'Panhandle'
+  ];
+
+  // Set default region if not set
   useEffect(() => {
-    setSelectedRegion('United States, Texas');
-  }, [setSelectedRegion]);
+    if (!selectedRegion) {
+      setSelectedRegion('Central Texas');
+    }
+  }, [selectedRegion, setSelectedRegion]);
 
   const switchInputMode = (direction: 'left' | 'right') => {
     let newMode: InputMode;
@@ -198,18 +210,99 @@ function UploadPage({ setCurrentPage, startAnalysis, selectedRegion, setSelected
           <div className="upload-section-content">
             <div className="upload-container">
               <div className="image-preview-container">
-                <img
-                  src={imagePreview}
-                  alt="Selected plant"
-                  className="image-preview"
+                {imagePreview ? (
+                  <>
+                    <img src={imagePreview} alt="Preview" className="image-preview" />
+                    <button 
+                      className="change-image-button"
+                      onClick={() => {
+                        setSelectedFile(null);
+                        setImagePreview(null);
+                      }}
+                    >
+                      Change Image
+                    </button>
+                  </>
+                ) : (
+                  <div 
+                    className="upload-placeholder" 
+                    onClick={triggerFileInput}
+                    role="button"
+                    tabIndex={0}
+                  >
+                    <div className="upload-icon">
+                      {inputMode === 'camera' ? '📸' : '📁'}
+                    </div>
+                    <p className="upload-text">
+                      {inputMode === 'camera' ? 'Tap to Take Photo' : 'Tap to Upload Image'}
+                    </p>
+                  </div>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture={inputMode === 'camera' ? 'environment' : undefined}
+                  className="file-input"
+                  onChange={handleFileSelect}
+                  style={{ display: 'none' }}
                 />
-                <button
-                  className="change-image-button"
-                  onClick={triggerFileInput}
-                >
-                  Change Image
-                </button>
               </div>
+              
+              {error && <div className="error-message">{error}</div>}
+
+              <button
+                className={`button primary-button upload-button ${!selectedFile ? 'disabled' : ''}`}
+                onClick={() => {
+                  if (selectedFile) {
+                    startAnalysis(selectedFile, selectedRegion, imagePreview);
+                  }
+                }}
+                disabled={!selectedFile}
+              >
+                {isAnalyzing ? 'Analyzing...' : 'Identify Plant'}
+              </button>
+            </div>
+
+            <div className="region-section">
+              <div className="region-display-container">
+                <div className="region-display">
+                  <div className="region-icon-wrapper">
+                    <span className="country-flag">🇺🇸</span>
+                    <svg 
+                      className="region-icon" 
+                      viewBox="0 0 24 24" 
+                      width="20"
+                      height="20"
+                      fill="currentColor"
+                    >
+                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                    </svg>
+                  </div>
+                  <div className="region-text-wrapper">
+                    <label htmlFor="region-select" className="region-label">Select Texas Region</label>
+                    <select 
+                      id="region-select"
+                      className="region-select"
+                      value={selectedRegion}
+                      onChange={(e) => setSelectedRegion(e.target.value)}
+                    >
+                      {texasRegions.map(region => (
+                        <option key={region} value={region}>{region}</option>
+                      ))}
+                    </select>
+                    <span className="region-subtitle">Specific region improves accuracy</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="upload-guidelines">
+              <h3>For best results:</h3>
+              <ul>
+                <li>Ensure good lighting when taking photos</li>
+                <li>Focus on the plant's distinctive features</li>
+                <li>Include leaves, flowers, or fruits if possible</li>
+              </ul>
             </div>
           </div>
         )}
@@ -318,12 +411,14 @@ const styles = `
   .country-flag { font-size: 1.5rem; flex-shrink: 0; }
   .region-icon { color: var(--accent-bright); flex-shrink: 0; }
   .region-text-wrapper { flex: 1; display: flex; flex-direction: column; gap: 0.25rem; }
-  .region-text { font-size: 1rem; font-weight: 600; color: var(--text-primary); }
-  .region-subtitle { font-size: 0.85rem; color: var(--secondary-text); }
+  .region-label { font-size: 0.8rem; color: var(--secondary-text); font-weight: 500; }
+  .region-select { font-size: 1rem; font-weight: 600; color: var(--text-primary); padding: 0.5rem; border: 1px solid var(--border-subtle); border-radius: 6px; background-color: white; width: 100%; cursor: pointer; outline: none; transition: border-color 0.2s; }
+  .region-select:focus { border-color: var(--accent-bright); }
+  .region-subtitle { font-size: 0.85rem; color: var(--secondary-text); margin-top: 0.25rem; }
   .upload-guidelines ul { list-style-position: inside; color: var(--secondary-text); padding-left: 0; margin: 0; }
   .upload-guidelines li { margin-bottom: 0.75rem; line-height: 1.5; font-size: 0.95rem; }
   @media (max-width: 480px) { .input-mode-toggle { gap: 0.75rem; padding: 0.75rem; } .mode-arrow { width: 40px; height: 40px; } .mode-display { padding: 1rem 1.5rem; min-width: 160px; } .mode-icon { font-size: 1.25rem; } .mode-text { font-size: 0.9rem; } .upload-section { padding-top: 60px; min-height: auto; padding-bottom: 120px; } .container { padding: 0 1rem; max-width: 100%; } .upload-guidelines { margin-top: 1.5rem; padding: 1.25rem; } .upload-guidelines h3 { font-size: 1rem; } .upload-guidelines li { font-size: 0.9rem; margin-bottom: 0.6rem; } .upload-button { margin-top: 1.5rem; min-width: auto; width: 100%; padding: 1rem; } .upload-section { margin-bottom: 2rem; } }
-  @media (hover: none) and (pointer: coarse) { .mode-arrow { width: 52px; height: 52px; } .mode-display { padding: 1.5rem 2rem; min-height: 80px; } .region-display { padding: 1rem; gap: 0.75rem; } .region-text { font-size: 0.95rem; } .region-subtitle { font-size: 0.8rem; } }
+  @media (hover: none) and (pointer: coarse) { .mode-arrow { width: 52px; height: 52px; } .mode-display { padding: 1.5rem 2rem; min-height: 80px; } .region-display { padding: 1rem; gap: 0.75rem; } .region-select { font-size: 1rem; padding: 0.75rem; } .region-subtitle { font-size: 0.8rem; } }
 `;
 
 if (typeof document !== 'undefined') {

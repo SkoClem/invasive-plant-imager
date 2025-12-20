@@ -1,11 +1,20 @@
-def optimized_analysis(region):
+def optimized_analysis(region, date=None, season=None):
     """Single-step optimized analysis that outputs JSON directly"""
-    return f"""Expert botanist for {region} invasive species. Analyze plant image, return ONLY valid JSON:
+    
+    context = f"Region: {region}"
+    if date:
+        context += f", Date: {date}"
+    if season:
+        context += f", Season: {season}"
+
+    return f"""Expert botanist for {region} invasive species. Analyze plant image with context: {context}. Return ONLY valid JSON:
 
 {{
   "specieIdentified": "species name or null",
   "nativeRegion": "native region/country", 
   "invasiveOrNot": boolean,
+  "confidenceScore": 0-100,
+  "confidenceReasoning": "explanation for confidence score based on visual traits and context (season, region)",
   "invasiveEffects": "effects or empty string",
   "nativeAlternatives": [
     {{
@@ -17,7 +26,7 @@ def optimized_analysis(region):
   "removeInstructions": "removal instructions or empty string"
 }}
 
-Always include native region. Focus on {region} invasive species. Be concise, accurate. JSON only."""
+Always include native region. Focus on {region} invasive species. Consider the season and date for identification accuracy. Be concise, accurate. JSON only."""
 
 def paragraph_analysis(region):
     """Generate paragraph analysis of plant image - now focused specifically on Texas"""

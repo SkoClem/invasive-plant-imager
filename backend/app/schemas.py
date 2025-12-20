@@ -40,6 +40,8 @@ class PlantInfo(BaseModel):
     specieIdentified: Optional[str] = None
     nativeRegion: Optional[str] = None
     invasiveOrNot: bool = False
+    confidenceScore: Optional[float] = None
+    confidenceReasoning: Optional[str] = None
     invasiveEffects: str = ""
     nativeAlternatives: List[Dict[str, str]] = []
     removeInstructions: str = ""

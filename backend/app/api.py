@@ -142,16 +142,28 @@ def chat(message: Message, current_user: Dict[str, Any] = Depends(get_current_us
 async def analyze_plant(
     request: Request,
     image: UploadFile = File(...),
-    region: str = Form("Texas"),  # Default to Texas, but will be overridden
+    region: str = Form("Texas"),  # Default to Texas if not provided
     current_user: Dict[str, Any] = Depends(get_current_user_optional)
 ):
     """Analyze plant image for Texas invasive species detection - authentication optional"""
-    # Always use Texas as the region for analysis
-    texas_region = "Texas"
     user_identifier = current_user.get('email') if current_user else 'anonymous'
     client_ip = request.client.host if request.client else "unknown"
     
-    print(f"Plant analysis request received from user: {user_identifier} for region: {texas_region}")
+    # Get current date and season
+    from datetime import datetime
+    current_date = datetime.now().strftime("%Y-%m-%d")
+    month = datetime.now().month
+    
+    if 3 <= month <= 5:
+        season = "Spring"
+    elif 6 <= month <= 8:
+        season = "Summer"
+    elif 9 <= month <= 11:
+        season = "Fall"
+    else:
+        season = "Winter"
+    
+    print(f"Plant analysis request received from user: {user_identifier} for region: {region}, Date: {current_date}, Season: {season}")
 
     # Rate limiting check
     rate_limit_key = rate_limiter.get_rate_limit_key(user_identifier, client_ip)
@@ -164,8 +176,8 @@ async def analyze_plant(
         if not image.content_type.startswith("image/"):
             raise HTTPException(status_code=400, detail="File must be an image")
 
-        # Always set region to Texas for analysis
-        imager.set_region(texas_region)
+        # Set region for analysis
+        imager.set_region(region)
 
         # Convert uploaded file to base64
         image_data = await image.read()
@@ -174,10 +186,13 @@ async def analyze_plant(
 
         # Analyze the image
         try:
-            parsed_data = imager.analyze_plant_image(base64_image)
+            parsed_data = imager.analyze_plant_image(base64_image, date=current_date, season=season)
             
             # Record successful request
             rate_limiter.record_success(rate_limit_key)
+            
+            # If user is authenticated, check for rewards
+            reward_data = None
             
             # Add user information to the response for potential future use (if authenticated)
             if current_user:
