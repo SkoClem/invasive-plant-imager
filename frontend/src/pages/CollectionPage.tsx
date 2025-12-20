@@ -3,7 +3,6 @@ import React from 'react';
 interface CollectedImage {
   id: string;
   file?: File; // Made optional since backend doesn't store File objects
-  preview?: string; // Made optional since blob URLs can't be persisted
   status: 'analyzing' | 'completed' | 'error';
   species?: string;
   description?: string;
@@ -161,29 +160,6 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem 
                           </svg>
                         </button>
                       </div>
-                    </div>
-
-                    <div className="image-preview enhanced">
-                      {image.preview ? (
-                        <>
-                          <img
-                            src={image.preview}
-                            alt={`${image.plantData?.commonName || image.plantData?.scientificName || image.species || 'Unknown'}`}
-                          />
-                          <div className="image-overlay">
-                            <button className="overlay-button">
-                              <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                              </svg>
-                            </button>
-                          </div>
-                        </>
-                      ) : (
-                        <div className="placeholder-image enhanced">
-                          <span className="placeholder-icon">📷</span>
-                          <p className="placeholder-text">Image not available</p>
-                        </div>
-                      )}
                     </div>
 
                     <div className="image-details enhanced">

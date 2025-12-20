@@ -6,7 +6,6 @@ interface ResultsPageProps {
   setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results') => void;
   resultItem?: {
     id: string;
-    preview?: string;
     status: 'analyzing' | 'completed' | 'error';
     species?: string;
     description?: string;
@@ -32,16 +31,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ setCurrentPage, resultItem })
 
         {showDetailedResult ? (
           <div className="results-content">
-            {resultItem?.preview ? (
-              <img
-                className="results-image"
-                src={resultItem.preview}
-                alt={`${resultItem.plantData?.commonName || resultItem.plantData?.scientificName || resultItem.species || 'Unknown'}`}
-              />
-            ) : (
-              <div className="results-image placeholder">Image not available</div>
-            )}
-
             <div className="results-details">
               <h2 className="plant-name">
                 {resultItem.plantData?.commonName || resultItem.plantData?.scientificName || resultItem.species || 'Unknown Plant'}

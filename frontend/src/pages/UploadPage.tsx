@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 interface UploadPageProps {
   setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results') => void;
-  startAnalysis: (file: File, region: string, previewDataUrl?: string | null) => void;
+  startAnalysis: (file: File, region: string) => void;
   selectedRegion: string;
   setSelectedRegion: (region: string) => void;
 }
@@ -69,65 +69,11 @@ function UploadPage({ setCurrentPage, startAnalysis, selectedRegion, setSelected
         lastModified: new Date(file.lastModified).toISOString()
       });
 
-      // Create preview data URL and compress for localStorage persistence
+      // Create preview data URL for immediate display
       const reader = new FileReader();
       reader.onload = (e) => {
         const originalDataUrl = e.target?.result as string;
-        // Attempt to compress to a reasonable thumbnail
-        const img = new Image();
-        img.onload = () => {
-          try {
-            // First pass: cap longest side to 640px, quality 0.7
-            const maxDim1 = 640;
-            const width1 = img.width;
-            const height1 = img.height;
-            const scale1 = Math.min(1, maxDim1 / Math.max(width1, height1));
-            const targetW1 = Math.round(width1 * scale1);
-            const targetH1 = Math.round(height1 * scale1);
-            const canvas1 = document.createElement('canvas');
-            canvas1.width = targetW1;
-            canvas1.height = targetH1;
-            const ctx1 = canvas1.getContext('2d');
-            if (!ctx1) {
-              console.warn('⚠️ Canvas context unavailable; using original data URL for preview');
-              setImagePreview(originalDataUrl);
-              return;
-            }
-            ctx1.drawImage(img, 0, 0, targetW1, targetH1);
-            let compressedDataUrl = canvas1.toDataURL('image/jpeg', 0.7);
-
-            // If still too large (>250KB), second pass: 320px, quality 0.6
-            const compressedKB1 = Math.round(compressedDataUrl.length / 1024);
-            if (compressedKB1 > 250) {
-              const maxDim2 = 320;
-              const scale2 = Math.min(1, maxDim2 / Math.max(width1, height1));
-              const targetW2 = Math.round(width1 * scale2);
-              const targetH2 = Math.round(height1 * scale2);
-              const canvas2 = document.createElement('canvas');
-              canvas2.width = targetW2;
-              canvas2.height = targetH2;
-              const ctx2 = canvas2.getContext('2d');
-              if (ctx2) {
-                ctx2.drawImage(img, 0, 0, targetW2, targetH2);
-                compressedDataUrl = canvas2.toDataURL('image/jpeg', 0.6);
-              }
-            }
-
-            const originalKB = Math.round(originalDataUrl.length / 1024);
-            const finalKB = Math.round(compressedDataUrl.length / 1024);
-            setImagePreview(compressedDataUrl);
-            console.log('🖼️ Image preview compressed for persistence');
-            console.log('📊 Preview size (original -> final):', `${originalKB} KB -> ${finalKB} KB`);
-          } catch (err) {
-            console.warn('⚠️ Preview compression failed, using original data URL:', err);
-            setImagePreview(originalDataUrl);
-          }
-        };
-        img.onerror = () => {
-          console.warn('⚠️ Failed to load image for compression; using original data URL');
-          setImagePreview(originalDataUrl);
-        };
-        img.src = originalDataUrl;
+        setImagePreview(originalDataUrl);
       };
       reader.readAsDataURL(file);
     }
@@ -254,7 +200,7 @@ function UploadPage({ setCurrentPage, startAnalysis, selectedRegion, setSelected
                 className={`button primary-button upload-button ${!selectedFile ? 'disabled' : ''}`}
                 onClick={() => {
                   if (selectedFile) {
-                    startAnalysis(selectedFile, selectedRegion, imagePreview);
+                    startAnalysis(selectedFile, selectedRegion);
                   }
                 }}
                 disabled={!selectedFile}
@@ -319,7 +265,7 @@ function UploadPage({ setCurrentPage, startAnalysis, selectedRegion, setSelected
             if (!selectedFile || !selectedRegion || isAnalyzing) return;
             setIsAnalyzing(true);
             setError(null);
-            startAnalysis(selectedFile, selectedRegion, imagePreview);
+            startAnalysis(selectedFile, selectedRegion);
           }}
           disabled={!selectedFile || !selectedRegion || isAnalyzing}
         >

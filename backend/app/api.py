@@ -5,7 +5,6 @@ from app.schemas import Message, PlantAnalysisRequest, PlantAnalysisResponse, Fi
 from app.backend import Imager
 from app.auth import AuthService, get_current_user, get_current_user_optional
 from app.collections import collection_manager
-from app.image_storage import image_storage
 from app.rate_limiter import rate_limiter
 from app.rewards import rewards_manager
 
@@ -64,20 +63,6 @@ async def get_user_collection(request: Request, current_user: Dict[str, Any] = D
         user_id = current_user['uid']
         collection = collection_manager.get_user_collection(user_id)
         
-        # Inject image URLs for each item
-        for item in collection:
-            if isinstance(item, dict):
-                image_id = item.get('id')
-                if image_id:
-                    # Get signed URL if available (Cloud Storage), or None (Local)
-                    url = image_storage.get_image_url(user_id, image_id)
-                    if url:
-                        item['image_url'] = url
-                    else:
-                        # Fallback for local storage: construct full API URL
-                        base_url = str(request.base_url).rstrip('/')
-                        item['image_url'] = f"{base_url}/api/images/{image_id}"
-        
         return UserCollectionResponse(
             user_id=user_id,
             collection=collection,
@@ -97,12 +82,6 @@ async def delete_collection_item(
         success = collection_manager.delete_item_from_collection(user_id, request.item_id)
         
         if success:
-            # Also delete any associated stored image to fully remove user ties
-            try:
-                image_storage.delete_image(user_id, request.item_id)
-            except Exception:
-                # Swallow errors to ensure collection deletion response remains successful
-                pass
             return {"message": "Collection item deleted successfully", "success": True}
         else:
             raise HTTPException(status_code=404, detail="Collection item not found")
@@ -115,11 +94,6 @@ async def clear_user_collection(current_user: Dict[str, Any] = Depends(get_curre
     try:
         user_id = current_user['uid']
         success = collection_manager.clear_user_collection(user_id)
-        # Also clear all stored images
-        try:
-            image_storage.clear_user_images(user_id)
-        except Exception:
-            pass
         
         if success:
             return {"message": "Collection cleared successfully", "success": True}
@@ -255,109 +229,4 @@ async def get_rewards(response: Response, current_user: Dict[str, Any] = Depends
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching rewards: {str(e)}")
 
-# Image storage endpoints
-@router.post("/api/images/upload")
-async def upload_image(
-    image_id: str = Form(...),
-    image: UploadFile = File(...),
-    current_user: Dict[str, Any] = Depends(get_current_user)
-):
-    """Upload and store an image for the authenticated user"""
-    try:
-        user_id = current_user['uid']
-        
-        # Read image data
-        image_data = await image.read()
-        
-        # Store the image
-        success = image_storage.store_image(
-            user_id=user_id,
-            image_id=image_id,
-            image_data=image_data,
-            filename=image.filename or f"{image_id}.jpg",
-            content_type=image.content_type or "image/jpeg"
-        )
-        
-        if success:
-            return {"message": "Image uploaded successfully", "success": True, "image_id": image_id}
-        else:
-            raise HTTPException(status_code=500, detail="Failed to store image")
-            
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error uploading image: {str(e)}")
 
-@router.get("/api/images/{image_id}")
-async def get_image(
-    image_id: str,
-    current_user: Dict[str, Any] = Depends(get_current_user)
-):
-    """Retrieve an image for the authenticated user"""
-    try:
-        user_id = current_user['uid']
-        
-        image_info = image_storage.get_image(user_id, image_id)
-        
-        if not image_info:
-            raise HTTPException(status_code=404, detail="Image not found")
-        
-        return Response(
-            content=image_info['data'],
-            media_type=image_info['content_type'],
-            headers={
-                "Content-Disposition": f"inline; filename={image_info['filename']}",
-                # Cache short-term to reduce repeated fetch latency
-                "Cache-Control": "public, max-age=300"
-            }
-        )
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error retrieving image: {str(e)}")
-
-@router.delete("/api/images/{image_id}")
-async def delete_image(
-    image_id: str,
-    current_user: Dict[str, Any] = Depends(get_current_user)
-):
-    """Delete an image for the authenticated user"""
-    try:
-        user_id = current_user['uid']
-        
-        success = image_storage.delete_image(user_id, image_id)
-        
-        if success:
-            return {"message": "Image deleted successfully", "success": True}
-        else:
-            raise HTTPException(status_code=404, detail="Image not found")
-            
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error deleting image: {str(e)}")
-
-@router.delete("/api/images")
-async def clear_images(current_user: Dict[str, Any] = Depends(get_current_user)):
-    """Delete all stored images for the authenticated user"""
-    try:
-        user_id = current_user['uid']
-        success = image_storage.clear_user_images(user_id)
-        if success:
-            return {"message": "All images deleted successfully", "success": True}
-        else:
-            raise HTTPException(status_code=500, detail="Failed to delete user images")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error clearing images: {str(e)}")
-
-@router.get("/api/images")
-async def list_user_images(current_user: Dict[str, Any] = Depends(get_current_user)):
-    """List all images for the authenticated user (metadata only)"""
-    try:
-        user_id = current_user['uid']
-        
-        images = image_storage.get_user_image_list(user_id)
-        
-        return {"images": images, "total": len(images)}
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error listing images: {str(e)}")

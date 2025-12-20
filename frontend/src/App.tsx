@@ -12,7 +12,6 @@ import ResultsPage from './pages/ResultsPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import AuthButton from './components/AuthButton';
 import { collectionService, CollectionItem, PlantInfo as BackendPlantInfo } from './services/collectionService';
-import { imageService } from './services/imageService';
 import { authService } from './services/authService';
 
 type PageType = 'home' | 'upload' | 'collection' | 'about' | 'learn' | 'loading' | 'results';
@@ -21,8 +20,6 @@ type DirectionType = 'forward' | 'backward';
 interface CollectedImage {
   id: string;
   file?: File; // Made optional since backend doesn't store File objects
-  preview?: string; // Made optional since blob URLs can't be persisted
-  image_url?: string; // Direct URL from backend (e.g. signed URL)
   status: 'analyzing' | 'completed' | 'error';
   species?: string;
   description?: string;
@@ -49,40 +46,7 @@ function AppContent() {
     if (hasBackendSession) {
       try {
         const backendCollection = await collectionService.getUserCollection();
-        
-        // For authenticated users, try to load images from backend
-        // Optimized: Use direct URLs if available to avoid heavy blob fetching
-        const collectionWithImages = await Promise.all(
-          backendCollection.map(async (item) => {
-            // If backend provides a direct URL (e.g. signed URL), use it
-            if (item.image_url) {
-              return {
-                ...item,
-                image_url: item.image_url,
-                preview: item.image_url
-              };
-            }
-
-            try {
-              // Fallback: try to get the image blob from backend (legacy/local mode)
-              const imageBlob = await imageService.getImage(item.id);
-              const preview = imageBlob ? URL.createObjectURL(imageBlob) : undefined;
-              return {
-                ...item,
-                preview
-              };
-            } catch (error) {
-              console.warn(`Could not load image for item ${item.id}:`, error);
-              // Return item without preview if image loading fails
-              return {
-                ...item,
-                preview: undefined
-              };
-            }
-          })
-        );
-        
-        setImageCollection(collectionWithImages);
+        setImageCollection(backendCollection);
       } catch (error) {
         console.error('Error loading collection from backend:', error);
         // Fall back to localStorage if backend fails
@@ -109,13 +73,10 @@ function AppContent() {
     if (savedCollection) {
       try {
         const parsedCollection = JSON.parse(savedCollection);
-        const previewMapRaw = localStorage.getItem('imagePreviewMap');
-        const previewMap: Record<string, string> = previewMapRaw ? JSON.parse(previewMapRaw) : {};
-        // Convert timestamp strings back to Date objects and attach preview from map if missing
+        // Convert timestamp strings back to Date objects
         const restoredCollection = parsedCollection.map((img: any) => ({
           ...img,
           timestamp: new Date(img.timestamp),
-          preview: img.preview || previewMap[img.id] || undefined,
         }));
         setImageCollection(restoredCollection);
       } catch (error) {
@@ -131,34 +92,12 @@ function AppContent() {
       const serializableCollection = collection.map(img => ({
         ...img,
         file: undefined, // Remove File object as it's not serializable
-        // Keep data URLs; strip blob: URLs as they are not restorable
-        preview: img.preview && img.preview.startsWith('blob:') ? undefined : img.preview,
       }));
-
-      // Maintain a separate preview map to recover previews for items that may have been saved without them previously
-      const previewMap: Record<string, string> = {};
-      serializableCollection.forEach(img => {
-        if (img.preview && typeof img.preview === 'string' && img.preview.startsWith('data:image')) {
-          previewMap[img.id] = img.preview;
-        }
-      });
 
       try {
         localStorage.setItem('imageCollection', JSON.stringify(serializableCollection));
-        localStorage.setItem('imagePreviewMap', JSON.stringify(previewMap));
       } catch (err) {
         console.error('Failed to save collection to localStorage:', err);
-        // As a fallback, try saving without previews if quota is exceeded
-        try {
-          const fallbackCollection = serializableCollection.map(img => ({ ...img, preview: undefined }));
-          localStorage.setItem('imageCollection', JSON.stringify(fallbackCollection));
-          // Attempt to trim preview map by only storing the most recent preview
-          const recent = collection[collection.length - 1];
-          const recentPreview = recent.preview && !recent.preview.startsWith('blob:') ? recent.preview : undefined;
-          localStorage.setItem('imagePreviewMap', JSON.stringify(recentPreview && recent.id ? { [recent.id]: recentPreview } : {}));
-        } catch (err2) {
-          console.error('Fallback save without previews also failed:', err2);
-        }
       }
     }
   };
@@ -177,23 +116,13 @@ function AppContent() {
     if (hasBackendSession) {
       try {
         await collectionService.deleteCollectionItem(itemId);
-        // Also delete any associated stored image for full removal
-        try {
-          await imageService.deleteImage(itemId);
-        } catch (error) {
-          console.warn('Failed to delete stored image for item:', itemId, error);
-        }
       } catch (error) {
         console.error('Failed to delete item from backend:', error);
       }
     }
     
-    // Revoke any blob URLs and update local state
+    // Update local state
     setImageCollection(prev => {
-      const target = prev.find(img => img.id === itemId);
-      if (target && target.preview && target.preview.startsWith('blob:')) {
-        try { URL.revokeObjectURL(target.preview); } catch {}
-      }
       return prev.filter(img => img.id !== itemId);
     });
   };
@@ -204,11 +133,6 @@ function AppContent() {
     if (hasBackendSession) {
       try {
         await collectionService.clearUserCollection();
-        try {
-          await imageService.clearUserImages();
-        } catch (error) {
-          console.warn('Failed to clear stored images:', error);
-        }
       } catch (error) {
         console.error('Failed to clear collection from backend:', error);
       }
@@ -216,15 +140,8 @@ function AppContent() {
       localStorage.removeItem('imageCollection');
     }
     
-    // Revoke any blob URLs and update local state
-    setImageCollection(prev => {
-      prev.forEach(img => {
-        if (img.preview && img.preview.startsWith('blob:')) {
-          try { URL.revokeObjectURL(img.preview); } catch {}
-        }
-      });
-      return [];
-    });
+    // Update local state
+    setImageCollection([]);
   };
 
   // Save region to localStorage whenever it changes
@@ -280,14 +197,12 @@ function AppContent() {
   };
 
   // Start analysis with file and region
-  const startAnalysis = (file: File, region: string, previewDataUrl?: string | null) => {
+  const startAnalysis = (file: File, region: string) => {
     // Add image to collection with analyzing status
     const hasBackendSession = authService.isAuthenticated();
-    const useDataUrl = !hasBackendSession && previewDataUrl && typeof previewDataUrl === 'string';
     const newImage: CollectedImage = {
       id: Date.now().toString(),
       file,
-      preview: useDataUrl ? previewDataUrl! : URL.createObjectURL(file),
       status: 'analyzing',
       timestamp: new Date(),
       region: region || selectedRegion
@@ -298,19 +213,8 @@ function AppContent() {
     // Set lastResultId immediately so ResultsPage can resolve the item reliably
     setLastResultId(newImage.id);
   
-    // For users with backend session, upload the image to backend
-    if (hasBackendSession) {
-      imageService.uploadImage(newImage.id, file).then(success => {
-        if (success) {
-          console.log(`✅ Image ${newImage.id} uploaded successfully to backend`);
-        } else {
-          console.error(`❌ Failed to upload image ${newImage.id} to backend`);
-        }
-      }).catch(error => {
-        console.error('Failed to upload image to backend:', error);
-      });
-    } else {
-      // Save to localStorage for non-authenticated users, preserving data URL preview
+    if (!hasBackendSession) {
+      // Save to localStorage for non-authenticated users
       saveToLocalStorage(updatedCollection);
     }
     
@@ -330,7 +234,6 @@ function AppContent() {
           }
         }
         
-        // Do not revoke blob URLs here to keep preview visible in collection
         const updatedImg: CollectedImage = {
           ...img,
           status,
