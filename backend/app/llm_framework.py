@@ -99,11 +99,24 @@ class ImageLLM:
 
         # Add image if provided
         if image_data:
-            # Assuming image_data is base64 encoded string
+            mime_type = "image/jpeg"
+            data = image_data
+
+            # Check if image_data is a Data URI
+            if isinstance(image_data, str) and image_data.startswith("data:"):
+                try:
+                    header, data = image_data.split(",", 1)
+                    # Extract mime type from header (e.g., "data:image/png;base64")
+                    if ";base64" in header:
+                        mime_type = header.split(":")[1].split(";")[0]
+                except Exception:
+                    # Fallback to defaults if parsing fails
+                    pass
+
             content_parts.append({
                 "inline_data": {
-                    "mime_type": "image/jpeg",  # or detect from image_data
-                    "data": image_data
+                    "mime_type": mime_type,
+                    "data": data
                 }
             })
 

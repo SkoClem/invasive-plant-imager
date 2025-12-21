@@ -156,7 +156,10 @@ async def analyze_plant(
         # Convert uploaded file to base64
         image_data = await image.read()
         import base64
-        base64_image = base64.b64encode(image_data).decode('utf-8')
+        base64_data = base64.b64encode(image_data).decode('utf-8')
+        
+        # Create Data URI with correct MIME type
+        base64_image = f"data:{image.content_type};base64,{base64_data}"
 
         # Analyze the image
         try:
@@ -200,6 +203,8 @@ async def analyze_plant(
         except Exception as analysis_error:
             # Record failure for rate limiting
             rate_limiter.record_failure(rate_limit_key)
+            import traceback
+            traceback.print_exc()
             print(f"❌ Plant analysis failed for user {user_identifier}: {str(analysis_error)}")
             raise HTTPException(
                 status_code=500, 
@@ -212,6 +217,8 @@ async def analyze_plant(
     except Exception as e:
         # Record failure for any other unexpected errors
         rate_limiter.record_failure(rate_limit_key)
+        import traceback
+        traceback.print_exc()
         print(f"❌ Unexpected error in plant analysis for user {user_identifier}: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 

@@ -20,9 +20,9 @@ class RateLimiter:
         self.requests: Dict[str, RateLimitInfo] = {}
         
         # Configuration
-        self.max_requests_per_minute = 15  # Increased from 10 to 15 requests per minute per user/IP
-        self.max_failures_before_block = 3  # Increased from 2 to 3 consecutive failures before blocking
-        self.failure_block_duration = 180  # Reduced from 300 to 180 seconds (3 minutes) for faster recovery
+        self.max_requests_per_minute = 30  # Increased limit for dev
+        self.max_failures_before_block = 10  # Increased failure tolerance
+        self.failure_block_duration = 10  # Short block duration
         self.request_window = 60  # 1 minute window for rate limiting
         
     def get_rate_limit_key(self, user_identifier: str, ip_address: str = "unknown") -> str:
