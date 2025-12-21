@@ -22,6 +22,10 @@ class Generate:
                  system_prompt:Optional[str]=None,
                  max_tokens:Optional[int]=None,
                  mode:str="default")->str:
+        # Auto-detect Gemini mode if URL suggests it
+        if "generativelanguage.googleapis.com" in self.url:
+            mode = "gemini"
+            
         if mode == "gemini":
             self.LLM = Gemini()
         contents = self.LLM.llm_contents(key=self.key,
