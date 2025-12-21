@@ -31,19 +31,6 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
     }).format(date);
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'analyzing':
-        return { bg: '#fff3cd', color: '#856404', icon: '🔄', text: 'Analyzing...' };
-      case 'completed':
-        return { bg: '#d4edda', color: '#155724', icon: '✅', text: 'Complete' };
-      case 'error':
-        return { bg: '#f8d7da', color: '#721c24', icon: '❌', text: 'Error' };
-      default:
-        return { bg: '#e2e3e5', color: '#383d41', icon: '❓', text: 'Unknown' };
-    }
-  };
-
   return (
     <section className="collection-section enhanced">
       <div className="container">
@@ -142,20 +129,20 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
 
             <div className={`collection-grid enhanced ${viewMode === 'desktop' ? 'desktop-view' : ''}`}>
               {imageCollection.map((image) => {
-                const statusInfo = getStatusColor(image.status);
                 return (
                   <div 
                     key={image.id} 
                     className="collection-item enhanced"
                     onClick={() => onItemClick && onItemClick(image.id)}
-                    style={{ cursor: 'pointer' }}
+                    style={{ 
+                      cursor: 'pointer',
+                      border: image.plantData?.isInvasive !== undefined 
+                        ? `4px solid ${image.plantData.isInvasive ? '#dc3545' : '#28a745'}` 
+                        : undefined
+                    }}
                   >
                     <div className="item-header">
-                      <div className={`status-badge ${image.status}`} style={{ backgroundColor: statusInfo.bg, color: statusInfo.color }}>
-                        <span className="status-icon">{statusInfo.icon}</span>
-                        <span className="status-text">{statusInfo.text}</span>
-                      </div>
-                      <div className="item-actions">
+                      <div className="item-actions" style={{ marginLeft: 'auto' }}>
                         <button 
                           className="action-button delete-button" 
                           title="Remove from collection"
@@ -184,14 +171,6 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
                             <div className="native-location">
                               <span className="location-icon">🌍</span>
                               <span className="location-text">Native to: {image.plantData.region}</span>
-                            </div>
-                          )}
-                          {image.plantData.isInvasive !== undefined && (
-                            <div className={`invasive-status ${image.plantData.isInvasive ? 'invasive' : 'native'}`}>
-                              <span className="status-icon">{image.plantData.isInvasive ? '🚨' : '✅'}</span>
-                              <span className="status-text">
-                                {image.plantData.isInvasive ? 'Invasive Species' : 'Native Plant'}
-                              </span>
                             </div>
                           )}
                           {image.plantData.description && (

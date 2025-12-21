@@ -109,10 +109,11 @@ function LoadingPage({ setCurrentPage, pendingAnalysis, updateImageInCollection 
         const imageId = pendingAnalysis.imageId || 'latest';
         // Await collection update to ensure latest result is available
         await updateImageInCollection(imageId, plantInfo, 'completed');
-        // Navigate promptly to results
-        setCurrentPage('results');
+        // Short delay to show 100% completion
+        setTimeout(() => {
+          setCurrentPage('upload');
+        }, 800);
       } catch (error) {
-        if (!isMounted) return;
         console.error('❌ Analysis failed:', error);
         clearInterval(progressInterval);
         clearInterval(stepInterval);
