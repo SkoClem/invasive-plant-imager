@@ -55,7 +55,7 @@ class Imager:
         generator = Generate()
         response = generator(
             prompt=prompt,
-            max_tokens=1000
+            max_tokens=4000  # Increased from 1000 to prevent cutoffs
         )
         return response
 

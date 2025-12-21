@@ -136,9 +136,8 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
                     onClick={() => onItemClick && onItemClick(image.id)}
                     style={{ 
                       cursor: 'pointer',
-                      border: image.plantData?.isInvasive !== undefined 
-                        ? `4px solid ${image.plantData.isInvasive ? '#dc3545' : '#28a745'}` 
-                        : undefined
+                      border: image.plantData?.isInvasive ? '2px solid #ef4444' : image.plantData?.isInvasive === false ? '2px solid #22c55e' : '2px solid transparent',
+                      padding: '12px' // Reduced padding
                     }}
                   >
                     <div className="item-header">
@@ -158,30 +157,39 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
                       </div>
                     </div>
 
-                    <div className="image-details enhanced">
+                    <div className="image-details enhanced" style={{ padding: '0 8px' }}>
                       {image.status === 'completed' && image.plantData ? (
                         <>
-                          <h3 className="plant-name">
+                          <h3 className="plant-name" style={{ fontSize: '1.1rem', marginBottom: '4px' }}>
                             {image.plantData.commonName || image.plantData.scientificName || image.species || 'Unknown Plant'}
                           </h3>
                           {image.plantData.scientificName && (
-                            <p className="scientific-name">{image.plantData.scientificName}</p>
+                            <p className="scientific-name" style={{ fontSize: '0.9rem', marginBottom: '4px' }}>{image.plantData.scientificName}</p>
                           )}
                           {image.plantData.region && (
-                            <div className="native-location">
+                            <div className="native-location" style={{ fontSize: '0.8rem', marginBottom: '4px' }}>
                               <span className="location-icon">🌍</span>
                               <span className="location-text">Native to: {image.plantData.region}</span>
                             </div>
                           )}
                           {image.plantData.description && (
-                            <p className="plant-description">{image.plantData.description}</p>
+                            <p className="plant-description" style={{ 
+                              fontSize: '0.9rem', 
+                              display: '-webkit-box',
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: 'vertical',
+                              overflow: 'hidden',
+                              marginBottom: '8px'
+                            }}>
+                              {image.plantData.description}
+                            </p>
                           )}
                         </>
                       ) : image.status === 'completed' && image.species ? (
                         <>
-                          <h3 className="plant-name">{image.species}</h3>
+                          <h3 className="plant-name" style={{ fontSize: '1.1rem' }}>{image.species}</h3>
                           {image.description && (
-                            <p className="plant-description">{image.description}</p>
+                            <p className="plant-description" style={{ fontSize: '0.9rem' }}>{image.description}</p>
                           )}
                         </>
                       ) : image.status === 'analyzing' ? (
