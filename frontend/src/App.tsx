@@ -331,6 +331,10 @@ function AppContent() {
                 imageCollection={imageCollection}
                 deleteCollectionItem={deleteCollectionItem}
                 clearCollection={clearCollection}
+                onItemClick={(id) => {
+                  setLastResultId(id);
+                  navigateToPage('results');
+                }}
               />;
             case 'about':
               return <AboutPage setCurrentPage={navigateToPage} />;

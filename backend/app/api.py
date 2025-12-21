@@ -1,7 +1,7 @@
 from typing import Dict, Any
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Depends, Request
 from fastapi.responses import Response
-from app.schemas import Message, PlantAnalysisRequest, PlantAnalysisResponse, FirebaseLoginRequest, LoginResponse, ProtectedResponse, SaveCollectionRequest, UserCollectionResponse, DeleteCollectionItemRequest
+from app.schemas import Message, ChatRequest, PlantAnalysisRequest, PlantAnalysisResponse, FirebaseLoginRequest, LoginResponse, ProtectedResponse, SaveCollectionRequest, UserCollectionResponse, DeleteCollectionItemRequest
 from app.backend import Imager
 from app.auth import AuthService, get_current_user, get_current_user_optional
 from app.collections import collection_manager
@@ -103,11 +103,11 @@ async def clear_user_collection(current_user: Dict[str, Any] = Depends(get_curre
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/api/chat")
-def chat(message: Message, current_user: Dict[str, Any] = Depends(get_current_user_optional)) -> dict[str, str]:
+def chat(request: ChatRequest, current_user: Dict[str, Any] = Depends(get_current_user_optional)) -> dict[str, str]:
     """Chat endpoint - optionally authenticated"""
     print(f"Message request received from user: {current_user.get('email') if current_user else 'anonymous'}")
     try:
-        response = imager.chat_response(message.message)
+        response = imager.chat_response(request.message, request.context)
         return {"text": response}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

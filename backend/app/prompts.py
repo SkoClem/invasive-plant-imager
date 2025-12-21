@@ -45,19 +45,42 @@ def json_information(analysis_text):
 {analysis_text}
 
 Return ONLY valid JSON:
-{{
-  "specieIdentified": "species name",
-  "nativeRegion": "native region",
-  "invasiveOrNot": boolean,
-  "invasiveEffects": "effects or empty string",
-  "nativeAlternatives": [
     {{
-      "commonName": "name",
-      "scientificName": "scientific name",
-      "characteristics": "brief description"
+      "specieIdentified": "species name",
+      "nativeRegion": "native region",
+      "invasiveOrNot": boolean,
+      "invasiveEffects": "effects or empty string",
+      "nativeAlternatives": [
+        {{
+          "commonName": "name",
+          "scientificName": "scientific name",
+          "characteristics": "brief description"
+        }}
+      ],
+      "removeInstructions": "removal instructions"
     }}
-  ],
-  "removeInstructions": "removal instructions"
-}}
 
-JSON only, no explanations."""
+    JSON only, no explanations."""
+
+def plant_expert_chat(question, context=None):
+    """Generate a response as a plant expert"""
+    plant_context = ""
+    if context:
+        species = context.get('species', 'this plant')
+        region = context.get('region', 'your area')
+        is_invasive = context.get('invasiveOrNot', False)
+        plant_context = f"The user is asking about {species}, which is {'invasive' if is_invasive else 'not invasive'} in {region}."
+        
+    return f"""You are an expert botanist and invasive species specialist. 
+{plant_context}
+
+The user is asking: "{question}"
+
+Provide a helpful, educational, and accurate response. 
+If the question is about threat level, explain the ecological impact.
+If about harms, detail specific negative effects on local flora/fauna.
+If about lookalikes, mention native plants that look similar.
+If about action, recommend specific removal or management techniques.
+
+Keep the answer concise (under 3 paragraphs) and easy to understand for a general audience.
+"""

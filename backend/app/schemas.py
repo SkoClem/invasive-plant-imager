@@ -6,6 +6,10 @@ from datetime import datetime
 class Message(BaseModel):
     message: str
 
+class ChatRequest(BaseModel):
+    message: str
+    context: Optional[Dict[str, Any]] = None
+
 class PlantAnalysisRequest(BaseModel):
     region: Optional[str] = "North America"
 

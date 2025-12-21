@@ -3,7 +3,7 @@ import base64
 import json
 import re
 llm = LLM()
-from app.prompts import paragraph_analysis, json_information, optimized_analysis
+from app.prompts import paragraph_analysis, json_information, optimized_analysis, plant_expert_chat
 from dotenv import load_dotenv
 #TODO: get environment variables without dotenv package
 load_dotenv(override=True)
@@ -42,6 +42,18 @@ class Imager:
     def set_region(self, region: str):
         """Update the region for analysis"""
         self.region = region
+
+    def chat_response(self, message: str, context: dict = None) -> str:
+        """Get chat response from expert botanist persona"""
+        prompt = plant_expert_chat(message, context)
+        
+        # Use regular LLM for text chat, not ImageLLM
+        generator = Generate()
+        response = generator(
+            prompt=prompt,
+            max_tokens=1000
+        )
+        return response
 
     def analyze_plant_image(self, image_path_or_data: str, date: str = None, season: str = None)->dict:
         """Analyze plant image for invasive species using optimized single-step approach"""

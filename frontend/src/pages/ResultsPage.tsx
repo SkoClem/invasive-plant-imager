@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { PlantInfo } from '../types/api';
+import PlantChat from '../components/PlantChat';
 
 interface ResultsPageProps {
   setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results') => void;
@@ -78,6 +79,10 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ setCurrentPage, resultItem })
                 <p className="plant-description">{resultItem.plantData.description}</p>
               )}
             </div>
+            
+            {resultItem.plantData && (
+              <PlantChat plantData={resultItem.plantData} />
+            )}
           </div>
         ) : (
           <div className="info-section">

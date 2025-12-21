@@ -16,9 +16,10 @@ interface CollectionPageProps {
   imageCollection: CollectedImage[];
   deleteCollectionItem?: (itemId: string) => Promise<void>;
   clearCollection?: () => Promise<void>;
+  onItemClick?: (itemId: string) => void;
 }
 
-function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem }: CollectionPageProps) {
+function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem, onItemClick }: CollectionPageProps) {
   const [viewMode, setViewMode] = React.useState<'mobile' | 'desktop'>('mobile');
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('en-US', {
@@ -143,7 +144,12 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem 
               {imageCollection.map((image) => {
                 const statusInfo = getStatusColor(image.status);
                 return (
-                  <div key={image.id} className="collection-item enhanced">
+                  <div 
+                    key={image.id} 
+                    className="collection-item enhanced"
+                    onClick={() => onItemClick && onItemClick(image.id)}
+                    style={{ cursor: 'pointer' }}
+                  >
                     <div className="item-header">
                       <div className={`status-badge ${image.status}`} style={{ backgroundColor: statusInfo.bg, color: statusInfo.color }}>
                         <span className="status-icon">{statusInfo.icon}</span>
@@ -153,7 +159,10 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem 
                         <button 
                           className="action-button delete-button" 
                           title="Remove from collection"
-                          onClick={() => deleteCollectionItem && deleteCollectionItem(image.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteCollectionItem && deleteCollectionItem(image.id);
+                          }}
                         >
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
