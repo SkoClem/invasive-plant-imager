@@ -1,10 +1,10 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { PlantInfo } from '../types/api';
-import PlantChat from '../components/PlantChat';
+import PlantChat, { Message } from '../components/PlantChat';
 
 interface ResultsPageProps {
-  setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results') => void;
+  setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results' | 'chat') => void;
   resultItem?: {
     id: string;
     status: 'analyzing' | 'completed' | 'error';
@@ -13,9 +13,11 @@ interface ResultsPageProps {
     region: string;
     plantData?: PlantInfo;
   };
+  messages: Message[];
+  onNewMessage: (message: Message) => void;
 }
 
-const ResultsPage: React.FC<ResultsPageProps> = ({ setCurrentPage, resultItem }) => {
+const ResultsPage: React.FC<ResultsPageProps> = ({ setCurrentPage, resultItem, messages, onNewMessage }) => {
   const { isAuthenticated } = useAuth();
 
   const showDetailedResult = resultItem && resultItem.status === 'completed';
@@ -81,7 +83,11 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ setCurrentPage, resultItem })
             </div>
             
             {resultItem.plantData && (
-              <PlantChat plantData={resultItem.plantData} />
+              <PlantChat 
+                plantData={resultItem.plantData} 
+                messages={messages}
+                onNewMessage={onNewMessage}
+              />
             )}
           </div>
         ) : (

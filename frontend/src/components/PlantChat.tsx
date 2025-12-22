@@ -5,14 +5,16 @@ import { useAuth } from '../contexts/AuthContext';
 
 const API_BASE_URL = (process.env.REACT_APP_API_URL || 'http://localhost:8000').replace(/\/$/, '');
 
-interface PlantChatProps {
-  plantData: PlantInfo;
-}
-
-interface Message {
+export interface Message {
   id: string;
   sender: 'user' | 'bot';
   text: string;
+}
+
+interface PlantChatProps {
+  plantData: PlantInfo;
+  messages: Message[];
+  onNewMessage: (message: Message) => void;
 }
 
 const PREDEFINED_QUESTIONS = [
@@ -24,17 +26,23 @@ const PREDEFINED_QUESTIONS = [
   "Tell me more about this plant."
 ];
 
-const PlantChat: React.FC<PlantChatProps> = ({ plantData }) => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 'welcome',
-      sender: 'bot',
-      text: `Hello! I'm your plant expert. I can tell you more about ${plantData.commonName || plantData.scientificName}. What would you like to know?`
-    }
-  ]);
+const PlantChat: React.FC<PlantChatProps> = ({ plantData, messages, onNewMessage }) => {
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { firebaseUser } = useAuth();
+  const initializedRef = useRef(false);
+
+  // Initialize with welcome message if empty
+  useEffect(() => {
+    if (messages.length === 0 && !initializedRef.current) {
+      initializedRef.current = true;
+      onNewMessage({
+        id: 'welcome',
+        sender: 'bot',
+        text: `Hello! I'm your plant expert. I can tell you more about ${plantData.commonName || plantData.scientificName}. What would you like to know?`
+      });
+    }
+  }, [messages.length, plantData.commonName, plantData.scientificName, onNewMessage]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -53,7 +61,7 @@ const PlantChat: React.FC<PlantChatProps> = ({ plantData }) => {
       sender: 'user',
       text: question
     };
-    setMessages(prev => [...prev, userMsg]);
+    onNewMessage(userMsg);
     setLoading(true);
 
     try {
@@ -91,7 +99,7 @@ const PlantChat: React.FC<PlantChatProps> = ({ plantData }) => {
         sender: 'bot',
         text: data.text
       };
-      setMessages(prev => [...prev, botMsg]);
+      onNewMessage(botMsg);
     } catch (error) {
       console.error('Chat error:', error);
       const errorMsg: Message = {
@@ -99,7 +107,7 @@ const PlantChat: React.FC<PlantChatProps> = ({ plantData }) => {
         sender: 'bot',
         text: "I'm sorry, I'm having trouble connecting to the expert database right now. Please try again later."
       };
-      setMessages(prev => [...prev, errorMsg]);
+      onNewMessage(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -107,10 +115,6 @@ const PlantChat: React.FC<PlantChatProps> = ({ plantData }) => {
 
   return (
     <div className="plant-chat-container">
-      <div className="chat-header">
-        <h3>🌱 Plant Expert Chat</h3>
-      </div>
-      
       <div className="chat-messages">
         {messages.map((msg) => (
           <div key={msg.id} className={`message ${msg.sender}`}>

@@ -12,7 +12,7 @@ interface CollectedImage {
 }
 
 interface CollectionPageProps {
-  setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results') => void;
+  setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results' | 'chat') => void;
   imageCollection: CollectedImage[];
   deleteCollectionItem?: (itemId: string) => Promise<void>;
   clearCollection?: () => Promise<void>;

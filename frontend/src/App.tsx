@@ -9,12 +9,14 @@ import AboutPage from './pages/AboutPage';
 import LearnPage from './pages/LearnPage';
 import LoadingPage from './pages/LoadingPage';
 import ResultsPage from './pages/ResultsPage';
+import ChatPage from './pages/ChatPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import AuthButton from './components/AuthButton';
 import { collectionService, CollectionItem, PlantInfo as BackendPlantInfo } from './services/collectionService';
 import { authService } from './services/authService';
+import { Message } from './components/PlantChat';
 
-type PageType = 'home' | 'upload' | 'collection' | 'about' | 'learn' | 'loading' | 'results';
+type PageType = 'home' | 'upload' | 'collection' | 'about' | 'learn' | 'loading' | 'results' | 'chat';
 type DirectionType = 'forward' | 'backward';
 
 interface CollectedImage {
@@ -37,6 +39,25 @@ function AppContent() {
   const [selectedRegion, setSelectedRegion] = useState<string>('');
   const [imageCollection, setImageCollection] = useState<CollectedImage[]>([]);
   const [lastResultId, setLastResultId] = useState<string | null>(null);
+  const [chatHistories, setChatHistories] = useState<Record<string, Message[]>>({});
+  
+  // Load chat history from local storage on mount
+  useEffect(() => {
+    const savedChat = localStorage.getItem('chatHistories');
+    if (savedChat) {
+      try {
+        setChatHistories(JSON.parse(savedChat));
+      } catch (e) {
+        console.error("Failed to parse chat history", e);
+      }
+    }
+  }, []);
+  
+  // Save chat history to local storage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('chatHistories', JSON.stringify(chatHistories));
+  }, [chatHistories]);
+  
   const pageRef = useRef<HTMLDivElement>(null);
   const { isAuthenticated, loading: authLoading } = useAuth();
 
@@ -160,7 +181,7 @@ function AppContent() {
   };
 
   // Define the order of pages for swipe navigation
-  const pageOrder: PageType[] = ['home', 'upload', 'collection', 'learn', 'about'];
+  const pageOrder: PageType[] = ['home', 'upload', 'collection', 'chat', 'learn', 'about'];
   // Note: loading and results pages are not in swipe navigation as they're part of the upload flow
 
   // Handle page navigation with direction detection
@@ -326,6 +347,21 @@ function AppContent() {
     setImageCollection(updatedCollection);
   };
 
+  const handleNewMessage = (message: Message, plantId?: string) => {
+    const targetId = plantId || lastResultId;
+    if (!targetId) return;
+    
+    setChatHistories(prev => ({
+      ...prev,
+      [targetId]: [...(prev[targetId] || []), message]
+    }));
+    
+    // If we're chatting about a plant that wasn't the "last result", make it so
+    if (plantId && plantId !== lastResultId) {
+      setLastResultId(plantId);
+    }
+  };
+
   // Handle swipe navigation (only for main pages)
   const handleSwipe = (direction: 'left' | 'right') => {
     // Don't allow swipe navigation on loading and results pages
@@ -356,6 +392,18 @@ function AppContent() {
       return transitionDirection === 'forward' ? 'page-forward-active' : 'page-backward-active';
     };
 
+    const currentPlant = imageCollection.find(img => img.id === lastResultId) 
+      || (currentPage === 'results' ? [...imageCollection].reverse().find(img => img.status === 'completed') : undefined)
+      || (imageCollection.length > 0 ? imageCollection[imageCollection.length - 1] : undefined);
+    
+    // Ensure we have a valid ID if we found a plant but lastResultId wasn't set
+    if (currentPlant && !lastResultId) {
+      // We don't call setLastResultId here to avoid render loop, but we use the ID for chat lookup
+    }
+    
+    const activeId = lastResultId || currentPlant?.id;
+    const currentMessages = activeId ? (chatHistories[activeId] || []) : [];
+
     return (
       <div 
         ref={pageRef}
@@ -382,8 +430,15 @@ function AppContent() {
                 clearCollection={clearCollection}
                 onItemClick={(id) => {
                   setLastResultId(id);
-                  navigateToPage('results');
+                  navigateToPage('chat');
                 }}
+              />;
+            case 'chat':
+              return <ChatPage 
+                currentPlant={currentPlant || null}
+                messages={currentMessages}
+                onNewMessage={(msg) => handleNewMessage(msg, activeId)}
+                onNavigateToCollection={() => navigateToPage('collection')}
               />;
             case 'about':
               return <AboutPage setCurrentPage={navigateToPage} />;
@@ -396,10 +451,12 @@ function AppContent() {
                 updateImageInCollection={updateImageInCollection}
               />;
             case 'results':
-              const fallbackResult = imageCollection.find(img => img.id === lastResultId) 
-              || [...imageCollection].reverse().find(img => img.status === 'completed')
-              || imageCollection[imageCollection.length - 1];
-              return <ResultsPage setCurrentPage={navigateToPage} resultItem={fallbackResult} />;
+              return <ResultsPage 
+                setCurrentPage={navigateToPage} 
+                resultItem={currentPlant} 
+                messages={currentMessages}
+                onNewMessage={(msg) => handleNewMessage(msg, activeId)}
+              />;
             default:
               return <HomePage
                 setCurrentPage={navigateToPage}
@@ -463,6 +520,17 @@ function AppContent() {
             </svg>
           </div>
           <span className="tab-label">Collection</span>
+        </button>
+        <button
+          className={`tab-item ${currentPage === 'chat' ? 'active' : ''}`}
+          onClick={() => navigateToPage('chat')}
+        >
+          <div className="tab-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+              <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
+            </svg>
+          </div>
+          <span className="tab-label">Chat</span>
         </button>
           <button
           className={`tab-item ${currentPage === 'learn' ? 'active' : ''}`}

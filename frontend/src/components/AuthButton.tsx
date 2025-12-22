@@ -17,6 +17,8 @@ const AuthButton: React.FC<AuthButtonProps> = ({ className = '', variant = 'defa
     setIsLoading(true);
     try {
       await signInWithGoogle();
+      // Reload page to ensure all states (collection, coins, etc.) are fresh
+      window.location.reload();
     } catch (error) {
       console.error('Sign in failed:', error);
       // You might want to show an error message to the user here
@@ -30,6 +32,8 @@ const AuthButton: React.FC<AuthButtonProps> = ({ className = '', variant = 'defa
     setShowUserMenu(false);
     try {
       await logout();
+      // Reload page to ensure clean state after logout
+      window.location.reload();
     } catch (error) {
       console.error('Sign out failed:', error);
     } finally {
