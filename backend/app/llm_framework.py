@@ -128,6 +128,14 @@ class ImageLLM:
         if max_tokens:
             payload["generationConfig"] = {"maxOutputTokens": max_tokens}
 
+        # Disable safety filters to prevent blocking benign plant images
+        payload["safetySettings"] = [
+            {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+            {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+            {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+            {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"}
+        ]
+
         headers = {
             "x-goog-api-key": key,
             "Content-Type": "application/json",
@@ -137,17 +145,24 @@ class ImageLLM:
     def get_output(self, url, llm_contents, mode='default'):
         payload, headers = llm_contents[0], llm_contents[1]
         try:
-            # Add timeout to prevent hanging - 60 seconds should be sufficient for most LLM responses
-            response = requests.post(url, json=payload, headers=headers, timeout=60)
+            # Add timeout to prevent hanging - 120 seconds for slower image analysis
+            response = requests.post(url, json=payload, headers=headers, timeout=120)
             response.raise_for_status()
 
             result = response.json()
             
             # Check if response was truncated due to token limit
-            if result["candidates"][0].get("finishReason") == "MAX_TOKENS":
-                return "Response truncated due to token limit. Please increase max_tokens."
+            if "candidates" in result and result["candidates"] and result["candidates"][0].get("finishReason") == "MAX_TOKENS":
+                # Still try to get content even if truncated
+                pass
             
             # Check if parts exist in the response
+            if "candidates" not in result or not result["candidates"]:
+                 return f"Error: No candidates returned. Safety settings might have blocked it. Response: {result}"
+
+            if "content" not in result["candidates"][0]:
+                 return f"Error: No content in candidate. Finish reason: {result['candidates'][0].get('finishReason', 'unknown')}"
+            
             if "parts" not in result["candidates"][0]["content"]:
                 return f"No content parts in response. Finish reason: {result['candidates'][0].get('finishReason', 'unknown')}"
             
@@ -155,9 +170,12 @@ class ImageLLM:
             return str(output)
 
         except requests.exceptions.HTTPError as e:
-            return f"HTTP Error: {e}\nResponse Content: {e.response.text}"
+            error_msg = f"HTTP Error: {e}"
+            if e.response is not None:
+                error_msg += f"\nResponse Content: {e.response.text}"
+            return error_msg
         except requests.exceptions.Timeout:
-            return f"Request timed out after 60 seconds. The LLM service may be overloaded. Please try again later."
+            return f"Request timed out after 120 seconds. The LLM service may be overloaded. Please try again later."
         except (KeyError, IndexError) as e:
             return f"Error parsing API response: {e}\nResponse JSON: {result}"
         except Exception as e:
@@ -175,6 +193,14 @@ class Gemini:
         }
         if max_tokens:
             payload["generationConfig"] = {"maxOutputTokens": max_tokens}
+        
+        # Disable safety filters
+        payload["safetySettings"] = [
+            {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+            {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+            {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+            {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"}
+        ]
             
         headers = {
             "x-goog-api-key": key,
@@ -185,19 +211,29 @@ class Gemini:
     def get_output(self, url, llm_contents, mode='default'):
         payload, headers = llm_contents[0], llm_contents[1]
         try:
-            # Add timeout to prevent hanging - 60 seconds should be sufficient for most LLM responses
-            response = requests.post(url, json=payload, headers=headers, timeout=60)
+            # Add timeout to prevent hanging - 120 seconds
+            response = requests.post(url, json=payload, headers=headers, timeout=120)
             response.raise_for_status()
             
             result = response.json()
+            
+            if "candidates" not in result or not result["candidates"]:
+                 return f"Error: No candidates returned. Safety settings might have blocked it. Response: {result}"
+
+            if "content" not in result["candidates"][0]:
+                 return f"Error: No content in candidate. Finish reason: {result['candidates'][0].get('finishReason', 'unknown')}"
+
             output = result["candidates"][0]["content"]["parts"][0]["text"]
                 
             return str(output)
             
         except requests.exceptions.HTTPError as e:
-            return f"HTTP Error: {e}\nResponse Content: {e.response.text}"
+            error_msg = f"HTTP Error: {e}"
+            if e.response is not None:
+                error_msg += f"\nResponse Content: {e.response.text}"
+            return error_msg
         except requests.exceptions.Timeout:
-            return f"Request timed out after 60 seconds. The LLM service may be overloaded. Please try again later."
+            return f"Request timed out after 120 seconds. The LLM service may be overloaded. Please try again later."
         except (KeyError, IndexError) as e:
             return f"Error parsing API response: {e}\nResponse JSON: {result}"
         except Exception as e:

@@ -145,7 +145,7 @@ class Imager:
                 "specieIdentified": "Parsing error",
                 "nativeRegion": "Unknown",
                 "invasiveOrNot": False,
-                "invasiveEffects": "Unable to parse the analysis response. Please try again.",
+                "invasiveEffects": f"Unable to parse the analysis response. Raw error: {cleaned_response[:200]}...",
                 "nativeAlternatives": [],
                 "removeInstructions": "Unable to provide removal instructions due to parsing error."
             }
