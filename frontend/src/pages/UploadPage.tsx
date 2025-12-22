@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 interface UploadPageProps {
-  setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results') => void;
+  setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'learn' | 'loading' | 'chat') => void;
   startAnalysis: (file: File, region: string) => void;
   selectedRegion: string;
   setSelectedRegion: (region: string) => void;

@@ -6,7 +6,7 @@ import PlantCard from '../components/PlantCard';
 import ResourceCard from '../components/ResourceCard';
 
 interface LearnPageProps {
-  setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'learn' | 'loading' | 'results') => void;
+  setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'learn' | 'loading' | 'chat') => void;
 }
 
 type LearnSection = 'why-matter' | 'local-focus' | 'resources' | 'homeowners' | 'education';

@@ -8,7 +8,6 @@ import CollectionPage from './pages/CollectionPage';
 import AboutPage from './pages/AboutPage';
 import LearnPage from './pages/LearnPage';
 import LoadingPage from './pages/LoadingPage';
-import ResultsPage from './pages/ResultsPage';
 import ChatPage from './pages/ChatPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import AuthButton from './components/AuthButton';
@@ -16,7 +15,7 @@ import { collectionService, CollectionItem, PlantInfo as BackendPlantInfo } from
 import { authService } from './services/authService';
 import { Message } from './components/PlantChat';
 
-type PageType = 'home' | 'upload' | 'collection' | 'about' | 'learn' | 'loading' | 'results' | 'chat';
+type PageType = 'home' | 'upload' | 'collection' | 'about' | 'learn' | 'loading' | 'chat';
 type DirectionType = 'forward' | 'backward';
 
 interface CollectedImage {
@@ -364,8 +363,8 @@ function AppContent() {
 
   // Handle swipe navigation (only for main pages)
   const handleSwipe = (direction: 'left' | 'right') => {
-    // Don't allow swipe navigation on loading and results pages
-    if (currentPage === 'loading' || currentPage === 'results') return;
+    // Don't allow swipe navigation on loading page
+    if (currentPage === 'loading') return;
 
     const currentIndex = pageOrder.indexOf(currentPage);
     if (direction === 'left' && currentIndex < pageOrder.length - 1) {
@@ -393,7 +392,6 @@ function AppContent() {
     };
 
     const currentPlant = imageCollection.find(img => img.id === lastResultId) 
-      || (currentPage === 'results' ? [...imageCollection].reverse().find(img => img.status === 'completed') : undefined)
       || (imageCollection.length > 0 ? imageCollection[imageCollection.length - 1] : undefined);
     
     // Ensure we have a valid ID if we found a plant but lastResultId wasn't set
@@ -439,6 +437,7 @@ function AppContent() {
                 messages={currentMessages}
                 onNewMessage={(msg) => handleNewMessage(msg, activeId)}
                 onNavigateToCollection={() => navigateToPage('collection')}
+                onNavigateToUpload={() => navigateToPage('upload')}
               />;
             case 'about':
               return <AboutPage setCurrentPage={navigateToPage} />;
@@ -449,13 +448,6 @@ function AppContent() {
                 setCurrentPage={navigateToPage}
                 pendingAnalysis={pendingAnalysis}
                 updateImageInCollection={updateImageInCollection}
-              />;
-            case 'results':
-              return <ResultsPage 
-                setCurrentPage={navigateToPage} 
-                resultItem={currentPlant} 
-                messages={currentMessages}
-                onNewMessage={(msg) => handleNewMessage(msg, activeId)}
               />;
             default:
               return <HomePage

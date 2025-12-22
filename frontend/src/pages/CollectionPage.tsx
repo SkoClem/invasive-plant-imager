@@ -1,4 +1,5 @@
 import React from 'react';
+import { PlantInfo } from '../types/api';
 
 interface CollectedImage {
   id: string;
@@ -8,18 +9,18 @@ interface CollectedImage {
   description?: string;
   timestamp: Date;
   region: string;
-  plantData?: any;
+  plantData?: PlantInfo;
 }
 
 interface CollectionPageProps {
-  setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results' | 'chat') => void;
+  setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'learn' | 'loading' | 'chat') => void;
   imageCollection: CollectedImage[];
   deleteCollectionItem?: (itemId: string) => Promise<void>;
   clearCollection?: () => Promise<void>;
   onItemClick?: (itemId: string) => void;
 }
 
-function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem, onItemClick }: CollectionPageProps) {
+function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem, clearCollection, onItemClick }: CollectionPageProps) {
   const [viewMode, setViewMode] = React.useState<'mobile' | 'desktop'>('mobile');
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('en-US', {

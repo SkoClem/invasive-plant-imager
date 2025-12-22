@@ -4,7 +4,7 @@ import { plantAnalysisService } from '../services/plantAnalysisService';
 import { convertToPlantInfo } from '../utils/dataConversion';
 
 interface LoadingPageProps {
-  setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'results') => void;
+  setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'loading' | 'chat') => void;
   pendingAnalysis: { file: File; region: string; imageId?: string } | null;
   updateImageInCollection: (imageId: string, plantData: PlantInfo | null, status: 'completed' | 'error') => void;
 }
@@ -111,7 +111,7 @@ function LoadingPage({ setCurrentPage, pendingAnalysis, updateImageInCollection 
         await updateImageInCollection(imageId, plantInfo, 'completed');
         // Short delay to show 100% completion
         setTimeout(() => {
-          setCurrentPage('results');
+          setCurrentPage('chat');
         }, 800);
       } catch (error) {
         console.error('❌ Analysis failed:', error);

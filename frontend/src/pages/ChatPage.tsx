@@ -6,52 +6,113 @@ interface ChatPageProps {
   currentPlant: {
     id: string;
     species?: string;
+    description?: string;
     plantData?: PlantInfo;
   } | null;
   messages: Message[];
   onNewMessage: (message: Message) => void;
   onNavigateToCollection: () => void;
+  onNavigateToUpload: () => void;
 }
 
 const ChatPage: React.FC<ChatPageProps> = ({ 
   currentPlant, 
   messages, 
   onNewMessage,
-  onNavigateToCollection
+  onNavigateToCollection,
+  onNavigateToUpload
 }) => {
   return (
-    <section className="chat-page">
+    <section className="chat-page results-section">
       <div className="container">
-        <div className="chat-page-header">
-          <h1>Plant Expert Chat</h1>
-          {currentPlant && (
-            <p className="subtitle">
-              Chatting about: <span className="highlight">{currentPlant.species || currentPlant.plantData?.commonName || 'Unknown Plant'}</span>
-            </p>
-          )}
-        </div>
+        {currentPlant && currentPlant.plantData ? (
+          <>
+            <div className={`results-header ${currentPlant.plantData.isInvasive ? 'invasive' : 'non-invasive'}`}>
+              <div className="status-icon">{currentPlant.plantData.isInvasive ? '🚨' : '✅'}</div>
+              <div className="status-content">
+                <h1 className="status-title">{currentPlant.plantData.commonName || currentPlant.plantData.scientificName || 'Analysis Result'}</h1>
+              </div>
+            </div>
 
-        <div className="chat-content">
-          {currentPlant && currentPlant.plantData ? (
-            <PlantChat 
-              plantData={currentPlant.plantData}
-              messages={messages}
-              onNewMessage={onNewMessage}
-            />
-          ) : (
-            <div className="empty-chat-state">
-              <div className="empty-icon">💬</div>
-              <h2>No Plant Selected</h2>
-              <p>Select a plant from your collection or scan a new one to start chatting with the expert.</p>
-              <button 
+            <div className="results-content">
+              <div className="results-details">
+                {currentPlant.plantData.scientificName && (
+                  <p className="scientific-name">{currentPlant.plantData.scientificName}</p>
+                )}
+                {currentPlant.plantData.region && (
+                  <div className="native-location">
+                    <span className="location-icon">🌍</span>
+                    <span className="location-text">Native to: {currentPlant.plantData.region}</span>
+                  </div>
+                )}
+                <div className={`invasive-status ${currentPlant.plantData.isInvasive ? 'invasive' : 'native'}`}>
+                  <span className="status-icon">{currentPlant.plantData.isInvasive ? '🚨' : '✅'}</span>
+                  <span className="status-text">
+                    {currentPlant.plantData.isInvasive ? 'Invasive Species' : 'Native Plant'}
+                  </span>
+                </div>
+                
+                {currentPlant.plantData.confidenceScore !== undefined && (
+                  <div className="confidence-section">
+                    <div className="confidence-header">
+                      <span className="confidence-label">Confidence Score:</span>
+                      <div className="confidence-badge-wrapper">
+                        <span className={`confidence-badge ${
+                          currentPlant.plantData.confidenceScore >= 80 ? 'high' : 
+                          currentPlant.plantData.confidenceScore >= 50 ? 'medium' : 'low'
+                        }`}>
+                          {currentPlant.plantData.confidenceScore}%
+                        </span>
+                      </div>
+                    </div>
+                    {currentPlant.plantData.confidenceReasoning && (
+                      <p className="confidence-reasoning">
+                        <span className="reasoning-label">Analysis:</span> {currentPlant.plantData.confidenceReasoning}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {(currentPlant.plantData.description || currentPlant.description) && (
+                  <p className="plant-description">{currentPlant.plantData.description || currentPlant.description}</p>
+                )}
+              </div>
+              
+              <PlantChat 
+                plantData={currentPlant.plantData}
+                messages={messages}
+                onNewMessage={onNewMessage}
+              />
+            </div>
+
+            <div className="results-actions">
+              <button
+                className="button secondary-button"
+                onClick={onNavigateToUpload}
+              >
+                Scan Another Plant
+              </button>
+              <button
                 className="button primary-button"
                 onClick={onNavigateToCollection}
               >
-                Go to Collection
+                View Collection
               </button>
             </div>
-          )}
-        </div>
+          </>
+        ) : (
+          <div className="empty-chat-state">
+            <div className="empty-icon">💬</div>
+            <h2>No Plant Selected</h2>
+            <p>Select a plant from your collection or scan a new one to start chatting with the expert.</p>
+            <button 
+              className="button primary-button"
+              onClick={onNavigateToCollection}
+            >
+              Go to Collection
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );
