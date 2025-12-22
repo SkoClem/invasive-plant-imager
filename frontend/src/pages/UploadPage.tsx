@@ -151,6 +151,39 @@ function UploadPage({ setCurrentPage, startAnalysis, selectedRegion, setSelected
           style={{ display: 'none' }}
         />
 
+        <div className="region-section" style={{ marginTop: '20px', marginBottom: '20px' }}>
+          <div className="region-display-container">
+            <div className="region-display">
+              <div className="region-icon-wrapper">
+                <span className="country-flag">🇺🇸</span>
+                <svg 
+                  className="region-icon" 
+                  viewBox="0 0 24 24" 
+                  width="20"
+                  height="20"
+                  fill="currentColor"
+                >
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+              </div>
+              <div className="region-text-wrapper">
+                <label htmlFor="region-select" className="region-label">Select Texas Region</label>
+                <select 
+                  id="region-select"
+                  className="region-select"
+                  value={selectedRegion}
+                  onChange={(e) => setSelectedRegion(e.target.value)}
+                >
+                  {texasRegions.map(region => (
+                    <option key={region} value={region}>{region}</option>
+                  ))}
+                </select>
+                <span className="region-subtitle">Specific region improves accuracy</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Image Preview Section */}
         {imagePreview && (
           <div className="upload-section-content">
@@ -207,39 +240,6 @@ function UploadPage({ setCurrentPage, startAnalysis, selectedRegion, setSelected
               >
                 {isAnalyzing ? 'Analyzing...' : 'Identify Plant'}
               </button>
-            </div>
-
-            <div className="region-section">
-              <div className="region-display-container">
-                <div className="region-display">
-                  <div className="region-icon-wrapper">
-                    <span className="country-flag">🇺🇸</span>
-                    <svg 
-                      className="region-icon" 
-                      viewBox="0 0 24 24" 
-                      width="20"
-                      height="20"
-                      fill="currentColor"
-                    >
-                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                    </svg>
-                  </div>
-                  <div className="region-text-wrapper">
-                    <label htmlFor="region-select" className="region-label">Select Texas Region</label>
-                    <select 
-                      id="region-select"
-                      className="region-select"
-                      value={selectedRegion}
-                      onChange={(e) => setSelectedRegion(e.target.value)}
-                    >
-                      {texasRegions.map(region => (
-                        <option key={region} value={region}>{region}</option>
-                      ))}
-                    </select>
-                    <span className="region-subtitle">Specific region improves accuracy</span>
-                  </div>
-                </div>
-              </div>
             </div>
 
             <div className="upload-guidelines">

@@ -111,7 +111,7 @@ function LoadingPage({ setCurrentPage, pendingAnalysis, updateImageInCollection 
         await updateImageInCollection(imageId, plantInfo, 'completed');
         // Short delay to show 100% completion
         setTimeout(() => {
-          setCurrentPage('upload');
+          setCurrentPage('results');
         }, 800);
       } catch (error) {
         console.error('❌ Analysis failed:', error);

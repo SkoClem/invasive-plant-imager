@@ -174,6 +174,10 @@ async def analyze_plant(
         # Analyze the image
         try:
             parsed_data = imager.analyze_plant_image(base64_image, date=current_date, season=season)
+            
+            # Add region to response
+            parsed_data['region'] = region
+            
             print(f"✅ Analysis successful for user {user_identifier}")
             
             # Record successful request

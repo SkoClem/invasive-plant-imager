@@ -38,7 +38,14 @@ function AppContent() {
   const [imageCollection, setImageCollection] = useState<CollectedImage[]>([]);
   const [lastResultId, setLastResultId] = useState<string | null>(null);
   const pageRef = useRef<HTMLDivElement>(null);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading: authLoading } = useAuth();
+
+  // Redirect to home on login/logout
+  useEffect(() => {
+    if (!authLoading) {
+      setCurrentPage('home');
+    }
+  }, [isAuthenticated, authLoading]);
 
   // Load collection from backend if backend JWT is present, otherwise from localStorage
   const loadCollection = useCallback(async () => {
