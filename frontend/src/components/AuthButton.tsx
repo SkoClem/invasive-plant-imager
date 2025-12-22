@@ -41,6 +41,13 @@ const AuthButton: React.FC<AuthButtonProps> = ({ className = '', variant = 'defa
     setShowUserMenu(!showUserMenu);
   };
 
+  // Initialize coin count from currentUser
+  useEffect(() => {
+    if (currentUser?.coins !== undefined) {
+      setCoinCount(currentUser.coins);
+    }
+  }, [currentUser]);
+
   // Fetch rewards when authenticated, and refresh on custom event
   useEffect(() => {
     let mounted = true;
@@ -53,10 +60,13 @@ const AuthButton: React.FC<AuthButtonProps> = ({ className = '', variant = 'defa
         const data = await rewardsService.getRewards();
         if (mounted) setCoinCount(data.coins || 0);
       } catch (err) {
-        // Non-fatal
-        if (mounted) setCoinCount(0);
+        // Non-fatal: don't overwrite with 0 if we have a value from currentUser
+        console.error('Failed to fetch rewards:', err);
       }
     };
+    
+    // Only fetch if we don't have coins from currentUser, or if we want to ensure freshness
+    // For now, always fetch to be safe, but handle error better
     fetchRewards();
 
     const onRewardsUpdated = () => fetchRewards();
@@ -65,7 +75,7 @@ const AuthButton: React.FC<AuthButtonProps> = ({ className = '', variant = 'defa
       mounted = false;
       window.removeEventListener('rewards-updated', onRewardsUpdated);
     };
-  }, [isAuthenticated]);
+  }, [isAuthenticated]); // removed currentUser dependency to avoid double fetching loop if we added it
 
   // Use isAuthenticated from context instead of just checking currentUser
   // This handles both development (requires backend) and production (Firebase only) modes

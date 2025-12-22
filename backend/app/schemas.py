@@ -34,6 +34,7 @@ class UserProfile(BaseModel):
     name: Optional[str]
     picture: Optional[str]
     email_verified: bool
+    coins: int = 0  # Added coins field
 
 class ProtectedResponse(BaseModel):
     message: str

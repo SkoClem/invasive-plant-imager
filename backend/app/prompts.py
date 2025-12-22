@@ -81,7 +81,7 @@ If the question is about threat level, explain the ecological impact.
 If about harms, detail specific negative effects on local flora/fauna.
 If about lookalikes, mention native plants that look similar.
 If about action, recommend specific removal or management techniques.
-If asked about native replacements, list 3-5 specific native plants that would thrive in the same conditions and support the local ecosystem.
+If asked about native replacements, list 3-5 specific plants native to the user's region (specifically Texas if not specified) that would be good alternatives, NOT plants native to the invasive plant's origin.
 
 Keep the answer concise (under 3 paragraphs) and easy to understand for a general audience.
 """

@@ -46,7 +46,9 @@ function AppContent() {
     if (hasBackendSession) {
       try {
         const backendCollection = await collectionService.getUserCollection();
-        setImageCollection(backendCollection);
+        // Convert backend items to frontend format
+        const frontendCollection = backendCollection.map(convertBackendToFrontend);
+        setImageCollection(frontendCollection);
       } catch (error) {
         console.error('Error loading collection from backend:', error);
         // Fall back to localStorage if backend fails
@@ -193,6 +195,46 @@ function AppContent() {
         characteristics: alt.description
       })),
       removeInstructions: apiPlantInfo.controlMethods.join('; ')
+    };
+  };
+
+  // Convert Backend format to Frontend format
+  const convertBackendToFrontend = (item: any): CollectedImage => {
+    // If it already has plantData (local storage format), use it
+    if (item.plantData) return item;
+
+    // If it has plant_data (backend format), convert it
+    let plantData: PlantInfo | undefined = undefined;
+    
+    if (item.plant_data) {
+      plantData = {
+        scientificName: item.plant_data.specieIdentified || '',
+        commonName: item.plant_data.specieIdentified || '', // Use same name if only one available
+        isInvasive: item.plant_data.invasiveOrNot || false,
+        confidenceScore: item.plant_data.confidenceScore,
+        confidenceReasoning: item.plant_data.confidenceReasoning,
+        description: item.description || '', // Use top-level description if available
+        impact: item.plant_data.invasiveEffects || '',
+        nativeAlternatives: (item.plant_data.nativeAlternatives || []).map((alt: any) => ({
+          scientificName: alt.scientificName || '',
+          commonName: alt.commonName || '',
+          description: alt.characteristics || '',
+          benefits: [], // Backend doesn't store this yet
+        })),
+        controlMethods: (item.plant_data.removeInstructions || '').split(';').map((s: string) => s.trim()).filter(Boolean),
+        region: item.plant_data.nativeRegion || item.region || '',
+      };
+    }
+
+    return {
+      id: item.id,
+      file: undefined,
+      status: item.status,
+      species: item.species,
+      description: item.description,
+      timestamp: typeof item.timestamp === 'string' ? new Date(item.timestamp) : item.timestamp,
+      region: item.region,
+      plantData: plantData
     };
   };
 

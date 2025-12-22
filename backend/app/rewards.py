@@ -29,15 +29,21 @@ class FileRewardsManager:
     def load_rewards(self):
         try:
             if os.path.exists(self.storage_file):
+                print(f"Loading rewards from {self.storage_file}")
                 with open(self.storage_file, 'r') as f:
                     self.rewards = json.load(f)
+                print(f"Loaded rewards for {len(self.rewards)} users")
+            else:
+                print(f"Rewards file {self.storage_file} not found, starting empty")
         except Exception as e:
             print(f"Error loading rewards: {e}")
 
     def save_rewards(self):
         try:
+            print(f"Saving rewards to {self.storage_file}")
             with open(self.storage_file, 'w') as f:
                 json.dump(self.rewards, f, indent=2)
+            print("Rewards saved successfully")
         except Exception as e:
             print(f"Error saving rewards: {e}")
 
@@ -117,8 +123,18 @@ class FirestoreRewardsManager:
 
 
 # Global instance: prefer Firestore, fallback to file-based JSON storage
-if _firestore_client is not None:
-    rewards_manager = FirestoreRewardsManager(_firestore_client)
-else:
-    rewards_manager = FileRewardsManager()
+rewards_manager = None
 
+if _firestore_client is not None:
+    try:
+        # Test connection by attempting to read a document (doesn't need to exist)
+        # We use a dummy query that should succeed if permissions are correct
+        _firestore_client.collection("user_rewards").limit(1).get()
+        print("✅ Firestore connection successful, using FirestoreRewardsManager")
+        rewards_manager = FirestoreRewardsManager(_firestore_client)
+    except Exception as e:
+        print(f"⚠️ Firestore connection failed ({e}), falling back to FileRewardsManager")
+        rewards_manager = FileRewardsManager()
+else:
+    print("Using FileRewardsManager (Firestore client not available)")
+    rewards_manager = FileRewardsManager()

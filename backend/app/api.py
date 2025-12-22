@@ -19,6 +19,10 @@ async def login(request: FirebaseLoginRequest):
         # Verify Firebase token and get user info
         user_info = AuthService.verify_firebase_token(request.id_token)
         
+        # Get user coins
+        user_rewards = rewards_manager.get_user_rewards(user_info['uid'])
+        user_info['coins'] = int(user_rewards.get('coins', 0))
+        
         # Create JWT token
         jwt_token = AuthService.create_jwt_token(user_info)
         
@@ -33,6 +37,10 @@ async def login(request: FirebaseLoginRequest):
 @router.get("/api/auth/me", response_model=ProtectedResponse)
 async def get_current_user_info(current_user: Dict[str, Any] = Depends(get_current_user)):
     """Get current authenticated user information"""
+    # Get latest coins
+    user_rewards = rewards_manager.get_user_rewards(current_user['uid'])
+    current_user['coins'] = int(user_rewards.get('coins', 0))
+    
     return ProtectedResponse(
         message="User authenticated successfully",
         user=current_user
@@ -160,10 +168,13 @@ async def analyze_plant(
         
         # Create Data URI with correct MIME type
         base64_image = f"data:{image.content_type};base64,{base64_data}"
+        
+        print(f"📸 Starting analysis for user {user_identifier} (Region: {region})")
 
         # Analyze the image
         try:
             parsed_data = imager.analyze_plant_image(base64_image, date=current_date, season=season)
+            print(f"✅ Analysis successful for user {user_identifier}")
             
             # Record successful request
             rate_limiter.record_success(rate_limit_key)
@@ -173,6 +184,7 @@ async def analyze_plant(
             
             # Add user information to the response for potential future use (if authenticated)
             if current_user:
+                print(f"👤 Processing rewards for authenticated user: {current_user['uid']}")
                 parsed_data['analyzed_by'] = current_user['uid']
                 parsed_data['user_email'] = current_user['email']
 
@@ -180,21 +192,28 @@ async def analyze_plant(
                 try:
                     is_invasive = bool(parsed_data.get('invasiveOrNot', False))
                     species = str(parsed_data.get('specieIdentified') or '').strip()
+                    print(f"🌱 Plant: {species}, Invasive: {is_invasive}")
+                    
                     if is_invasive and species:
                         awarded, total_coins = rewards_manager.award_species_if_new(current_user['uid'], species)
                         parsed_data['coinAwarded'] = awarded
                         parsed_data['coins'] = total_coins
+                        print(f"💰 Rewards processed. Awarded: {awarded}, Total: {total_coins}")
                     else:
                         # Return current coin count even if nothing was awarded
                         user_rewards = rewards_manager.get_user_rewards(current_user['uid'])
                         parsed_data['coinAwarded'] = False
                         parsed_data['coins'] = int(user_rewards.get('coins', 0))
+                        print(f"💰 No new rewards. Current total: {parsed_data['coins']}")
                 except Exception as e:
                     # Non-fatal: do not block analysis response on rewards errors
                     parsed_data['coinAwarded'] = False
                     parsed_data['coins'] = 0
-                    print(f"Rewards processing error: {e}")
+                    print(f"❌ Rewards processing error: {e}")
+                    import traceback
+                    traceback.print_exc()
             else:
+                print("👤 User is anonymous")
                 parsed_data['analyzed_by'] = 'anonymous'
                 parsed_data['user_email'] = 'anonymous@example.com'
             

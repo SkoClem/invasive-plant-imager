@@ -24,6 +24,7 @@ export interface LoginResponse {
     name?: string;
     picture?: string;
     email_verified: boolean;
+    coins?: number;
   };
 }
 
@@ -35,6 +36,7 @@ export interface AuthUser {
   photoURL?: string;
   displayName?: string;
   email_verified: boolean;
+  coins?: number;
 }
 
 class AuthService {
