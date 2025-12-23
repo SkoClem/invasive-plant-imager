@@ -141,19 +141,34 @@ function AppContent() {
 
   // Delete collection item
   const deleteCollectionItem = async (itemId: string) => {
-    const hasBackendSession = authService.isAuthenticated();
-    if (hasBackendSession) {
-      try {
-        await collectionService.deleteCollectionItem(itemId);
-      } catch (error) {
-        console.error('Failed to delete item from backend:', error);
-      }
-    }
-    
-    // Update local state
+    // Find the item first in case we need to restore it
+    const itemToDelete = imageCollection.find(img => img.id === itemId);
+    if (!itemToDelete) return;
+
+    // Optimistically update local state
     setImageCollection(prev => {
       return prev.filter(img => img.id !== itemId);
     });
+
+    const hasBackendSession = authService.isAuthenticated();
+    if (hasBackendSession) {
+      try {
+        const success = await collectionService.deleteCollectionItem(itemId);
+        if (!success) {
+          throw new Error('Backend returned false');
+        }
+      } catch (error) {
+        console.error('Failed to delete item from backend:', error);
+        // Revert local state change if backend fails
+        setImageCollection(prev => {
+          // Check if it's already back (rare race condition)
+          if (prev.some(img => img.id === itemId)) return prev;
+          // Add it back
+          return [...prev, itemToDelete];
+        });
+        alert('Failed to delete item from cloud storage. Please check your connection.');
+      }
+    }
   };
 
   // Clear entire collection

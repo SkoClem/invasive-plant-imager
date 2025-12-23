@@ -22,6 +22,8 @@ interface CollectionPageProps {
 
 function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem, clearCollection, onItemClick }: CollectionPageProps) {
   const [viewMode, setViewMode] = React.useState<'mobile' | 'desktop'>('mobile');
+  const [deletingItems, setDeletingItems] = React.useState<Set<string>>(new Set());
+
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
@@ -30,6 +32,29 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
       hour: '2-digit',
       minute: '2-digit'
     }).format(date);
+  };
+
+  const handleDelete = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    if (!deleteCollectionItem) return;
+
+    // Add to deleting set to trigger animation
+    setDeletingItems(prev => {
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
+
+    // Wait for animation to complete before actually deleting
+    setTimeout(async () => {
+      await deleteCollectionItem(id);
+      // Remove from deleting set (though item should be gone from list by now)
+      setDeletingItems(prev => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    }, 500); // 500ms matches CSS animation duration
   };
 
   return (
@@ -130,26 +155,29 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
 
             <div className={`collection-grid enhanced ${viewMode === 'desktop' ? 'desktop-view' : ''}`}>
               {imageCollection.map((image) => {
+                const isDeleting = deletingItems.has(image.id);
                 return (
                   <div 
                     key={image.id} 
-                    className="collection-item enhanced"
+                    className={`collection-item enhanced ${isDeleting ? 'shrinking' : ''}`}
                     onClick={() => onItemClick && onItemClick(image.id)}
-                    style={{ 
-                      cursor: 'pointer',
-                      border: image.plantData?.isInvasive ? '2px solid #ef4444' : image.plantData?.isInvasive === false ? '2px solid #22c55e' : '2px solid transparent',
-                      padding: '12px' // Reduced padding
-                    }}
                   >
                     <div className="item-header">
-                      <div className="item-actions" style={{ marginLeft: 'auto' }}>
+                      {image.status === 'analyzing' ? (
+                        <div className="status-badge analyzing">Analyzing</div>
+                      ) : image.status === 'error' ? (
+                        <div className="status-badge error">Error</div>
+                      ) : image.plantData?.isInvasive ? (
+                        <div className="status-badge invasive">Invasive</div>
+                      ) : (
+                        <div className="status-badge native">Native</div>
+                      )}
+                      
+                      <div className="header-actions">
                         <button 
-                          className="action-button delete-button" 
-                          title="Remove from collection"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteCollectionItem && deleteCollectionItem(image.id);
-                          }}
+                          className="action-button delete-button"
+                          aria-label="Delete item"
+                          onClick={(e) => handleDelete(e, image.id)}
                         >
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>

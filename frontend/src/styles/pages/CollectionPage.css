@@ -235,6 +235,8 @@
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
+  /* Ensure max-height is animatable */
+  max-height: 1000px;
 }
 
 .collection-item.enhanced:hover {
@@ -324,6 +326,34 @@
   background: #dc3545;
   color: white;
   transform: scale(1.05);
+}
+
+/* New Status Badges */
+.status-badge.invasive {
+  background: rgba(244, 67, 54, 0.1);
+  color: #d32f2f;
+  border: 1px solid rgba(244, 67, 54, 0.2);
+}
+
+.status-badge.native {
+  background: rgba(76, 175, 80, 0.1);
+  color: #2e7d32;
+  border: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+/* Shrinking Animation */
+.collection-item.enhanced.shrinking {
+  transform: scale(0.8);
+  opacity: 0;
+  /* Animate height to 0 for smooth layout reflow */
+  max-height: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  pointer-events: none;
+  overflow: hidden;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Image Preview Enhanced */
