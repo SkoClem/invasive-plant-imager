@@ -55,7 +55,7 @@ class Imager:
         generator = Generate()
         response = generator(
             prompt=prompt,
-            max_tokens=600  # Reduced from 4000 to improve speed and conciseness
+            max_tokens=4000  # Increased to prevent mid-sentence cutoffs; brevity enforced via prompt
         )
         return response
 
