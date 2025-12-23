@@ -76,12 +76,12 @@ def plant_expert_chat(question, context=None):
 
 The user is asking: "{question}"
 
-Provide a helpful, educational, and accurate response. 
-If the question is about threat level, explain the ecological impact.
-If about harms, detail specific negative effects on local flora/fauna.
-If about lookalikes, mention native plants that look similar.
-If about action, recommend specific removal or management techniques.
-If asked about native replacements, list 3-5 specific plants native to the user's region (specifically Texas if not specified) that would be good alternatives, NOT plants native to the invasive plant's origin.
+Provide a concise, direct, and helpful response.
+- Answer the specific question immediately.
+- Limit response to 2-3 sentences unless a detailed list is explicitly requested.
+- If asked about native replacements, list exactly 3 specific plants native to the user's region (Texas if not specified).
+- Avoid generic filler phrases like "That is a great question" or "As an expert botanist".
+- Focus only on key actionable information.
 
-Keep the answer concise (under 3 paragraphs) and easy to understand for a general audience.
+Keep it short and to the point.
 """
