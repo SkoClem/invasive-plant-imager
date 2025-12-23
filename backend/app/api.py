@@ -1,3 +1,4 @@
+import traceback
 from typing import Dict, Any
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Depends, Request
 from fastapi.responses import Response
@@ -199,23 +200,20 @@ async def analyze_plant(
                     print(f"🌱 Plant: {species}, Invasive: {is_invasive}")
                     
                     if is_invasive and species:
-                        awarded, total_coins = rewards_manager.award_species_if_new(current_user['uid'], species)
-                        parsed_data['coinAwarded'] = awarded
-                        parsed_data['coins'] = total_coins
-                        print(f"💰 Rewards processed. Awarded: {awarded}, Total: {total_coins}")
+                         awarded, total_coins = rewards_manager.award_species_if_new(current_user['uid'], species)
+                         parsed_data['coinAwarded'] = awarded
+                         parsed_data['coins'] = total_coins
+                         print(f"💰 Rewards processed. Awarded: {awarded}, Total: {total_coins}")
                     else:
-                        # Return current coin count even if nothing was awarded
-                        user_rewards = rewards_manager.get_user_rewards(current_user['uid'])
-                        parsed_data['coinAwarded'] = False
-                        parsed_data['coins'] = int(user_rewards.get('coins', 0))
-                        print(f"💰 No new rewards. Current total: {parsed_data['coins']}")
+                         # Return current coin count even if nothing was awarded
+                         user_rewards = rewards_manager.get_user_rewards(current_user['uid'])
+                         parsed_data['coinAwarded'] = False
+                         parsed_data['coins'] = int(user_rewards.get('coins', 0))
+                         print(f"💰 No new rewards. Current total: {parsed_data['coins']}")
                 except Exception as e:
-                    # Non-fatal: do not block analysis response on rewards errors
-                    parsed_data['coinAwarded'] = False
-                    parsed_data['coins'] = 0
-                    print(f"❌ Rewards processing error: {e}")
-                    import traceback
-                    traceback.print_exc()
+                    print(f"⚠️ Error processing rewards: {e}")
+                    # Don't fail the analysis if rewards fail
+                    pass
             else:
                 print("👤 User is anonymous")
                 parsed_data['analyzed_by'] = 'anonymous'
@@ -223,26 +221,16 @@ async def analyze_plant(
             
             return parsed_data
             
-        except Exception as analysis_error:
-            # Record failure for rate limiting
-            rate_limiter.record_failure(rate_limit_key)
-            import traceback
+        except Exception as e:
+            print(f"❌ Analysis failed: {str(e)}")
             traceback.print_exc()
-            print(f"❌ Plant analysis failed for user {user_identifier}: {str(analysis_error)}")
-            raise HTTPException(
-                status_code=500, 
-                detail=f"Plant analysis failed: {str(analysis_error)}"
-            )
-
+            raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
+            
     except HTTPException:
-        # Re-raise HTTP exceptions (like rate limiting)
         raise
     except Exception as e:
-        # Record failure for any other unexpected errors
-        rate_limiter.record_failure(rate_limit_key)
-        import traceback
+        print(f"❌ Server error: {str(e)}")
         traceback.print_exc()
-        print(f"❌ Unexpected error in plant analysis for user {user_identifier}: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 # Rewards endpoints

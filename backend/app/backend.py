@@ -111,7 +111,7 @@ class Imager:
 
     def _convert_to_json(self, paragraph_response: str)->dict:
         """Convert paragraph response to JSON format using optimized prompts"""
-        prompt = json_information(self.region, paragraph_response)
+        prompt = json_information(paragraph_response)
         generator = Generate()
         json_response = generator(
             prompt=prompt,

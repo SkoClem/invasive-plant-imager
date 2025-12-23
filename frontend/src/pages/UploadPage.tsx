@@ -233,10 +233,11 @@ function UploadPage({ setCurrentPage, startAnalysis, selectedRegion, setSelected
                 className={`button primary-button upload-button ${!selectedFile ? 'disabled' : ''}`}
                 onClick={() => {
                   if (selectedFile) {
+                    setIsAnalyzing(true);
                     startAnalysis(selectedFile, selectedRegion);
                   }
                 }}
-                disabled={!selectedFile}
+                disabled={!selectedFile || isAnalyzing}
               >
                 {isAnalyzing ? 'Analyzing...' : 'Identify Plant'}
               </button>
@@ -258,19 +259,6 @@ function UploadPage({ setCurrentPage, startAnalysis, selectedRegion, setSelected
             {error}
           </div>
         )}
-
-        <button
-          className={`button upload-button ${!selectedFile || !selectedRegion || isAnalyzing ? 'disabled' : ''}`}
-          onClick={() => {
-            if (!selectedFile || !selectedRegion || isAnalyzing) return;
-            setIsAnalyzing(true);
-            setError(null);
-            startAnalysis(selectedFile, selectedRegion);
-          }}
-          disabled={!selectedFile || !selectedRegion || isAnalyzing}
-        >
-          {isAnalyzing ? 'Analyzing...' : 'ANALYZE PLANT'}
-        </button>
 
         {/* Region Display - moved below analyze button */}
         <div className="region-section">
