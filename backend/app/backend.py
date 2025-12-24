@@ -101,6 +101,7 @@ class Imager:
         )
 
         json_response = self.image_llm.get_output(url=self.url, llm_contents=contents)
+        print(f"DEBUG - Raw LLM Response: {json_response[:500]}...") # Log the first 500 chars
         return self.parse_llm_response(json_response)
 
     def _get_paragraph_analysis(self, image_path_or_data: str)->str:
@@ -133,23 +134,43 @@ class Imager:
     def parse_llm_response(self, response_text: str)->dict:
         """Parse LLM response and extract JSON content"""
         try:
-            cleaned_response = response_text.strip()
-            cleaned_response = re.sub(r"```json|```", "", cleaned_response)
-            cleaned_response = cleaned_response.replace('\n', ' ').replace('\r', ' ')
+            print(f"DEBUG - Parsing response text length: {len(response_text)}")
             
-            # If response looks like JSON, parse it immediately
-            if cleaned_response.startswith('{') and cleaned_response.endswith('}'):
-                return json.loads(cleaned_response)
+            # Check for HTTP Error explicit strings from llm_framework
+            if response_text.startswith("HTTP Error") or "Error:" in response_text[:50]:
+                print(f"DEBUG - LLM API Error: {response_text}")
+                return {
+                    "specieIdentified": "API Error",
+                    "nativeRegion": "Unknown",
+                    "invasiveOrNot": False,
+                    "invasiveEffects": f"API Error: {response_text[:200]}...",
+                    "nativeAlternatives": [],
+                    "removeInstructions": "Check API configuration."
+                }
 
-            # Try to find JSON anywhere in the response
-            json_match = re.search(r"\{.*\}", cleaned_response)
-            if json_match:
-                possible_json = json_match.group(0)
-                # Attempt to parse it, and handle any trailing commas or minor issues
-                possible_json = re.sub(r",\s*\}", "}", possible_json)
-                return json.loads(possible_json)
+            # Find the first JSON block enclosed in ```json ... ``` or just ``` ... ```
+            code_block_match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", response_text, re.DOTALL)
+            if code_block_match:
+                cleaned_response = code_block_match.group(1)
+            else:
+                # Fallback: try to find the first outer { and last }
+                start_idx = response_text.find('{')
+                end_idx = response_text.rfind('}')
+                if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
+                    cleaned_response = response_text[start_idx:end_idx+1]
+                else:
+                    cleaned_response = response_text
 
-            # If no JSON found, return a structured error
+            # Clean up cleanup response
+            cleaned_response = cleaned_response.strip()
+            # Remove any non-printable characters that might interfere
+            cleaned_response = re.sub(r'[\x00-\x1f\x7f-\x9f]', ' ', cleaned_response)
+            
+            return json.loads(cleaned_response)
+
+        except json.JSONDecodeError as e:
+            print(f"DEBUG - JSON parsing failed: {e}")
+            print(f"DEBUG - Failed JSON content: {cleaned_response[:500]}...")
             return {
                 "specieIdentified": "Parsing error",
                 "nativeRegion": "Unknown",
@@ -159,17 +180,6 @@ class Imager:
                 "removeInstructions": "Unable to provide removal instructions due to parsing error."
             }
 
-        except json.JSONDecodeError as e:
-            print(f"DEBUG - JSON parsing failed: {e}")
-            print(f"DEBUG - Attempted to parse: {response_text[:200]}...")
-            return {
-                "specieIdentified": "Parsing error",
-                "nativeRegion": "Unknown",
-                "invasiveOrNot": False,
-                "invasiveEffects": "Unable to parse the analysis response. Please try again.",
-                "nativeAlternatives": [],
-                "removeInstructions": "Unable to provide removal instructions due to parsing error."
-            }
         except Exception as e:
             print(f"DEBUG - Exception in parse_llm_response: {e}")
             return {

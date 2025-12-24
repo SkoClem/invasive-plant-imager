@@ -129,9 +129,11 @@ class ImageLLM:
             payload["generationConfig"] = {"maxOutputTokens": max_tokens}
             
         # Add thinking level for newer models
-        if "generationConfig" not in payload:
-            payload["generationConfig"] = {}
-        payload["generationConfig"]["thinkingLevel"] = "high"
+        # Note: 'thinkingLevel' is not a standard Gemini API parameter and may cause 400 errors.
+        # Disabling it for now to prevent "Unknown Plant" errors caused by API rejection.
+        # if "generationConfig" not in payload:
+        #     payload["generationConfig"] = {}
+        # payload["generationConfig"]["thinkingLevel"] = "high"
 
         # Disable safety filters to prevent blocking benign plant images
         payload["safetySettings"] = [
@@ -200,9 +202,11 @@ class Gemini:
             payload["generationConfig"] = {"maxOutputTokens": max_tokens}
             
         # Add thinking level for newer models
-        if "generationConfig" not in payload:
-            payload["generationConfig"] = {}
-        payload["generationConfig"]["thinkingLevel"] = "high"
+        # Note: 'thinkingLevel' is not a standard Gemini API parameter and may cause 400 errors.
+        # Disabling it for now to prevent "Unknown Plant" errors caused by API rejection.
+        # if "generationConfig" not in payload:
+        #     payload["generationConfig"] = {}
+        # payload["generationConfig"]["thinkingLevel"] = "high"
 
         # Disable safety filters
         payload["safetySettings"] = [
