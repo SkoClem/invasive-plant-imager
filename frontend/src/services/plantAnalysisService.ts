@@ -1,5 +1,6 @@
 import { PlantAnalysisResponse, PlantAnalysisRequest } from '../types/plantAnalysis';
 import { authService } from './authService';
+import { compressImage } from '../utils/imageUtils';
 
 const API_BASE_URL = (process.env.REACT_APP_API_URL || 'http://localhost:8000').replace(/\/$/, '');
 
@@ -9,19 +10,32 @@ console.log('Environment variable value:', process.env.REACT_APP_API_URL);
 
 class PlantAnalysisService {
   async analyzePlant(request: PlantAnalysisRequest): Promise<PlantAnalysisResponse> {
+    // Compress the image before sending
+    console.log(`Original image size: ${(request.image.size / 1024 / 1024).toFixed(2)} MB`);
+    let imageToSend = request.image;
+    
+    try {
+      // Compress to max 1024px dimension and 0.8 quality
+      // This significantly reduces upload time and LLM processing token count
+      imageToSend = await compressImage(request.image, 1024, 0.8);
+      console.log(`Compressed image size: ${(imageToSend.size / 1024 / 1024).toFixed(2)} MB`);
+    } catch (error) {
+      console.warn('Image compression failed, sending original image:', error);
+    }
+
     const formData = new FormData();
 
     // Append the image file
-    formData.append('image', request.image);
+    formData.append('image', imageToSend);
 
     // Append the region
     formData.append('region', request.region);
 
     console.log('🚀 Sending request to:', `${API_BASE_URL}/api/analyze-plant`);
     console.log('📸 FormData contents:', {
-      fileName: request.image.name,
-      fileSize: `${(request.image.size / 1024 / 1024).toFixed(2)} MB`,
-      fileType: request.image.type,
+      fileName: imageToSend.name,
+      fileSize: `${(imageToSend.size / 1024 / 1024).toFixed(2)} MB`,
+      fileType: imageToSend.type,
       region: request.region
     });
 

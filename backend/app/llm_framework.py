@@ -125,8 +125,14 @@ class ImageLLM:
             "parts": content_parts
         })
 
+        payload["generationConfig"] = {
+            "temperature": 0.2,
+            "topP": 0.95,
+            "topK": 40
+        }
+        
         if max_tokens:
-            payload["generationConfig"] = {"maxOutputTokens": max_tokens}
+            payload["generationConfig"]["maxOutputTokens"] = max_tokens
             
         # Add thinking level for newer models
         # Note: 'thinkingLevel' is not a standard Gemini API parameter and may cause 400 errors.
@@ -198,8 +204,15 @@ class Gemini:
                 {"role": "user", "parts": [{"text": prompt}]}
             ],
         }
+        
+        payload["generationConfig"] = {
+            "temperature": 0.2,
+            "topP": 0.95,
+            "topK": 40
+        }
+
         if max_tokens:
-            payload["generationConfig"] = {"maxOutputTokens": max_tokens}
+            payload["generationConfig"]["maxOutputTokens"] = max_tokens
             
         # Add thinking level for newer models
         # Note: 'thinkingLevel' is not a standard Gemini API parameter and may cause 400 errors.

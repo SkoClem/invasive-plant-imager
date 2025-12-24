@@ -64,7 +64,7 @@ class Imager:
         generator = Generate()
         response = generator(
             prompt=prompt,
-            max_tokens=4000  # Increased to prevent mid-sentence cutoffs; brevity enforced via prompt
+            max_tokens=2000  # Reduced to 2000 for faster response
         )
         return response
 
@@ -97,7 +97,7 @@ class Imager:
             name=self.name,
             prompt=prompt,
             image_data=image_data,
-            max_tokens=8000  # Increased significantly to prevent truncation issues
+            max_tokens=4000  # Reduced from 8000 to 4000 for efficiency
         )
 
         json_response = self.image_llm.get_output(url=self.url, llm_contents=contents)
@@ -113,7 +113,7 @@ class Imager:
             name=self.name,
             prompt=prompt,
             image_data=image_path_or_data,
-            max_tokens=8000
+            max_tokens=4000  # Reduced from 8000 to 4000
         )
 
         output = self.image_llm.get_output(url=self.url, llm_contents=contents)
@@ -126,7 +126,7 @@ class Imager:
         json_response = generator(
             prompt=prompt,
             system_prompt=None,
-            max_tokens=8000,
+            max_tokens=4000,  # Reduced from 8000 to 4000
             mode="default"
         )
         return self.parse_llm_response(json_response)
