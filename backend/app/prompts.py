@@ -14,19 +14,19 @@ def optimized_analysis(region, date=None, season=None):
   "nativeRegion": "native region/country", 
   "invasiveOrNot": boolean,
   "confidenceScore": 0-100,
-  "confidenceReasoning": "explanation for confidence score based on visual traits and context (season, region)",
-  "invasiveEffects": "effects or empty string",
+  "confidenceReasoning": "brief explanation for confidence score based on visual traits and context",
+  "invasiveEffects": "brief key effects or empty string",
   "nativeAlternatives": [
     {{
       "commonName": "name",
       "scientificName": "scientific name", 
-      "characteristics": "brief description"
+      "characteristics": "very brief description"
     }}
   ],
-  "removeInstructions": "removal instructions or empty string"
+  "removeInstructions": "concise removal steps or empty string"
 }}
 
-Always include native region. Focus on {region} invasive species. Consider the season and date for identification accuracy. Be concise, accurate. JSON only."""
+Always include native region. Focus on {region} invasive species. Consider the season and date for identification accuracy. Keep descriptions concise and to the point. JSON only."""
 
 def paragraph_analysis(region):
     """Generate paragraph analysis of plant image - now focused specifically on Texas"""
@@ -36,7 +36,7 @@ Common {region} invasives: Giant Salvinia, Japanese Honeysuckle, Giant Hogweed, 
 
 Include: species ID, native region, {region} invasiveness, ecosystem effects, native alternatives, removal methods.
 
-Single detailed paragraph response."""
+Provide a concise, factual paragraph response. Avoid flowery language."""
 
 def json_information(analysis_text):
     """Convert analysis text to structured JSON"""
@@ -49,7 +49,7 @@ Return ONLY valid JSON:
       "specieIdentified": "species name",
       "nativeRegion": "native region",
       "invasiveOrNot": boolean,
-      "invasiveEffects": "effects or empty string",
+      "invasiveEffects": "concise effects or empty string",
       "nativeAlternatives": [
         {{
           "commonName": "name",
@@ -57,7 +57,7 @@ Return ONLY valid JSON:
           "characteristics": "brief description"
         }}
       ],
-      "removeInstructions": "removal instructions"
+      "removeInstructions": "concise removal instructions"
     }}
 
     JSON only, no explanations."""
