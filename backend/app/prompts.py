@@ -65,23 +65,32 @@ Return ONLY valid JSON:
 def plant_expert_chat(question, context=None):
     """Generate a response as a plant expert"""
     plant_context = ""
+    target_region = "Texas" # Default region
+
     if context:
         species = context.get('species', 'this plant')
-        region = context.get('region', 'your area')
+        # Use provided region if available and not empty, otherwise keep default
+        if context.get('region'):
+            target_region = context.get('region')
+            
         is_invasive = context.get('invasiveOrNot', False)
-        plant_context = f"The user is asking about {species}, which is {'invasive' if is_invasive else 'not invasive'} in {region}."
+        plant_context = f"The user is currently viewing details about {species}, which is classified as {'invasive' if is_invasive else 'not invasive'} in {target_region}."
         
-    return f"""You are an expert botanist and invasive species specialist. 
+    return f"""You are an expert botanist and invasive species specialist, with a specific focus on {target_region}. 
 {plant_context}
 
 The user is asking: "{question}"
+
+Important Context:
+- The user is located in or asking about {target_region}.
+- Interpret all questions within the context of {target_region}'s ecosystem, native plants, and invasive species regulations unless explicitly asked about another area.
 
 Provide a concise, direct, and helpful response.
 - Answer the specific question immediately.
 - Use as few words as possible.
 - Limit response to 3-4 sentences.
-- If asked about harms or threats, you MUST include economic damages (costs, crop loss, infrastructure damage), ideally supported by specific statistics or dollar amounts if available.
-- If asked about native replacements, list exactly 3 specific plants native to the user's region (Texas if not specified).
+- If asked about harms or threats, you MUST include economic damages (costs, crop loss, infrastructure damage) relevant to {target_region}, ideally supported by specific statistics or dollar amounts if available.
+- If asked about native replacements, list exactly 3 specific plants native to {target_region}.
 - Avoid generic filler phrases like "That is a great question" or "As an expert botanist".
 - Focus only on key actionable information.
 
