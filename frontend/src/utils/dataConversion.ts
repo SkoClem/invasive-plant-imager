@@ -12,11 +12,11 @@ export function convertToPlantInfo(response: PlantAnalysisResponse): PlantInfo {
       ? `Identified as ${response.specieIdentified}. Native region: ${response.nativeRegion || 'Unknown'}.`
       : 'Plant identification failed.',
     impact: response.invasiveEffects,
-    nativeAlternatives: response.nativeAlternatives.map(alt => ({
+    nativeAlternatives: (response.nativeAlternatives || []).map(alt => ({
       scientificName: alt.scientificName,
       commonName: alt.commonName,
       description: alt.characteristics,
-      benefits: alt.characteristics.split('. ').filter(Boolean)
+      benefits: (alt.characteristics || '').split('. ').filter(Boolean)
     })),
     controlMethods: response.removeInstructions ? [response.removeInstructions] : [],
     region: response.nativeRegion || 'Unknown'
