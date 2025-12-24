@@ -20,7 +20,7 @@ interface PlantChatProps {
 const PREDEFINED_QUESTIONS = [
   "What is the threat level?",
   "What are the harms of this species?",
-  "Are there native lookalikes?",
+  "What are the native lookalikes?",
   "What are some native replacements?",
   "What is the best course of action?",
   "Tell me more about this plant."

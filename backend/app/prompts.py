@@ -79,10 +79,11 @@ The user is asking: "{question}"
 Provide a concise, direct, and helpful response.
 - Answer the specific question immediately.
 - Use as few words as possible.
-- Limit response to 2-3 short sentences unless a detailed list is explicitly requested.
+- Limit response to 3-4 sentences.
+- If asked about harms or threats, you MUST include economic damages (costs, crop loss, infrastructure damage), ideally supported by specific statistics or dollar amounts if available.
 - If asked about native replacements, list exactly 3 specific plants native to the user's region (Texas if not specified).
 - Avoid generic filler phrases like "That is a great question" or "As an expert botanist".
 - Focus only on key actionable information.
 
-Keep it extremely short and to the point.
+Keep it short and to the point.
 """
