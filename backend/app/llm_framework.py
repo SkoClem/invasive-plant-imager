@@ -61,8 +61,8 @@ class LLM:
         payload, headers = llm_contents[0], llm_contents[1]
         
         try:
-            # Add timeout to prevent hanging - 60 seconds should be sufficient for most LLM responses
-            response = requests.post(url, json=payload, headers=headers, timeout=60)
+            # Add timeout to prevent hanging - 180 seconds should be sufficient for most LLM responses
+            response = requests.post(url, json=payload, headers=headers, timeout=180)
             response.raise_for_status()
             
             result = response.json()
@@ -79,7 +79,7 @@ class LLM:
         except requests.exceptions.HTTPError as e:
             return f"HTTP Error: {e}\nResponse Content: {e.response.text}"
         except requests.exceptions.Timeout:
-            return f"Request timed out after 60 seconds. The LLM service may be overloaded. Please try again later."
+            return f"Request timed out after 180 seconds. The LLM service may be overloaded. Please try again later."
         except (KeyError, IndexError) as e:
             return f"Error parsing API response: {e}\nResponse JSON: {result}"
         except Exception as e:
@@ -152,8 +152,8 @@ class ImageLLM:
     def get_output(self, url, llm_contents, mode='default'):
         payload, headers = llm_contents[0], llm_contents[1]
         try:
-            # Add timeout to prevent hanging - 120 seconds for slower image analysis
-            response = requests.post(url, json=payload, headers=headers, timeout=120)
+            # Add timeout to prevent hanging - 180 seconds for slower image analysis
+            response = requests.post(url, json=payload, headers=headers, timeout=180)
             response.raise_for_status()
 
             result = response.json()
@@ -182,7 +182,7 @@ class ImageLLM:
                 error_msg += f"\nResponse Content: {e.response.text}"
             return error_msg
         except requests.exceptions.Timeout:
-            return f"Request timed out after 120 seconds. The LLM service may be overloaded. Please try again later."
+            return f"Request timed out after 180 seconds. The LLM service may be overloaded. Please try again later."
         except (KeyError, IndexError) as e:
             return f"Error parsing API response: {e}\nResponse JSON: {result}"
         except Exception as e:
@@ -225,8 +225,8 @@ class Gemini:
     def get_output(self, url, llm_contents, mode='default'):
         payload, headers = llm_contents[0], llm_contents[1]
         try:
-            # Add timeout to prevent hanging - 120 seconds
-            response = requests.post(url, json=payload, headers=headers, timeout=120)
+            # Add timeout to prevent hanging - 180 seconds
+            response = requests.post(url, json=payload, headers=headers, timeout=180)
             response.raise_for_status()
             
             result = response.json()
@@ -247,7 +247,7 @@ class Gemini:
                 error_msg += f"\nResponse Content: {e.response.text}"
             return error_msg
         except requests.exceptions.Timeout:
-            return f"Request timed out after 120 seconds. The LLM service may be overloaded. Please try again later."
+            return f"Request timed out after 180 seconds. The LLM service may be overloaded. Please try again later."
         except (KeyError, IndexError) as e:
             return f"Error parsing API response: {e}\nResponse JSON: {result}"
         except Exception as e:

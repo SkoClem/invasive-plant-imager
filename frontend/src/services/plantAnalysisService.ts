@@ -35,7 +35,7 @@ class PlantAnalysisService {
       console.log('Making request to backend...');
 
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minute timeout
+      const timeoutId = setTimeout(() => controller.abort(), 180000); // 3 minute timeout
 
       const headers: HeadersInit = {};
       const token = await authService.getAccessToken();

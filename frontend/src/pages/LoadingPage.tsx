@@ -80,7 +80,7 @@ function LoadingPage({ setCurrentPage, pendingAnalysis, updateImageInCollection 
         clearInterval(stepInterval);
         setProgress(100);
         setProgressMessage('Finalizing...');
-      }, 20_000);
+      }, 60_000);
 
       try {
         setProgressMessage('Uploading image...');
