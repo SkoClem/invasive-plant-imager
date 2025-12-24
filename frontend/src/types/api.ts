@@ -14,7 +14,8 @@ export interface PlantInfo {
   impact: string;
   nativeAlternatives: NativeAlternative[];
   controlMethods: string[];
-  region: string;
+  region: string; // The region where the scan was performed (User's region)
+  nativeRegion?: string; // The native region of the plant
   imageUrl?: string;
 }
 

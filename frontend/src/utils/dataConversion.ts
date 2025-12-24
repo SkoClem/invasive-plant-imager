@@ -19,6 +19,7 @@ export function convertToPlantInfo(response: PlantAnalysisResponse): PlantInfo {
       benefits: (alt.characteristics || '').split('. ').filter(Boolean)
     })),
     controlMethods: response.removeInstructions ? [response.removeInstructions] : [],
-    region: response.nativeRegion || 'Unknown'
+    region: response.region || 'Unknown',
+    nativeRegion: response.nativeRegion || 'Unknown'
   };
 }

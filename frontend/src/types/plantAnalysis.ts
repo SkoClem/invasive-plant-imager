@@ -15,6 +15,7 @@ export interface PlantAnalysisResponse {
   removeInstructions: string;
   coins?: number;
   coinAwarded?: boolean;
+  region?: string; // The region where the scan was performed
 }
 
 export interface PlantAnalysisRequest {

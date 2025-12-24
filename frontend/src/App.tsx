@@ -226,7 +226,7 @@ function AppContent() {
   const convertPlantInfoToBackend = (apiPlantInfo: PlantInfo): BackendPlantInfo => {
     return {
       specieIdentified: apiPlantInfo.scientificName || apiPlantInfo.commonName,
-      nativeRegion: apiPlantInfo.region,
+      nativeRegion: apiPlantInfo.nativeRegion || apiPlantInfo.region, // Use nativeRegion if available, otherwise fallback
       invasiveOrNot: apiPlantInfo.isInvasive,
       confidenceScore: apiPlantInfo.confidenceScore,
       confidenceReasoning: apiPlantInfo.confidenceReasoning,
@@ -264,7 +264,8 @@ function AppContent() {
           benefits: [], // Backend doesn't store this yet
         })),
         controlMethods: (item.plant_data.removeInstructions || '').split(';').map((s: string) => s.trim()).filter(Boolean),
-        region: item.plant_data.nativeRegion || item.region || '',
+        region: item.region || '', // User's scan region
+        nativeRegion: item.plant_data.nativeRegion || '' // Plant's native region
       };
     }
 
@@ -308,57 +309,59 @@ function AppContent() {
 
   // Update image in collection after analysis
   const updateImageInCollection = async (imageId: string, plantData: PlantInfo | null, status: 'completed' | 'error') => {
-    const updatedCollection = imageCollection.map(img => {
-      if (img.id === imageId || imageId === 'latest') {
-        // If imageId is 'latest', find the most recent analyzing item
-        if (imageId === 'latest') {
-          const analyzingItems = imageCollection.filter(item => item.status === 'analyzing');
-          if (analyzingItems.length === 0 || img.id !== analyzingItems[0].id) {
-            return img; // Skip if this isn't the most recent analyzing item
+    setImageCollection(prevCollection => {
+      const updatedCollection = prevCollection.map(img => {
+        if (img.id === imageId || imageId === 'latest') {
+          // If imageId is 'latest', find the most recent analyzing item
+          if (imageId === 'latest') {
+            const analyzingItems = prevCollection.filter(item => item.status === 'analyzing');
+            if (analyzingItems.length === 0 || img.id !== analyzingItems[0].id) {
+              return img; // Skip if this isn't the most recent analyzing item
+            }
           }
-        }
-        
-        const updatedImg: CollectedImage = {
-          ...img,
-          status,
-          plantData: plantData || undefined,
-          species: plantData?.commonName || plantData?.scientificName || undefined,
-          description: plantData?.description || undefined
-        };
-        
-        // Track latest result for immediate ResultsPage display
-        if (status === 'completed') {
-          setLastResultId(updatedImg.id);
-        }
-        
-        // Save updated item to backend if backend session exists
-        const hasBackendSession = authService.isAuthenticated();
-        if (hasBackendSession && status === 'completed') {
-          const collectionItem: CollectionItem = {
-            id: updatedImg.id,
-            timestamp: updatedImg.timestamp,
-            region: updatedImg.region,
-            status: updatedImg.status,
-            species: updatedImg.species,
-            description: updatedImg.description,
-            plant_data: updatedImg.plantData ? convertPlantInfoToBackend(updatedImg.plantData) : undefined
+          
+          const updatedImg: CollectedImage = {
+            ...img,
+            status,
+            plantData: plantData || undefined,
+            species: plantData?.commonName || plantData?.scientificName || undefined,
+            description: plantData?.description || undefined
           };
-          collectionService.saveCollectionItem(collectionItem)
-            .then(() => {
-              // Notify UI to refresh rewards (coins)
-              try { window.dispatchEvent(new Event('rewards-updated')); } catch {}
-            })
-            .catch(error => {
-              console.error('Failed to update item in backend:', error);
-            });
+          
+          // Track latest result for immediate ResultsPage display
+          if (status === 'completed') {
+            setLastResultId(updatedImg.id);
+            
+            // Side effect: Backend Save
+            const hasBackendSession = authService.isAuthenticated();
+            if (hasBackendSession) {
+                const collectionItem: CollectionItem = {
+                    id: updatedImg.id,
+                    timestamp: updatedImg.timestamp,
+                    region: updatedImg.region,
+                    status: updatedImg.status,
+                    species: updatedImg.species,
+                    description: updatedImg.description,
+                    plant_data: updatedImg.plantData ? convertPlantInfoToBackend(updatedImg.plantData) : undefined
+                };
+                
+                // We'll call saveCollectionItem asynchronously
+                setTimeout(() => {
+                    collectionService.saveCollectionItem(collectionItem)
+                    .then(() => {
+                        try { window.dispatchEvent(new Event('rewards-updated')); } catch {}
+                    })
+                    .catch(e => console.error('Backend save failed', e));
+                }, 0);
+            }
+          }
+          
+          return updatedImg;
         }
-        
-        return updatedImg;
-      }
-      return img;
+        return img;
+      });
+      return updatedCollection;
     });
-    
-    setImageCollection(updatedCollection);
   };
 
   const handleNewMessage = (message: Message, plantId?: string) => {
