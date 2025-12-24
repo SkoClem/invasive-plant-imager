@@ -239,6 +239,16 @@
   max-height: 1000px;
 }
 
+.collection-item.enhanced.invasive-border {
+  border: 2px solid #d32f2f;
+  box-shadow: 0 4px 15px rgba(244, 67, 54, 0.15);
+}
+
+.collection-item.enhanced.native-border {
+  border: 2px solid #2e7d32;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.15);
+}
+
 .collection-item.enhanced:hover {
   transform: translateY(-5px);
   box-shadow: 0 12px 35px var(--shadow-medium);

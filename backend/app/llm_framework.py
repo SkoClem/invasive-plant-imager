@@ -127,6 +127,11 @@ class ImageLLM:
 
         if max_tokens:
             payload["generationConfig"] = {"maxOutputTokens": max_tokens}
+            
+        # Add thinking level for newer models
+        if "generationConfig" not in payload:
+            payload["generationConfig"] = {}
+        payload["generationConfig"]["thinkingLevel"] = "high"
 
         # Disable safety filters to prevent blocking benign plant images
         payload["safetySettings"] = [
@@ -193,7 +198,12 @@ class Gemini:
         }
         if max_tokens:
             payload["generationConfig"] = {"maxOutputTokens": max_tokens}
-        
+            
+        # Add thinking level for newer models
+        if "generationConfig" not in payload:
+            payload["generationConfig"] = {}
+        payload["generationConfig"]["thinkingLevel"] = "high"
+
         # Disable safety filters
         payload["safetySettings"] = [
             {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},

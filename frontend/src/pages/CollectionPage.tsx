@@ -156,10 +156,11 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
             <div className={`collection-grid enhanced ${viewMode === 'desktop' ? 'desktop-view' : ''}`}>
               {imageCollection.map((image) => {
                 const isDeleting = deletingItems.has(image.id);
+                const borderClass = image.plantData?.isInvasive ? 'invasive-border' : (image.plantData?.isInvasive === false ? 'native-border' : '');
                 return (
                   <div 
                     key={image.id} 
-                    className={`collection-item enhanced ${isDeleting ? 'shrinking' : ''}`}
+                    className={`collection-item enhanced ${isDeleting ? 'shrinking' : ''} ${borderClass}`}
                     onClick={() => onItemClick && onItemClick(image.id)}
                   >
                     <div className="item-header">
