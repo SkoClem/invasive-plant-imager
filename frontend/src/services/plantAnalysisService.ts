@@ -1,12 +1,7 @@
 import { PlantAnalysisResponse, PlantAnalysisRequest } from '../types/plantAnalysis';
 import { authService } from './authService';
 import { compressImage } from '../utils/imageUtils';
-
-const API_BASE_URL = (process.env.REACT_APP_API_URL || 'http://localhost:8000').replace(/\/$/, '');
-
-console.log('API Base URL:', API_BASE_URL);
-console.log('Environment variable loaded:', !!process.env.REACT_APP_API_URL);
-console.log('Environment variable value:', process.env.REACT_APP_API_URL);
+import { API_BASE_URL } from '../config/api';
 
 class PlantAnalysisService {
   async analyzePlant(request: PlantAnalysisRequest): Promise<PlantAnalysisResponse> {

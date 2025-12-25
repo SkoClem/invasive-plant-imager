@@ -1,24 +1,13 @@
 import { authService } from './authService';
+import { API_BASE_URL } from '../config/api';
 
-// Determine API base URL with production fallback (duplicated from collectionService to avoid circular deps or complex refactoring)
-const getApiBaseUrl = () => {
-  if (process.env.NODE_ENV === 'production') {
-    if (!process.env.REACT_APP_API_URL || process.env.REACT_APP_API_URL.includes('localhost')) {
-      return 'https://backend-not-configured.example.com';
-    }
-  }
-  return (process.env.REACT_APP_API_URL || 'http://localhost:8000').replace(/\/$/, '');
-};
-
-const API_BASE_URL = getApiBaseUrl();
-
-interface RewardsResponse {
+export interface RewardsData {
   coins: number;
   awarded_species: string[];
 }
 
 export const rewardsService = {
-  async getRewards(): Promise<RewardsResponse> {
+  async getRewards(): Promise<RewardsData> {
     const token = authService.getAccessToken();
     if (!token) throw new Error('Not authenticated');
     // Add timestamp to prevent caching
@@ -30,6 +19,6 @@ export const rewardsService = {
       },
     });
     if (!res.ok) throw new Error(`Failed to fetch rewards: ${res.status}`);
-    return (await res.json()) as RewardsResponse;
+    return (await res.json()) as RewardsData;
   },
 };
