@@ -110,6 +110,7 @@ const AuthButton: React.FC<AuthButtonProps> = ({ className = '', variant = 'defa
             <span className="user-name">{userInfo.name || userInfo.displayName}</span>
             <span className="user-coins" title="Coins earned from new invasive scans">
               <svg
+                id="coin-target"
                 aria-hidden
                 className="clover-icon"
                 viewBox="0 0 24 24"

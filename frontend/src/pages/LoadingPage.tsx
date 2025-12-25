@@ -103,6 +103,8 @@ function LoadingPage({ setCurrentPage, pendingAnalysis, updateImageInCollection 
         if (result.coinAwarded || typeof result.coins === 'number') {
           console.log('💰 Coins updated from analysis:', result.coins);
           window.dispatchEvent(new Event('rewards-updated'));
+          // Trigger coin animation
+          window.dispatchEvent(new CustomEvent('animate-coins', { detail: { count: 10 } }));
         }
 
         const plantInfo = convertToPlantInfo(result);

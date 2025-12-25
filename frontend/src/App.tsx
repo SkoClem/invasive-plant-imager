@@ -14,6 +14,7 @@ import AuthButton from './components/AuthButton';
 import { collectionService, CollectionItem, PlantInfo as BackendPlantInfo } from './services/collectionService';
 import { authService } from './services/authService';
 import { Message } from './components/PlantChat';
+import CoinAnimation from './components/CoinAnimation';
 
 type PageType = 'home' | 'upload' | 'collection' | 'about' | 'learn' | 'loading' | 'chat';
 type DirectionType = 'forward' | 'backward';
@@ -309,59 +310,68 @@ function AppContent() {
 
   // Update image in collection after analysis
   const updateImageInCollection = async (imageId: string, plantData: PlantInfo | null, status: 'completed' | 'error') => {
+    // Resolve targetId first
+    let targetId = imageId;
+    let targetItem = imageCollection.find(img => img.id === imageId);
+
+    if (imageId === 'latest') {
+      const analyzingItems = imageCollection.filter(item => item.status === 'analyzing');
+      if (analyzingItems.length > 0) {
+        targetItem = analyzingItems[0];
+        targetId = targetItem.id;
+      } else {
+        console.warn('No analyzing item found for update');
+        return;
+      }
+    }
+
+    if (!targetItem) {
+      console.warn(`Item with id ${imageId} not found`);
+      return;
+    }
+
+    // Update collection state
     setImageCollection(prevCollection => {
-      const updatedCollection = prevCollection.map(img => {
-        if (img.id === imageId || imageId === 'latest') {
-          // If imageId is 'latest', find the most recent analyzing item
-          if (imageId === 'latest') {
-            const analyzingItems = prevCollection.filter(item => item.status === 'analyzing');
-            if (analyzingItems.length === 0 || img.id !== analyzingItems[0].id) {
-              return img; // Skip if this isn't the most recent analyzing item
-            }
-          }
-          
-          const updatedImg: CollectedImage = {
+      return prevCollection.map(img => {
+        if (img.id === targetId) {
+          return {
             ...img,
             status,
             plantData: plantData || undefined,
             species: plantData?.commonName || plantData?.scientificName || undefined,
             description: plantData?.description || undefined
           };
-          
-          // Track latest result for immediate ResultsPage display
-          if (status === 'completed') {
-            setLastResultId(updatedImg.id);
-            
-            // Side effect: Backend Save
-            const hasBackendSession = authService.isAuthenticated();
-            if (hasBackendSession) {
-                const collectionItem: CollectionItem = {
-                    id: updatedImg.id,
-                    timestamp: updatedImg.timestamp,
-                    region: updatedImg.region,
-                    status: updatedImg.status,
-                    species: updatedImg.species,
-                    description: updatedImg.description,
-                    plant_data: updatedImg.plantData ? convertPlantInfoToBackend(updatedImg.plantData) : undefined
-                };
-                
-                // We'll call saveCollectionItem asynchronously
-                setTimeout(() => {
-                    collectionService.saveCollectionItem(collectionItem)
-                    .then(() => {
-                        try { window.dispatchEvent(new Event('rewards-updated')); } catch {}
-                    })
-                    .catch(e => console.error('Backend save failed', e));
-                }, 0);
-            }
-          }
-          
-          return updatedImg;
         }
         return img;
       });
-      return updatedCollection;
     });
+
+    // Handle side effects (outside state updater)
+    if (status === 'completed') {
+      setLastResultId(targetId);
+      
+      const hasBackendSession = authService.isAuthenticated();
+      if (hasBackendSession) {
+          const collectionItem: CollectionItem = {
+              id: targetId,
+              timestamp: targetItem.timestamp,
+              region: targetItem.region,
+              status: status,
+              species: plantData?.commonName || plantData?.scientificName,
+              description: plantData?.description,
+              plant_data: plantData ? convertPlantInfoToBackend(plantData) : undefined
+          };
+          
+          // Call saveCollectionItem asynchronously
+          setTimeout(() => {
+              collectionService.saveCollectionItem(collectionItem)
+              .then(() => {
+                  try { window.dispatchEvent(new Event('rewards-updated')); } catch {}
+              })
+              .catch(e => console.error('Backend save failed', e));
+          }, 0);
+      }
+    }
   };
 
   const handleNewMessage = (message: Message, plantId?: string) => {
@@ -479,6 +489,7 @@ function AppContent() {
 
   return (
     <div className="App">
+      <CoinAnimation />
       {/* Navigation Bar */}
       <nav className="navbar">
         <button
