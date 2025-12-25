@@ -115,13 +115,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         console.log('🔄 Keeping Firebase user despite backend failure');
         
         // In production, keep Firebase user even if backend fails
-        if (process.env.NODE_ENV === 'production') {
+        if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'development') {
           setFirebaseUser(result.user);
           setCurrentUser(null);
-          console.log('✅ Production mode: Firebase authentication successful, backend optional');
+          console.log(`✅ ${process.env.NODE_ENV} mode: Firebase authentication successful, backend optional/failed`);
           return result;
         } else {
-          // In development, require both Firebase and backend
+          // In other environments (e.g. test), require both
           throw backendError;
         }
       }
