@@ -15,7 +15,7 @@ interface AuthContextType {
   currentUser: AuthUser | null;
   firebaseUser: User | null;
   loading: boolean;
-  signInWithGoogle: () => Promise<UserCredential>;
+  signInWithGoogle: () => Promise<UserCredential | null>;
   logout: () => Promise<void>;
   isAuthenticated: boolean;
 }
@@ -39,7 +39,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const signInWithGoogle = async (): Promise<UserCredential> => {
+  const signInWithGoogle = async (): Promise<UserCredential | null> => {
     try {
       setLoading(true);
       console.log('🚀 Starting Google sign-in process...');
@@ -61,7 +61,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         try {
           await signInWithRedirect(auth, googleProvider);
           // The result will be handled in the useEffect with getRedirectResult
-          return Promise.resolve({} as UserCredential); // Temporary return
+          return null; // Return null to indicate redirect
         } catch (redirectError) {
           console.error('❌ Mobile redirect failed:', redirectError);
           throw redirectError;
@@ -84,7 +84,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             
             // Fallback to redirect method
             await signInWithRedirect(auth, googleProvider);
-            return Promise.resolve({} as UserCredential); // Will be handled by redirect result
+            return null; // Return null to indicate redirect
           } else {
             // Re-throw non-popup related errors
             throw popupError;

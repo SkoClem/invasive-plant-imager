@@ -16,9 +16,13 @@ const AuthButton: React.FC<AuthButtonProps> = ({ className = '', variant = 'defa
   const handleSignIn = async () => {
     setIsLoading(true);
     try {
-      await signInWithGoogle();
+      const result = await signInWithGoogle();
       // Reload page to ensure all states (collection, coins, etc.) are fresh
-      window.location.reload();
+      // Only reload if we got a result (popup flow)
+      // If result is null, it means we are redirecting, so don't reload
+      if (result) {
+        window.location.reload();
+      }
     } catch (error) {
       console.error('Sign in failed:', error);
       // You might want to show an error message to the user here
