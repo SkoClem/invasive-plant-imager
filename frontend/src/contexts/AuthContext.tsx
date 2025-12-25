@@ -6,7 +6,8 @@ import {
   getRedirectResult,
   signOut, 
   onAuthStateChanged,
-  UserCredential 
+  UserCredential,
+  GoogleAuthProvider
 } from 'firebase/auth';
 import { auth, googleProvider } from '../config/firebase';
 import { authService, AuthUser } from '../services/authService';
@@ -44,108 +45,64 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setLoading(true);
       console.log('🚀 Starting Google sign-in process...');
       
-      // Enhanced mobile detection
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-                       (window.innerWidth <= 768) ||
-                       ('ontouchstart' in window);
-      console.log('📱 Device type:', isMobile ? 'Mobile' : 'Desktop');
-      console.log('📱 User agent:', navigator.userAgent);
-      console.log('📱 Window width:', window.innerWidth);
-      console.log('📱 Touch support:', 'ontouchstart' in window);
+      // Unified authentication strategy: Popup first, then Redirect fallback
+      // This works for both Desktop and Mobile (modern mobile browsers support popups on click)
+      console.log('🔐 Attempting popup authentication...');
       
       let result: UserCredential;
       
-      if (isMobile) {
-        // Use redirect for mobile devices to avoid popup blocking
-        console.log('📱 Using redirect authentication for mobile...');
-        try {
-          await signInWithRedirect(auth, googleProvider);
-          // The result will be handled in the useEffect with getRedirectResult
-          return null; // Return null to indicate redirect
-        } catch (redirectError) {
-          console.error('❌ Mobile redirect failed:', redirectError);
-          throw redirectError;
-        }
-      } else {
-        // Try popup first for desktop, with fallback to redirect
-        console.log('🖥️ Attempting popup authentication for desktop...');
-        try {
-          result = await signInWithPopup(auth, googleProvider);
-          console.log('✅ Firebase popup authentication successful:', result.user.email);
-        } catch (popupError: any) {
-          console.error('❌ Firebase popup authentication failed:', popupError);
-          
-          // Check if it's a popup-related error
-          if (popupError.code === 'auth/popup-blocked' || 
-              popupError.code === 'auth/popup-closed-by-user' ||
-              popupError.code === 'auth/cancelled-popup-request' ||
-              popupError.message?.includes('popup')) {
-            console.log('🔄 Popup blocked or closed, falling back to redirect...');
-            
-            // Fallback to redirect method
-            await signInWithRedirect(auth, googleProvider);
-            return null; // Return null to indicate redirect
-          } else {
-            // Re-throw non-popup related errors
-            throw popupError;
-          }
-        }
-      }
-      
-      // Step 2: Get Firebase ID token
-      console.log('🔑 Getting Firebase ID token...');
-      const idToken = await result.user.getIdToken();
-      console.log('✅ Firebase ID token obtained');
-      
-      // Step 3: Send token to backend and get JWT
-      console.log('🔄 Authenticating with backend...');
       try {
-        const backendUser = await authService.loginWithFirebaseToken(idToken);
-        console.log('✅ Backend authentication successful:', backendUser);
+        // Try popup first
+        // Use the existing googleProvider but ensure we select account
+        googleProvider.setCustomParameters({ prompt: 'select_account' });
+        result = await signInWithPopup(auth, googleProvider);
+        console.log('✅ Popup authentication successful:', result.user.email);
         
-        // Step 4: Update local state
-        setCurrentUser(backendUser);
-        setFirebaseUser(result.user);
+        // Handle successful popup sign-in
+        const user = result.user;
+        setFirebaseUser(user);
         
-        console.log('✅ Authentication complete - User state updated');
+        // Authenticate with backend
+        try {
+          console.log('🔄 Authenticating with backend...');
+          const idToken = await user.getIdToken();
+          const backendUser = await authService.loginWithFirebaseToken(idToken);
+          setCurrentUser(backendUser);
+          console.log('✅ Backend authentication complete:', backendUser);
+        } catch (backendError) {
+          console.error('❌ Backend authentication failed:', backendError);
+          // If backend fails, still set Firebase user (partial auth)
+          // This allows the UI to show logged-in state even if backend is unreachable
+          setCurrentUser(null);
+          console.log('⚠️ Proceeding with Firebase-only authentication');
+        }
         
         return result;
-      } catch (backendError) {
-        console.error('❌ Backend authentication failed:', backendError);
-        console.log('🔄 Keeping Firebase user despite backend failure');
+      } catch (popupError: any) {
+        console.warn('⚠️ Popup authentication failed, falling back to redirect:', popupError);
         
-        // In production, keep Firebase user even if backend fails
-        if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'development') {
-          setFirebaseUser(result.user);
-          setCurrentUser(null);
-          console.log(`✅ ${process.env.NODE_ENV} mode: Firebase authentication successful, backend optional/failed`);
-          return result;
-        } else {
-          // In other environments (e.g. test), require both
-          throw backendError;
+        // If popup fails (e.g. blocked), fall back to redirect
+        // This is common on some mobile browsers or strict settings
+        if (popupError.code === 'auth/popup-blocked' || 
+            popupError.code === 'auth/popup-closed-by-user' ||
+            popupError.code === 'auth/cancelled-popup-request' ||
+            popupError.code === 'auth/operation-not-supported-in-this-environment') {
+            
+          console.log('🔄 Initiating redirect authentication fallback...');
+          await signInWithRedirect(auth, googleProvider);
+          return null; // Redirect initiated
         }
+        
+        throw popupError;
       }
     } catch (error) {
-      console.error('❌ Sign in failed:', error);
-      console.error('Error details:', {
-        name: (error as any)?.name,
-        message: (error as any)?.message,
-        code: (error as any)?.code,
-        stack: (error as any)?.stack
-      });
-      
-      // Clean up on error
-      setCurrentUser(null);
-      setFirebaseUser(null);
-      authService.logout();
-      
-      throw error;
-    } finally {
+      console.error('❌ Google sign-in error:', error);
       setLoading(false);
+      throw error;
     }
   };
 
-  const logout = async (): Promise<void> => {
+  const logout = async () => {
     try {
       setLoading(true);
       
@@ -298,28 +255,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // In production, consider user authenticated if they have Firebase auth even without backend
     // Add debug logging to help troubleshoot mobile authentication issues
     isAuthenticated: (() => {
-      const isProduction = process.env.NODE_ENV === 'production';
+      // Simplify authentication check: If we have a Firebase user, we are authenticated.
+      // The backend session (currentUser) is secondary for data persistence but not for "signed in" status.
+      // This ensures the UI always reflects the user's logged-in state even if backend connection is flaky.
       const hasFirebaseUser = firebaseUser !== null;
-      const hasCurrentUser = currentUser !== null;
-      const isAuthServiceAuthenticated = authService.isAuthenticated();
       
-      const result = isProduction 
-        ? hasFirebaseUser 
-        : (hasCurrentUser && isAuthServiceAuthenticated);
+      if (firebaseUser) {
+        console.debug('🔐 Auth Check: User is authenticated via Firebase', {
+          email: firebaseUser.email,
+          hasBackendSession: currentUser !== null
+        });
+      }
       
-      // Debug logging for mobile authentication troubleshooting
-      console.log('Authentication State Debug:', {
-        isProduction,
-        hasFirebaseUser,
-        hasCurrentUser,
-        isAuthServiceAuthenticated,
-        result,
-        firebaseUserEmail: firebaseUser?.email,
-        currentUserEmail: currentUser?.email
-      });
-      
-      return result;
-    })()
+      return hasFirebaseUser;
+    })(),
   };
 
   return (
