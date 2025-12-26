@@ -5,7 +5,6 @@ import re
 llm = LLM()
 from app.prompts import paragraph_analysis, json_information, optimized_analysis, plant_expert_chat
 from dotenv import load_dotenv
-#TODO: get environment variables without dotenv package
 load_dotenv(override=True)
 print(llm)
 from typing import Optional
@@ -16,10 +15,6 @@ class Generate:
         self.key,self.name,self.url=self.LLM.initialize_llm(KEY='LLM_KEY',
                                                             NAME='LLM_NAME',
                                                             URL='LLM_URL')
-        self.name = "gemini-3-flash-preview"
-        # Update URL to match the new model
-        if "models/" in self.url:
-            self.url = re.sub(r'models/[^:]+', f'models/{self.name}', self.url)
         
     def __call__(self,
                  prompt:str,
@@ -43,10 +38,6 @@ class Imager:
     def __init__(self, region: str = "North America"):
         self.llm_info = LLM().initialize_llm(KEY='LLM_KEY',NAME='LLM_NAME',URL='LLM_URL')
         self.key, self.name, self.url = self.llm_info
-        self.name = "gemini-3-flash-preview"
-        # Update URL to match the new model
-        if "models/" in self.url:
-            self.url = re.sub(r'models/[^:]+', f'models/{self.name}', self.url)
             
         self.region = region
         self.image_llm = ImageLLM()
