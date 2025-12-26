@@ -4,8 +4,14 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from app.api import router
+from app.plant_classifier import load_model
 
 app = FastAPI()
+
+@app.on_event("startup")
+async def startup_event():
+    load_model()
+
 # MUST BE CHANGED DURING PRODUCTION
 app.add_middleware(
     CORSMiddleware,

@@ -8,6 +8,7 @@ from app.auth import AuthService, get_current_user, get_current_user_optional
 from app.collections import collection_manager
 from app.rate_limiter import rate_limiter
 from app.rewards import rewards_manager
+from app.plant_classifier import is_plant
 
 imager = Imager()
 router = APIRouter()
@@ -121,6 +122,21 @@ def chat(request: ChatRequest, current_user: Dict[str, Any] = Depends(get_curren
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.post("/api/check-plant")
+async def check_plant(image: UploadFile = File(...)):
+    """Quickly check if the image is a plant using CNN"""
+    try:
+        if not image.content_type.startswith("image/"):
+            raise HTTPException(status_code=400, detail="File must be an image")
+            
+        image_data = await image.read()
+        is_plant_result = is_plant(image_data)
+        
+        return {"is_plant": is_plant_result}
+    except Exception as e:
+        print(f"❌ Check plant failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.post("/api/analyze-plant")
 async def analyze_plant(
     request: Request,
@@ -164,6 +180,27 @@ async def analyze_plant(
 
         # Convert uploaded file to base64
         image_data = await image.read()
+        
+        # 🌿 Check if it is a plant using CNN
+        print("🔍 Checking if image is a plant...")
+        if not is_plant(image_data):
+            print("🚫 Image classified as NOT a plant. Skipping LLM analysis.")
+            return {
+                "specieIdentified": "Not a Plant",
+                "nativeRegion": "N/A",
+                "invasiveOrNot": False,
+                "confidenceScore": 0.0,
+                "confidenceReasoning": "The image was classified as a non-plant object by our AI filter.",
+                "invasiveEffects": "This image does not appear to contain a plant.",
+                "nativeAlternatives": [],
+                "removeInstructions": "Please upload a clear image of a plant.",
+                "region": region,
+                "analyzed_by": current_user['uid'] if current_user else 'anonymous',
+                "user_email": current_user['email'] if current_user else 'anonymous@example.com',
+                "coinAwarded": False,
+                "coins": int(rewards_manager.get_user_rewards(current_user['uid']).get('coins', 0)) if current_user else 0
+            }
+            
         import base64
         base64_data = base64.b64encode(image_data).decode('utf-8')
         
