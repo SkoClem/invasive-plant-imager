@@ -8,12 +8,12 @@ interface ResourceCardProps {
 function ResourceCard({ resource }: ResourceCardProps) {
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'program': return '📋';
-      case 'guide': return '📖';
-      case 'incentive': return '💵';
-      case 'nursery': return '🏪';
-      case 'organization': return '🏛️';
-      default: return '📚';
+      case 'program': return 'P';
+      case 'guide': return 'G';
+      case 'incentive': return '$';
+      case 'nursery': return 'N';
+      case 'organization': return 'O';
+      default: return 'R';
     }
   };
 

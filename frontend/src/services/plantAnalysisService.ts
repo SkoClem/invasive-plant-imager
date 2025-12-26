@@ -26,8 +26,8 @@ class PlantAnalysisService {
     // Append the region
     formData.append('region', request.region);
 
-    console.log('🚀 Sending request to:', `${API_BASE_URL}/api/analyze-plant`);
-    console.log('📸 FormData contents:', {
+    console.log(' Sending request to:', `${API_BASE_URL}/api/analyze-plant`);
+    console.log(' FormData contents:', {
       fileName: imageToSend.name,
       fileSize: `${(imageToSend.size / 1024 / 1024).toFixed(2)} MB`,
       fileType: imageToSend.type,
@@ -35,7 +35,7 @@ class PlantAnalysisService {
     });
 
     // Log FormData entries to verify data is being sent
-    console.log('📋 FormData entries:');
+    console.log(' FormData entries:');
     formData.forEach((value, key) => {
       console.log(`  ${key}: ${value instanceof File ? `File(${value.name}, ${value.size} bytes)` : value}`);
     });

@@ -19,7 +19,7 @@ function PlantCard({ plant, onLearnMore }: PlantCardProps) {
 
         <div className="plant-details">
           <div className="detail-section">
-            <h4>🔍 Identification Tips</h4>
+            <h4>Identification Tips</h4>
             <ul>
               {plant.identificationTips.map((tip, index) => (
                 <li key={index}>{tip}</li>
@@ -28,12 +28,12 @@ function PlantCard({ plant, onLearnMore }: PlantCardProps) {
           </div>
 
           <div className="detail-section">
-            <h4>⚠️ Impact</h4>
+            <h4>Impact</h4>
             <p>{plant.impact}</p>
           </div>
 
           <div className="detail-section">
-            <h4>🛠️ Control Methods</h4>
+            <h4>Control Methods</h4>
             <ul>
               {plant.controlMethods.map((method, index) => (
                 <li key={index}>{method}</li>
@@ -42,7 +42,7 @@ function PlantCard({ plant, onLearnMore }: PlantCardProps) {
           </div>
 
           <div className="detail-section">
-            <h4>🌱 Native Alternatives</h4>
+            <h4>Native Alternatives</h4>
             <div className="alternatives-list">
               {plant.nativeAlternatives.map((alternative, index) => (
                 <div key={index} className="alternative-item">

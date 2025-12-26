@@ -98,17 +98,17 @@ function RegionSelector({ selectedRegion, onRegionChange }: RegionSelectorProps)
   };
 
   const getSelectedCountryFlag = () => {
-    if (!selectedCountry) return '🌍';
+    if (!selectedCountry) return '';
 
     const flags: Record<string, string> = {
       'United States': '🇺🇸',
-      'Canada': '🇨🇦',
-      'Mexico': '🇲🇽',
-      'Australia': '🇦🇺',
-      'New Zealand': '🇳🇿'
+      'Canada': '',
+      'Mexico': '',
+      'Australia': '',
+      'New Zealand': ''
     };
 
-    return flags[selectedCountry] || '🌍';
+    return flags[selectedCountry] || '';
   };
 
   const getPopularRegions = () => {
@@ -174,13 +174,13 @@ function RegionSelector({ selectedRegion, onRegionChange }: RegionSelectorProps)
               className={`tab-button ${activeTab === 'browse' ? 'active' : ''}`}
               onClick={() => setActiveTab('browse')}
             >
-              🔍 Browse
+              Browse
             </button>
             <button
               className={`tab-button ${activeTab === 'search' ? 'active' : ''}`}
               onClick={() => setActiveTab('search')}
             >
-              🔎 Search
+              Search
             </button>
           </div>
 
@@ -188,7 +188,7 @@ function RegionSelector({ selectedRegion, onRegionChange }: RegionSelectorProps)
           {activeTab === 'search' && (
             <div className="search-section">
               <div className="search-input-wrapper">
-                <span className="search-icon">🔍</span>
+                <span className="search-icon"></span>
                 <input
                   ref={searchInputRef}
                   type="text"
@@ -208,7 +208,7 @@ function RegionSelector({ selectedRegion, onRegionChange }: RegionSelectorProps)
                 <div className="search-results">
                   {filteredRegions.length === 0 ? (
                     <div className="no-results">
-                      <span className="no-results-icon">🔍</span>
+                      <span className="no-results-icon"></span>
                       <p>No regions found for "{searchTerm}"</p>
                       <p className="no-results-hint">Try searching for a state, province, or country</p>
                     </div>
@@ -225,11 +225,7 @@ function RegionSelector({ selectedRegion, onRegionChange }: RegionSelectorProps)
                             onClick={() => handleSearchResultSelect(country, region)}
                           >
                             <span className="result-country-flag">
-                              {country === 'United States' ? '🇺🇸' :
-                               country === 'Canada' ? '🇨🇦' :
-                               country === 'Mexico' ? '🇲🇽' :
-                               country === 'Australia' ? '🇦🇺' :
-                               country === 'New Zealand' ? '🇳🇿' : '🌍'}
+                              {country === 'United States' ? '🇺🇸' : ''}
                             </span>
                             <div className="result-content">
                               <span className="result-region">{region}</span>
@@ -252,7 +248,7 @@ function RegionSelector({ selectedRegion, onRegionChange }: RegionSelectorProps)
               {/* Popular Regions */}
               <div className="dropdown-section">
                 <h3 className="dropdown-title">
-                  ⭐ Popular Regions
+                  Popular Regions
                 </h3>
                 <div className="dropdown-list popular-list">
                   {getPopularRegions().map(({ country, region }) => (
@@ -262,9 +258,7 @@ function RegionSelector({ selectedRegion, onRegionChange }: RegionSelectorProps)
                       onClick={() => handleSearchResultSelect(country, region)}
                     >
                       <span className="popular-flag">
-                        {country === 'United States' ? '🇺🇸' :
-                         country === 'Canada' ? '🇨🇦' :
-                         country === 'Australia' ? '🇦🇺' : '🌍'}
+                        {country === 'United States' ? '🇺🇸' : ''}
                       </span>
                       <span className="popular-region">{region}</span>
                       <span className="popular-country">{country}</span>
@@ -276,7 +270,7 @@ function RegionSelector({ selectedRegion, onRegionChange }: RegionSelectorProps)
               {/* Countries List */}
               <div className="dropdown-section">
                 <h3 className="dropdown-title">
-                  🌎 Countries ({countries.length})
+                  Countries ({countries.length})
                 </h3>
                 <div className="dropdown-list countries-list">
                   {countries.map((country) => (
@@ -286,11 +280,7 @@ function RegionSelector({ selectedRegion, onRegionChange }: RegionSelectorProps)
                       onClick={() => handleCountrySelect(country.name)}
                     >
                       <span className="country-flag-large">
-                        {country.name === 'United States' ? '🇺🇸' :
-                         country.name === 'Canada' ? '🇨🇦' :
-                         country.name === 'Mexico' ? '🇲🇽' :
-                         country.name === 'Australia' ? '🇦🇺' :
-                         country.name === 'New Zealand' ? '🇳🇿' : '🌍'}
+                        {country.name === 'United States' ? '🇺🇸' : ''}
                       </span>
                       <span className="country-name">{country.name}</span>
                       <span className="region-count">{country.regions.length} regions</span>
@@ -306,7 +296,7 @@ function RegionSelector({ selectedRegion, onRegionChange }: RegionSelectorProps)
               {selectedCountry && availableRegions.length > 0 && (
                 <div className="dropdown-section regions-section">
                   <h3 className="dropdown-title">
-                    📍 Regions in {selectedCountry}
+                    Regions in {selectedCountry}
                   </h3>
                   <div className="dropdown-list regions-list enhanced">
                     {availableRegions.map((region) => (
@@ -315,7 +305,7 @@ function RegionSelector({ selectedRegion, onRegionChange }: RegionSelectorProps)
                         className="dropdown-item region-item"
                         onClick={() => handleRegionSelect(region)}
                       >
-                        <span className="region-icon-small">📍</span>
+                        <span className="region-icon-small"></span>
                         <span className="region-name">{region}</span>
                         <span className="select-arrow">→</span>
                       </button>

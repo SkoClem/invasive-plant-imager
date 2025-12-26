@@ -90,11 +90,11 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
         {imageCollection.length === 0 ? (
           <div className="collection-empty enhanced">
             <div className="empty-illustration">
-              <div className="empty-icon">🌿</div>
+              <div className="empty-icon"></div>
               <div className="empty-decoration">
-                <span className="deco-leaf">🍃</span>
-                <span className="deco-leaf">🌱</span>
-                <span className="deco-leaf">🍀</span>
+                <span className="deco-leaf"></span>
+                <span className="deco-leaf"></span>
+                <span className="deco-leaf"></span>
               </div>
             </div>
             <div className="empty-content">
@@ -104,15 +104,15 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
               </p>
               <div className="empty-benefits">
                 <div className="benefit-item">
-                  <span className="benefit-icon">🔍</span>
+                  <span className="benefit-icon"></span>
                   <span>AI-powered identification</span>
                 </div>
                 <div className="benefit-item">
-                  <span className="benefit-icon">📍</span>
+                  <span className="benefit-icon"></span>
                   <span>Location-based tracking</span>
                 </div>
                 <div className="benefit-item">
-                  <span className="benefit-icon">📊</span>
+                  <span className="benefit-icon"></span>
                   <span>Conservation impact</span>
                 </div>
               </div>
@@ -120,7 +120,7 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
                 className="button primary-button enhanced"
                 onClick={() => setCurrentPage('upload')}
               >
-                <span className="button-icon">📸</span>
+                <span className="button-icon"></span>
                 <span className="button-text">Scan Your First Plant</span>
               </button>
             </div>
@@ -132,7 +132,7 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
                 className="button secondary-button enhanced"
                 onClick={() => setCurrentPage('upload')}
               >
-                <span className="button-icon">➕</span>
+                <span className="button-icon"></span>
                 <span className="button-text">Add New Plant</span>
               </button>
               <div className="view-options">
@@ -141,14 +141,14 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
                   onClick={() => setViewMode('mobile')}
                   title="Mobile view"
                 >
-                  <span className="view-icon">📱</span>
+                  <span className="view-icon"></span>
                 </button>
                 <button
                   className={`view-button ${viewMode === 'desktop' ? 'active' : ''}`}
                   onClick={() => setViewMode('desktop')}
                   title="Desktop view"
                 >
-                  <span className="view-icon">🖥️</span>
+                  <span className="view-icon"></span>
                 </button>
               </div>
             </div>
@@ -198,7 +198,7 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
                           )}
                           {image.plantData.region && (
                             <div className="native-location" style={{ fontSize: '0.8rem', marginBottom: '4px' }}>
-                              <span className="location-icon">🌍</span>
+                              <span className="location-icon"></span>
                               <span className="location-text">Native to: {image.plantData.region}</span>
                             </div>
                           )}
@@ -246,11 +246,11 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
                       )}
                       <div className="image-metadata">
                         <div className="metadata-item">
-                          <span className="metadata-icon">🕒</span>
+                          <span className="metadata-icon"></span>
                           <span className="metadata-text">{formatDate(image.timestamp)}</span>
                         </div>
                         <div className="metadata-item">
-                          <span className="metadata-icon">📍</span>
+                          <span className="metadata-icon"></span>
                           <span className="metadata-text">{image.region}</span>
                         </div>
                       </div>
@@ -265,11 +265,11 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
                 className="button primary-button enhanced"
                 onClick={() => setCurrentPage('upload')}
               >
-                <span className="button-icon">📸</span>
+                <span className="button-icon"></span>
                 <span className="button-text">Scan Another Plant</span>
               </button>
               <p className="collection-tip">
-                💡 Tip: Regular scanning helps track invasive species spread in your area
+                Tip: Regular scanning helps track invasive species spread in your area
               </p>
             </div>
           </div>

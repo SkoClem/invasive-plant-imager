@@ -62,7 +62,7 @@ function UploadPage({ setCurrentPage, startAnalysis, selectedRegion, setSelected
       setSelectedFile(file);
       setError(null);
 
-      console.log('📁 File selected:', {
+      console.log('File selected:', {
         name: file.name,
         size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
         type: file.type,
@@ -210,7 +210,7 @@ function UploadPage({ setCurrentPage, startAnalysis, selectedRegion, setSelected
                     tabIndex={0}
                   >
                     <div className="upload-icon">
-                      {inputMode === 'camera' ? '📸' : '📁'}
+                      {inputMode === 'camera' ? '' : ''}
                     </div>
                     <p className="upload-text">
                       {inputMode === 'camera' ? 'Tap to Take Photo' : 'Tap to Upload Image'}
@@ -243,14 +243,6 @@ function UploadPage({ setCurrentPage, startAnalysis, selectedRegion, setSelected
               </button>
             </div>
 
-            <div className="upload-guidelines">
-              <h3>For best results:</h3>
-              <ul>
-                <li>Ensure good lighting when taking photos</li>
-                <li>Focus on the plant's distinctive features</li>
-                <li>Include leaves, flowers, or fruits if possible</li>
-              </ul>
-            </div>
           </div>
         )}
 
@@ -260,34 +252,6 @@ function UploadPage({ setCurrentPage, startAnalysis, selectedRegion, setSelected
           </div>
         )}
 
-        {/* Region Display - moved below analyze button */}
-        <div className="region-section">
-          <div className="region-header">
-            <h2>Region</h2>
-            <p className="region-hint">Plant identification focused on Texas invasive species</p>
-          </div>
-          <div className="region-display-container">
-            <div className="region-display">
-              <div className="region-icon-wrapper">
-                <span className="country-flag">🇺🇸</span>
-                <svg
-                  className="region-icon"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  width="20"
-                  height="20"
-                  fill="currentColor"
-                >
-                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                </svg>
-              </div>
-              <div className="region-text-wrapper">
-                <span className="region-text">United States, Texas</span>
-                <span className="region-subtitle">Fixed region for invasive species detection</span>
-              </div>
-            </div>
-          </div>
-        </div>
 
         <div className="upload-guidelines">
           <h3>For best results:</h3>
