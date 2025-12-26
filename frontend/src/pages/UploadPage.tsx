@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { plantAnalysisService } from '../services/plantAnalysisService';
 
 interface UploadPageProps {
   setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'learn' | 'loading' | 'chat') => void;
@@ -231,10 +232,27 @@ function UploadPage({ setCurrentPage, startAnalysis, selectedRegion, setSelected
 
               <button
                 className={`button primary-button upload-button ${!selectedFile ? 'disabled' : ''}`}
-                onClick={() => {
+                onClick={async () => {
                   if (selectedFile) {
                     setIsAnalyzing(true);
-                    startAnalysis(selectedFile, selectedRegion);
+                    setError(null);
+                    
+                    try {
+                      // Check if it's a plant before proceeding
+                      const isPlant = await plantAnalysisService.checkPlant(selectedFile);
+                      
+                      if (!isPlant) {
+                        setError("This doesn't look like a plant. Please upload a clear plant image.");
+                        setIsAnalyzing(false);
+                        return;
+                      }
+                      
+                      startAnalysis(selectedFile, selectedRegion);
+                    } catch (err) {
+                      console.error("Plant check failed:", err);
+                      // Fallback: proceed to analysis if check fails
+                      startAnalysis(selectedFile, selectedRegion);
+                    }
                   }
                 }}
                 disabled={!selectedFile || isAnalyzing}

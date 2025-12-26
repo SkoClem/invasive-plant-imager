@@ -4,6 +4,38 @@ import { compressImage } from '../utils/imageUtils';
 import { API_BASE_URL } from '../config/api';
 
 class PlantAnalysisService {
+  async checkPlant(file: File): Promise<boolean> {
+    try {
+      // Compress the image before sending check
+      let imageToSend = file;
+      try {
+        // Smaller compression for faster check
+        imageToSend = await compressImage(file, 512, 0.7); 
+      } catch (error) {
+        console.warn('Image compression for check failed:', error);
+      }
+
+      const formData = new FormData();
+      formData.append('image', imageToSend);
+
+      const response = await fetch(`${API_BASE_URL}/api/check-plant`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to check plant status');
+      }
+
+      const data = await response.json();
+      return data.is_plant;
+    } catch (error) {
+      console.error('Plant check error:', error);
+      // If check fails, assume it's a plant and let the main analysis handle it to avoid blocking user
+      return true;
+    }
+  }
+
   async analyzePlant(request: PlantAnalysisRequest): Promise<PlantAnalysisResponse> {
     // Compress the image before sending
     console.log(`Original image size: ${(request.image.size / 1024 / 1024).toFixed(2)} MB`);
