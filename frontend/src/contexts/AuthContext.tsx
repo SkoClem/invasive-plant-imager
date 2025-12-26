@@ -6,8 +6,7 @@ import {
   getRedirectResult,
   signOut, 
   onAuthStateChanged,
-  UserCredential,
-  GoogleAuthProvider
+  UserCredential
 } from 'firebase/auth';
 import { auth, googleProvider } from '../config/firebase';
 import { authService, AuthUser } from '../services/authService';
