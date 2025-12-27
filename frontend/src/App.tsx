@@ -229,7 +229,7 @@ function AppContent() {
   };
 
   // Convert PlantInfo from API format to backend format
-  const convertPlantInfoToBackend = (apiPlantInfo: PlantInfo): BackendPlantInfo => {
+  const convertPlantInfoToBackend = useCallback((apiPlantInfo: PlantInfo): BackendPlantInfo => {
     return {
       specieIdentified: apiPlantInfo.scientificName || apiPlantInfo.commonName,
       nativeRegion: apiPlantInfo.nativeRegion || apiPlantInfo.region, // Use nativeRegion if available, otherwise fallback
@@ -244,7 +244,7 @@ function AppContent() {
       })),
       removeInstructions: apiPlantInfo.controlMethods.join('; ')
     };
-  };
+  }, []);
 
   // Convert Backend format to Frontend format
   const convertBackendToFrontend = (item: any): CollectedImage => {
@@ -354,7 +354,7 @@ function AppContent() {
     // Handle side effects (outside state updater)
     if (status === 'completed') {
       setLastResultId(targetId);
-      
+
       const hasBackendSession = authService.isAuthenticated();
       if (hasBackendSession) {
           const collectionItem: CollectionItem = {
@@ -366,7 +366,7 @@ function AppContent() {
               description: plantData?.description,
               plant_data: plantData ? convertPlantInfoToBackend(plantData) : undefined
           };
-          
+
           // Call saveCollectionItem asynchronously
           setTimeout(() => {
               collectionService.saveCollectionItem(collectionItem)
@@ -377,7 +377,7 @@ function AppContent() {
           }, 0);
       }
     }
-  }, [imageCollection]); // Depends on imageCollection to find items
+  }, [imageCollection, convertPlantInfoToBackend, setImageCollection, setLastResultId]);
 
   const handleNewMessage = (message: Message, plantId?: string) => {
     const targetId = plantId || lastResultId;

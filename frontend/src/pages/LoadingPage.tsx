@@ -18,23 +18,23 @@ function LoadingPage({ setCurrentPage, pendingAnalysis, updateImageInCollection 
   const hasStartedAnalysis = useRef(false);
 
   const steps = useMemo(() => [
-    { title: 'Image Processing', description: 'Enhancing and analyzing your photo', icon: '📸' },
-    { title: 'AI Identification', description: 'Matching plant characteristics', icon: '🤖' },
-    { title: 'Regional Analysis', description: 'Checking invasive status in your area', icon: '🌍' }
+    { title: 'Image Processing', description: 'Enhancing and analyzing your photo', icon: '' },
+    { title: 'AI Identification', description: 'Matching plant characteristics', icon: '' },
+    { title: 'Regional Analysis', description: 'Checking invasive status in your area', icon: '' }
   ], []);
 
   useEffect(() => {
-    console.log('🔄 LoadingPage mounted, checking pendingAnalysis...');
-    console.log('📋 Pending analysis data:', pendingAnalysis);
+    console.log(' LoadingPage mounted, checking pendingAnalysis...');
+    console.log(' Pending analysis data:', pendingAnalysis);
     
     // Prevent duplicate analysis in React.StrictMode
     if (hasStartedAnalysis.current) {
-      console.log('⚠️ Analysis already started, skipping duplicate call');
+      console.log(' Analysis already started, skipping duplicate call');
       return;
     }
     
     if (!pendingAnalysis) {
-      console.error('❌ No pending analysis data available');
+      console.error(' No pending analysis data available');
       alert('No analysis data found. Please try scanning again.');
       setCurrentPage('upload');
       return;
@@ -90,7 +90,7 @@ function LoadingPage({ setCurrentPage, pendingAnalysis, updateImageInCollection 
           region: pendingAnalysis.region,
         });
         const apiDuration = Date.now() - apiStart;
-        console.log(`✅ API response in ${(apiDuration/1000).toFixed(1)}s`);
+        console.log(` API response in ${(apiDuration/1000).toFixed(1)}s`);
 
         clearInterval(progressInterval);
         clearInterval(stepInterval);
@@ -116,7 +116,7 @@ function LoadingPage({ setCurrentPage, pendingAnalysis, updateImageInCollection 
           setCurrentPage('chat');
         }, 800);
       } catch (error) {
-        console.error('❌ Analysis failed:', error);
+        console.error(' Analysis failed:', error);
         clearInterval(progressInterval);
         clearInterval(stepInterval);
         clearTimeout(safetyTimeout);
@@ -133,7 +133,7 @@ function LoadingPage({ setCurrentPage, pendingAnalysis, updateImageInCollection 
 
     return () => {
       isMounted = false;
-      hasStartedAnalysis.current = false;
+      // DO NOT reset hasStartedAnalysis here - it should persist across re-renders
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingAnalysis, setCurrentPage, updateImageInCollection]);
@@ -157,7 +157,7 @@ function LoadingPage({ setCurrentPage, pendingAnalysis, updateImageInCollection 
             {pendingAnalysis && (
               <span className="file-info">
                 <br />
-                📸 {pendingAnalysis.file.name} ({(pendingAnalysis.file.size / 1024 / 1024).toFixed(1)} MB)
+                 {pendingAnalysis.file.name} ({(pendingAnalysis.file.size / 1024 / 1024).toFixed(1)} MB)
               </span>
             )}
           </p>

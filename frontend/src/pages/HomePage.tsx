@@ -24,12 +24,12 @@ function HomePage({ setCurrentPage }: HomePageProps) {
                 className="button hero-button enhanced"
                 onClick={() => setCurrentPage('upload')}
               >
-                <span className="button-icon">📸</span>
+                <span className="button-icon"></span>
                 <span className="button-text">Start Scanning</span>
               </button>
 
               <p className="region-hint-text">
-                📍 Select your region on the scan page for accurate plant identification
+                 Select your region on the scan page for accurate plant identification
               </p>
             </div>
           </div>
@@ -48,7 +48,7 @@ function HomePage({ setCurrentPage }: HomePageProps) {
 
           <div className="features-grid enhanced">
             <div className="feature-card enhanced">
-              <div className="feature-icon">🤖</div>
+              <div className="feature-icon"></div>
               <h3 className="feature-title">AI-Powered Recognition</h3>
               <p className="feature-description">
                 State-of-the-art machine learning algorithms identify invasive plant species with up to 95% accuracy from your photos.
@@ -60,7 +60,7 @@ function HomePage({ setCurrentPage }: HomePageProps) {
             </div>
 
             <div className="feature-card enhanced">
-              <div className="feature-icon">📚</div>
+              <div className="feature-icon"></div>
               <h3 className="feature-title">Comprehensive Database</h3>
               <p className="feature-description">
                 Access detailed information about identified plants, including control methods, ecological impact, and native alternatives.
@@ -72,7 +72,7 @@ function HomePage({ setCurrentPage }: HomePageProps) {
             </div>
 
             <div className="feature-card enhanced">
-              <div className="feature-icon">🗺️</div>
+              <div className="feature-icon"></div>
               <h3 className="feature-title">Conservation Mapping</h3>
               <p className="feature-description">
                 Contribute to conservation efforts by mapping invasive species distribution and helping researchers track their spread.
@@ -84,7 +84,7 @@ function HomePage({ setCurrentPage }: HomePageProps) {
             </div>
 
             <div className="feature-card enhanced">
-              <div className="feature-icon">📱</div>
+              <div className="feature-icon"></div>
               <h3 className="feature-title">Mobile Optimized</h3>
               <p className="feature-description">
                 Designed for field use with offline capabilities, GPS integration, and camera-optimized image capture.
@@ -96,7 +96,7 @@ function HomePage({ setCurrentPage }: HomePageProps) {
             </div>
 
             <div className="feature-card enhanced">
-              <div className="feature-icon">🔒</div>
+              <div className="feature-icon"></div>
               <h3 className="feature-title">Privacy Protected</h3>
               <p className="feature-description">
                 Your data is secure with encrypted storage and optional anonymous contribution to scientific research.
@@ -108,7 +108,7 @@ function HomePage({ setCurrentPage }: HomePageProps) {
             </div>
 
             <div className="feature-card enhanced">
-              <div className="feature-icon">🌍</div>
+              <div className="feature-icon"></div>
               <h3 className="feature-title">Global Coverage</h3>
               <p className="feature-description">
                 Regional-specific databases ensure accurate identification across North America, Australia, New Zealand, and beyond.
@@ -134,7 +134,7 @@ function HomePage({ setCurrentPage }: HomePageProps) {
               className="button cta-button"
               onClick={() => setCurrentPage('upload')}
             >
-              <span className="button-icon">🚀</span>
+              <span className="button-icon"></span>
               <span className="button-text">Start Identifying Plants</span>
             </button>
           </div>

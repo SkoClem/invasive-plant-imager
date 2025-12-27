@@ -37,8 +37,8 @@ class AuthService {
    */
   async loginWithFirebaseToken(idToken: string): Promise<AuthUser> {
     try {
-      console.log('🔄 Sending Firebase token to backend for authentication...');
-      console.log('🔗 Backend URL:', `${API_BASE_URL}/api/auth/login`);
+      console.log(' Sending Firebase token to backend for authentication...');
+      console.log(' Backend URL:', `${API_BASE_URL}/api/auth/login`);
       
       const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
@@ -50,17 +50,17 @@ class AuthService {
         }),
       });
 
-      console.log('📡 Backend response status:', response.status);
-      console.log('📡 Backend response headers:', Object.fromEntries(response.headers.entries()));
+      console.log(' Backend response status:', response.status);
+      console.log(' Backend response headers:', Object.fromEntries(response.headers.entries()));
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('❌ Backend login failed with error:', errorData);
+        console.error(' Backend login failed with error:', errorData);
         throw new Error(errorData.detail || 'Login failed');
       }
 
       const loginResponse: LoginResponse = await response.json();
-      console.log('✅ Backend login successful:', {
+      console.log(' Backend login successful:', {
         user: loginResponse.user,
         tokenReceived: !!loginResponse.access_token
       });
@@ -68,11 +68,11 @@ class AuthService {
       // Store the JWT token
       this.accessToken = loginResponse.access_token;
       localStorage.setItem('access_token', this.accessToken);
-      console.log('💾 JWT token stored in localStorage');
+      console.log(' JWT token stored in localStorage');
       
       return loginResponse.user;
     } catch (error) {
-      console.error('❌ Backend login failed:', error);
+      console.error(' Backend login failed:', error);
       console.error('Error details:', {
         name: (error as any)?.name,
         message: (error as any)?.message,

@@ -28,7 +28,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
         {currentPlant && currentPlant.plantData ? (
           <>
             <div className={`results-header ${currentPlant.plantData.isInvasive ? 'invasive' : 'non-invasive'}`}>
-              <div className="status-icon">{currentPlant.plantData.isInvasive ? '🚨' : '✅'}</div>
+              <div className="status-icon">{currentPlant.plantData.isInvasive ? '' : ''}</div>
               <div className="status-content">
                 <h1 className="status-title">{currentPlant.plantData.commonName || currentPlant.plantData.scientificName || 'Analysis Result'}</h1>
               </div>
@@ -41,12 +41,12 @@ const ChatPage: React.FC<ChatPageProps> = ({
                 )}
                 {currentPlant.plantData.region && (
                   <div className="native-location">
-                    <span className="location-icon">🌍</span>
+                    <span className="location-icon"></span>
                     <span className="location-text">Native to: {currentPlant.plantData.region}</span>
                   </div>
                 )}
                 <div className={`invasive-status ${currentPlant.plantData.isInvasive ? 'invasive' : 'native'}`}>
-                  <span className="status-icon">{currentPlant.plantData.isInvasive ? '🚨' : '✅'}</span>
+                  <span className="status-icon">{currentPlant.plantData.isInvasive ? '' : ''}</span>
                   <span className="status-text">
                     {currentPlant.plantData.isInvasive ? 'Invasive Species' : 'Native Plant'}
                   </span>
@@ -102,7 +102,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
           </>
         ) : (
           <div className="empty-chat-state">
-            <div className="empty-icon">💬</div>
+            <div className="empty-icon"></div>
             <h2>No Plant Selected</h2>
             <p>Select a plant from your collection or scan a new one to start chatting with the expert.</p>
             <button 
