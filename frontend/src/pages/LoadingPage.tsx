@@ -133,7 +133,7 @@ function LoadingPage({ setCurrentPage, pendingAnalysis, updateImageInCollection 
 
     return () => {
       isMounted = false;
-      hasStartedAnalysis.current = false;
+      // DO NOT reset hasStartedAnalysis here - it should persist across re-renders
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingAnalysis, setCurrentPage, updateImageInCollection]);

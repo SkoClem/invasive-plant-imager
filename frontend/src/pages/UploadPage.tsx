@@ -218,14 +218,6 @@ function UploadPage({ setCurrentPage, startAnalysis, selectedRegion, setSelected
                     </p>
                   </div>
                 )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  capture={inputMode === 'camera' ? 'environment' : undefined}
-                  className="file-input"
-                  onChange={handleFileSelect}
-                  style={{ display: 'none' }}
-                />
               </div>
               
               {error && <div className="error-message">{error}</div>}
