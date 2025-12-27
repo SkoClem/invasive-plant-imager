@@ -203,6 +203,11 @@ function AppContent() {
   const navigateToPage = (newPage: PageType) => {
     if (newPage === currentPage || isTransitioning) return;
 
+    // Clear pending analysis if navigating away from loading page
+    if (currentPage === 'loading' && newPage !== 'loading') {
+      setPendingAnalysis(null);
+    }
+
     const currentIndex = pageOrder.indexOf(currentPage);
     const newIndex = pageOrder.indexOf(newPage);
 
@@ -309,7 +314,7 @@ function AppContent() {
   };
 
   // Update image in collection after analysis
-  const updateImageInCollection = async (imageId: string, plantData: PlantInfo | null, status: 'completed' | 'error') => {
+  const updateImageInCollection = useCallback(async (imageId: string, plantData: PlantInfo | null, status: 'completed' | 'error') => {
     // Resolve targetId first
     let targetId = imageId;
     let targetItem = imageCollection.find(img => img.id === imageId);
@@ -372,7 +377,7 @@ function AppContent() {
           }, 0);
       }
     }
-  };
+  }, [imageCollection]); // Depends on imageCollection to find items
 
   const handleNewMessage = (message: Message, plantId?: string) => {
     const targetId = plantId || lastResultId;
