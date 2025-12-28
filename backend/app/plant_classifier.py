@@ -19,8 +19,8 @@ class PlantClassifier(nn.Module):
         # Conv2: (31-3+1) = 29x29 -> Pool: 14x14
         # Flatten: 16 * 14 * 14 = 3136
         self.fc1 = nn.Linear(16 * 14 * 14, 120) 
-        self.fc2 = nn.Linear(120, 84) # Standardized to match training
-        self.fc3 = nn.Linear(84, 2)
+        self.fc2 = nn.Linear(120, 67) # Standardized to match training
+        self.fc3 = nn.Linear(67, 2)
         
         # Dropout regularization (needed to load state_dict even if not used in eval)
         self.dropout = nn.Dropout(0.5)

@@ -10,7 +10,7 @@ from PIL import Image
 
 # Configuration
 # User can adjust epochs here
-EPOCHS = 50 
+EPOCHS = 5
 BATCH_SIZE = 32
 LEARNING_RATE = 0.001
 
@@ -107,8 +107,8 @@ class PlantCNN(nn.Module):
         # Conv2: (31-3+1) = 29x29 -> Pool: 14x14
         # Flatten: 16 * 14 * 14 = 3136
         self.fc1 = nn.Linear(16 * 14 * 14, 120) 
-        self.fc2 = nn.Linear(120, 84) # Slightly increased from 67 to standard 84 or kept similar
-        self.fc3 = nn.Linear(84, 2)
+        self.fc2 = nn.Linear(120, 67) # Changed to 67 neurons as requested
+        self.fc3 = nn.Linear(67, 2)
         
         # Dropout regularization
         self.dropout = nn.Dropout(0.5)
@@ -169,7 +169,12 @@ def train():
     val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
     # 3. Initialize Model
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    if torch.backends.mps.is_available():
+        device = torch.device("mps")
+    elif torch.cuda.is_available():
+        device = torch.device("cuda")
+    else:
+        device = torch.device("cpu")
     print(f"💻 Using device: {device}")
     
     # Use the local PlantCNN class
