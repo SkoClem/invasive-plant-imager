@@ -16,6 +16,7 @@ function LoadingPage({ setCurrentPage, pendingAnalysis, updateImageInCollection 
   
   // Use ref to prevent duplicate API calls in React.StrictMode
   const hasStartedAnalysis = useRef(false);
+  const navigationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const steps = useMemo(() => [
     { title: 'Image Processing', description: 'Enhancing and analyzing your photo', icon: '' },
@@ -110,11 +111,17 @@ function LoadingPage({ setCurrentPage, pendingAnalysis, updateImageInCollection 
         const plantInfo = convertToPlantInfo(result);
         const imageId = pendingAnalysis.imageId || 'latest';
         // Await collection update to ensure latest result is available
-        await updateImageInCollection(imageId, plantInfo, 'completed');
+        try {
+          await updateImageInCollection(imageId, plantInfo, 'completed');
+        } catch (updateError) {
+          console.error('Error updating collection:', updateError);
+          // Continue anyway - we still want to show the results
+        }
         // Short delay to show 100% completion
-        setTimeout(() => {
+        navigationTimeoutRef.current = setTimeout(() => {
+          console.log('Analysis complete, navigating to chat page');
           setCurrentPage('chat');
-        }, 800);
+        }, 500);
       } catch (error) {
         console.error(' Analysis failed:', error);
         clearInterval(progressInterval);
@@ -123,7 +130,7 @@ function LoadingPage({ setCurrentPage, pendingAnalysis, updateImageInCollection 
         setProgress(0);
         setProgressMessage('Analysis failed');
         const imageId = pendingAnalysis.imageId || 'latest';
-        await updateImageInCollection(imageId, null, 'error');
+        updateImageInCollection(imageId, null, 'error');
         alert(`Analysis failed: ${error instanceof Error ? error.message : String(error)}`);
         setCurrentPage('upload');
       }
@@ -133,6 +140,11 @@ function LoadingPage({ setCurrentPage, pendingAnalysis, updateImageInCollection 
 
     return () => {
       isMounted = false;
+      // Clear navigation timeout if it exists
+      if (navigationTimeoutRef.current) {
+        clearTimeout(navigationTimeoutRef.current);
+        navigationTimeoutRef.current = null;
+      }
       // DO NOT reset hasStartedAnalysis here - it should persist across re-renders
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

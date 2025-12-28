@@ -201,7 +201,18 @@ function AppContent() {
 
   // Handle page navigation with direction detection
   const navigateToPage = (newPage: PageType) => {
-    if (newPage === currentPage || isTransitioning) return;
+    console.log(`navigateToPage called: ${currentPage} -> ${newPage}, isTransitioning: ${isTransitioning}`);
+
+    // Special case: allow navigation from loading page even if isTransitioning is true
+    // This fixes the issue where the app gets stuck on loading page at 100%
+    const isFromLoadingPage = currentPage === 'loading';
+
+    if (newPage === currentPage || (!isFromLoadingPage && isTransitioning)) {
+      console.log(`Navigation blocked: ${newPage === currentPage ? 'same page' : 'isTransitioning=true'}${isFromLoadingPage ? ' (but from loading page, allowing)' : ''}`);
+      if (newPage === currentPage) return;
+      // Only return if not from loading page
+      if (!isFromLoadingPage && isTransitioning) return;
+    }
 
     // Clear pending analysis if navigating away from loading page
     if (currentPage === 'loading' && newPage !== 'loading') {
@@ -210,6 +221,7 @@ function AppContent() {
 
     const currentIndex = pageOrder.indexOf(currentPage);
     const newIndex = pageOrder.indexOf(newPage);
+    console.log(`Page indices: currentIndex=${currentIndex} (${currentPage}), newIndex=${newIndex} (${newPage})`);
 
     if (newIndex > currentIndex) {
       setTransitionDirection('forward');
@@ -218,11 +230,14 @@ function AppContent() {
     }
 
     setIsTransitioning(true);
+    console.log(`Setting isTransitioning to true, will navigate to ${newPage}`);
 
     // Start transition
     setTimeout(() => {
+      console.log(`Actually setting currentPage to ${newPage}`);
       setCurrentPage(newPage);
       setTimeout(() => {
+        console.log(`Setting isTransitioning to false`);
         setIsTransitioning(false);
       }, 300);
     }, 10);
