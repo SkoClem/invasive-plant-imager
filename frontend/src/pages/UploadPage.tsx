@@ -256,7 +256,7 @@ function UploadPage({ setCurrentPage, startAnalysis, selectedRegion, setSelected
           </div>
         )}
 
-        {error && (
+        {!imagePreview && error && (
           <div className="error-message">
             {error}
           </div>
