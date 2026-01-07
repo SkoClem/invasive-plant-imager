@@ -8,33 +8,52 @@ function AboutPage({ setCurrentPage }: AboutPageProps) {
   return (
     <section className="about-section">
       <div className="container">
-        <h1>About Our Mission</h1>
+        <h1>About This Project</h1>
         <p className="subtitle">
-          We're dedicated to helping communities identify and manage invasive plant species through accessible technology.
+          A tool designed to help users learn about and recognize invasive plant species.
         </p>
 
         <div className="about-content">
           <div className="about-text">
-            <h2>Our Story</h2>
+            <h2>Why This Exists</h2>
             <p>
-              InvasiScan was created by a team of environmental scientists and software engineers who recognized
-              the need for an accessible tool to help people identify potentially harmful invasive plant species.
+              Invasive plant species can disrupt local ecosystems, reduce biodiversity, and make it harder for native
+              plants to survive. Identifying these species early is an important step in managing their spread, but
+              doing so often requires specialized knowledge.
             </p>
             <p>
-              Our mission is to empower communities with the knowledge they need to protect local ecosystems
-              and biodiversity from the threat of invasive plants.
+              This project was created to make basic invasive plant identification more accessible to students,
+              hobbyists, and community members who may not have a background in botany or ecology.
             </p>
 
-            <h2>How It Works</h2>
+            <h2>What It Does</h2>
             <p>
-              Our platform uses advanced machine learning algorithms trained on thousands of plant images to accurately
-              identify invasive species. Simply upload a photo, and our system will analyze it to determine if the plant
-              is invasive and provide detailed information about it.
+              The platform allows users to upload photos of plants and receive an identification suggestion based on a
+              machine learning model trained on labeled plant images. When possible, it also provides general
+              information about whether a species is considered invasive and why it may be harmful in certain regions.
+            </p>
+            <p>
+              Results are intended for educational purposes and should not replace expert verification or official
+              guidance from local environmental agencies.
+            </p>
+
+            <h2>Project Goals</h2>
+            <p>
+              The goal of this project is to explore how machine learning can support environmental awareness and
+              education. Over time, the project may expand to include more species, improved accuracy, and clearer
+              regional context for invasive classifications.
             </p>
           </div>
 
           <div className="about-image">
-            <div className="image-placeholder" style={{backgroundColor: 'var(--container-bg)', height: '300px', borderRadius: 'var(--radius-card)'}}></div>
+            <div
+              className="image-placeholder"
+              style={{
+                backgroundColor: 'var(--container-bg)',
+                height: '300px',
+                borderRadius: 'var(--radius-card)',
+              }}
+            ></div>
           </div>
         </div>
       </div>
