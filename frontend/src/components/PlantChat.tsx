@@ -137,7 +137,7 @@ const PlantChat: React.FC<PlantChatProps> = ({ plantData, messages, onNewMessage
       <div className="chat-input-area">
         <p className="chat-instruction">Select a question to ask:</p>
         <div className="question-chips">
-          {PREDEFINED_QUESTIONS.map((q, idx) => (
+          {(plantData.isInvasive ? PREDEFINED_QUESTIONS : ["What are the benefits of this plant?"]).map((q, idx) => (
             <button
               key={idx}
               className="question-chip"
