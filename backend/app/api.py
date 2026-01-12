@@ -1,11 +1,12 @@
 import traceback
-from typing import Dict, Any
+from typing import Dict, Any, List
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Depends, Request
 from fastapi.responses import Response
-from app.schemas import Message, ChatRequest, PlantAnalysisRequest, PlantAnalysisResponse, FirebaseLoginRequest, LoginResponse, ProtectedResponse, SaveCollectionRequest, UserCollectionResponse, DeleteCollectionItemRequest
+from app.schemas import Message, ChatRequest, PlantAnalysisRequest, PlantAnalysisResponse, FirebaseLoginRequest, LoginResponse, ProtectedResponse, SaveCollectionRequest, UserCollectionResponse, DeleteCollectionItemRequest, CreateMarkerRequest, MapMarker
 from app.backend import Imager
 from app.auth import AuthService, get_current_user, get_current_user_optional
 from app.collections import collection_manager
+from app.maps import map_manager
 from app.rate_limiter import rate_limiter
 from app.rewards import rewards_manager
 from app.plant_classifier import is_plant
@@ -283,5 +284,35 @@ async def get_rewards(response: Response, current_user: Dict[str, Any] = Depends
         return {"coins": int(data.get('coins', 0)), "awarded_species": data.get('awarded_species', [])}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching rewards: {str(e)}")
+
+# Map endpoints
+@router.post("/api/map/markers", response_model=MapMarker)
+async def create_marker(
+    request: CreateMarkerRequest,
+    current_user: Dict[str, Any] = Depends(get_current_user)
+):
+    """Add a new marker to the community map"""
+    try:
+        user_id = current_user['uid']
+        user_name = current_user.get('name', 'Anonymous')
+        
+        marker = map_manager.add_marker(user_id, user_name, request)
+        
+        if marker:
+            return marker
+        else:
+            raise HTTPException(status_code=500, detail="Failed to add marker")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/api/map/markers", response_model=List[MapMarker])
+async def get_markers(current_user: Dict[str, Any] = Depends(get_current_user_optional)):
+    """Get all markers from the community map"""
+    try:
+        return map_manager.get_all_markers()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 

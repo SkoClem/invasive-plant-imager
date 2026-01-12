@@ -1,5 +1,4 @@
-from enum import Enum
-from typing import Union, Optional, List, Dict, Any
+from typing import List, Optional, Dict, Any
 from pydantic import BaseModel
 from datetime import datetime
 
@@ -73,3 +72,22 @@ class UserCollectionResponse(BaseModel):
 
 class DeleteCollectionItemRequest(BaseModel):
     item_id: str
+
+# Map schemas
+class MapMarker(BaseModel):
+    id: str
+    user_id: str
+    user_name: Optional[str] = "Anonymous"
+    latitude: float
+    longitude: float
+    plant_name: str
+    is_invasive: bool
+    timestamp: datetime
+    scan_id: Optional[str] = None
+
+class CreateMarkerRequest(BaseModel):
+    latitude: float
+    longitude: float
+    plant_name: str
+    is_invasive: bool
+    scan_id: Optional[str] = None

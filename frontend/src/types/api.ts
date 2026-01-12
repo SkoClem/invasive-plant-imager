@@ -31,3 +31,23 @@ export interface AnalysisRequest {
   image: File;
   region: string;
 }
+
+export interface MapMarker {
+  id: string;
+  user_id: string;
+  user_name: string;
+  latitude: number;
+  longitude: number;
+  plant_name: string;
+  is_invasive: boolean;
+  timestamp: string;
+  scan_id?: string;
+}
+
+export interface CreateMarkerRequest {
+  latitude: number;
+  longitude: number;
+  plant_name: string;
+  is_invasive: boolean;
+  scan_id?: string;
+}

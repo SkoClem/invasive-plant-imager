@@ -1,0 +1,81 @@
+.map-page {
+  padding-bottom: 4rem;
+  min-height: 80vh;
+}
+
+.map-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 2rem 1rem;
+  background: var(--primary-gradient);
+  color: white;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.map-header h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2.2rem;
+}
+
+.map-header p {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 1.1rem;
+}
+
+.map-container-wrapper {
+  height: 600px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  position: relative;
+}
+
+.leaflet-map {
+  height: 100%;
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px var(--shadow-medium);
+  border: 1px solid var(--border-light);
+  z-index: 1;
+}
+
+.loading-map, .error-map {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.error-map {
+  color: var(--error-red);
+}
+
+.marker-popup {
+  text-align: center;
+  min-width: 150px;
+}
+
+.marker-popup h3 {
+  margin: 0 0 0.5rem 0;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.marker-popup p {
+  margin: 0.2rem 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.marker-popup .status-badge {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.75rem;
+}
