@@ -3,7 +3,7 @@
 /* Hero Section Enhanced */
 .hero.enhanced {
   min-height: 70vh;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 50%, #e8f5e8 100%);
+  background: var(--hero-gradient);
   position: relative;
   overflow: hidden;
 }
@@ -80,7 +80,7 @@
 
 .hero-title.enhanced {
   font-size: clamp(3rem, 8vw, 5rem);
-  background: linear-gradient(135deg, var(--accent-bright), var(--accent-lime), #8bc34a);
+  background: linear-gradient(135deg, var(--accent-bright), var(--accent-lime), var(--accent-chartreuse));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -113,7 +113,7 @@
 /* Stats Section */
 .stats-section {
   padding: 6rem 0;
-  background: white;
+  background: var(--bg-secondary);
   border-top: 1px solid var(--border-light);
 }
 
@@ -127,7 +127,7 @@
 .stat-item {
   padding: 1.5rem;
   border-radius: var(--radius-card);
-  background: linear-gradient(135deg, var(--bg-primary), white);
+  background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
   border: 1px solid var(--border-subtle);
   transition: all var(--transition-standard);
 }
@@ -168,7 +168,7 @@
 }
 
 .feature-card.enhanced {
-  background: white;
+  background: var(--container-bg);
   border-radius: var(--radius-card);
   padding: 2.5rem;
   box-shadow: 0 5px 20px var(--shadow-light);

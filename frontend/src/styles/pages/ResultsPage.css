@@ -4,7 +4,7 @@
   padding-top: 80px;
   min-height: calc(100vh - 180px);
   overflow-y: auto;
-  background: linear-gradient(135deg, var(--bg-primary), white);
+  background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
 }
 
 /* Results Header */
@@ -19,7 +19,7 @@
 }
 
 .results-header.invasive {
-  background: linear-gradient(135deg, #d32f2f, #f44336);
+  background: linear-gradient(135deg, var(--danger-dark), var(--danger-red));
   color: white;
 }
 
@@ -50,7 +50,7 @@
 }
 
 .confidence-badge {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--white-transparent-20);
   color: white;
   padding: 0.5rem 1rem;
   border-radius: 20px;
@@ -68,7 +68,7 @@
 
 /* Plant Info Card */
 .plant-info-card {
-  background: white;
+  background: var(--container-bg);
   border-radius: var(--radius-card);
   padding: 2rem;
   margin-bottom: 2rem;
@@ -143,8 +143,8 @@
 
 /* Invasive Alert */
 .invasive-alert {
-  background: rgba(244, 67, 54, 0.1);
-  border: 2px solid rgba(244, 67, 54, 0.2);
+  background: var(--danger-bg-subtle);
+  border: 2px solid var(--danger-border-subtle);
   border-radius: var(--radius-card);
   padding: 1.5rem;
   margin-bottom: 2rem;
@@ -197,7 +197,7 @@
 }
 
 .metadata-card {
-  background: white;
+  background: var(--container-bg);
   padding: 1rem;
   border-radius: var(--radius-smooth);
   border: 1px solid var(--border-subtle);
@@ -245,7 +245,7 @@
 }
 
 .action-button-secondary {
-  background: white;
+  background: var(--container-bg);
   color: var(--primary-green);
   border: 2px solid var(--primary-green);
   padding: 1rem 2rem;
@@ -264,7 +264,7 @@
 
 /* Additional Information */
 .additional-info {
-  background: white;
+  background: var(--container-bg);
   border-radius: var(--radius-card);
   padding: 2rem;
   margin-bottom: 2rem;
@@ -290,13 +290,13 @@
 }
 
 .info-tag {
-  background: rgba(76, 175, 80, 0.1);
+  background: var(--badge-success-bg);
   color: var(--accent-bright);
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
   font-size: 0.8rem;
   font-weight: 600;
-  border: 1px solid rgba(76, 175, 80, 0.2);
+  border: 1px solid var(--badge-success-border);
 }
 
 /* Responsive Design */
@@ -433,20 +433,20 @@
 }
 
 .confidence-badge.high {
-  background-color: rgba(76, 175, 80, 0.15);
-  color: #2e7d32;
-  border: 1px solid rgba(76, 175, 80, 0.3);
+  background-color: var(--status-native-bg);
+  color: var(--status-native-text);
+  border: 1px solid var(--status-native-border);
 }
 
 .confidence-badge.medium {
-  background-color: rgba(255, 152, 0, 0.15);
-  color: #ef6c00;
-  border: 1px solid rgba(255, 152, 0, 0.3);
+  background-color: var(--status-invasive-bg);
+  color: var(--status-invasive-text);
+  border: 1px solid var(--status-invasive-border);
 }
 
 .confidence-badge.low {
   background-color: rgba(244, 67, 54, 0.15);
-  color: #c62828;
+  color: var(--danger-red);
   border: 1px solid rgba(244, 67, 54, 0.3);
 }
 
@@ -455,7 +455,7 @@
   line-height: 1.5;
   color: var(--secondary-text);
   margin: 0;
-  background-color: rgba(0, 0, 0, 0.02);
+  background-color: var(--bg-primary);
   padding: 0.75rem;
   border-radius: 8px;
 }

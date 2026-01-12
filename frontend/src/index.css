@@ -1,23 +1,6 @@
 /* Import Inter font - moved to index.html for better performance */
 
 :root {
-  /* Color Palette */
-  --primary-bg: #fffaf5;
-  --container-bg: #ffffff;
-  --primary-text: #333333;
-  --secondary-text: #666666;
-  --accent-bright: #2e7d32;
-  --accent-lime: #4caf50;
-  --accent-chartreuse: #8bc34a;
-  --glow-strong: rgba(46, 125, 50, 0.7);
-  --glow-medium: rgba(76, 175, 80, 0.5);
-  --glow-bright: rgba(76, 175, 80, 0.8);
-  --glow-subtle: rgba(76, 175, 80, 0.3);
-  --frosted-glass: rgba(255, 255, 255, 0.7);
-  --border-subtle: rgba(76, 175, 80, 0.2);
-  --border-bright: rgba(46, 125, 50, 0.7);
-  --border-nav: rgba(76, 175, 80, 0.3);
-  
   /* Spacing Variables */
   --section-gap: 5rem;
   --grid-gap: 2rem;
@@ -60,10 +43,11 @@ body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--primary-bg);
+  background-color: var(--bg-primary);
   color: var(--primary-text);
   line-height: 1.6;
   overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 code {

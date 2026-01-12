@@ -10,7 +10,9 @@ import LearnPage from './pages/LearnPage';
 import LoadingPage from './pages/LoadingPage';
 import ChatPage from './pages/ChatPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import AuthButton from './components/AuthButton';
+import ThemeToggle from './components/ThemeToggle';
 import { collectionService, CollectionItem, PlantInfo as BackendPlantInfo } from './services/collectionService';
 import { authService } from './services/authService';
 import { Message } from './components/PlantChat';
@@ -518,7 +520,10 @@ function AppContent() {
         >
           InvasiScan
         </button>
-        <AuthButton variant="compact" />
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <ThemeToggle />
+          <AuthButton variant="compact" />
+        </div>
       </nav>
 
       {/* Main Content */}
@@ -604,7 +609,9 @@ function AppContent() {
 function App() {
   return (
     <AuthProvider>
-      <AppContent />
+      <ThemeProvider>
+        <AppContent />
+      </ThemeProvider>
     </AuthProvider>
   );
 }

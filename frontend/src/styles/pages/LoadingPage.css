@@ -6,7 +6,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--bg-primary), white);
+  background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
 }
 
 .loading-content {
@@ -131,12 +131,12 @@
 
 .loading-step.active {
   border-color: var(--accent-bright);
-  background-color: rgba(76, 175, 80, 0.05);
+  background-color: var(--shadow-subtle);
 }
 
 .loading-step.completed {
   border-color: var(--primary-green);
-  background-color: rgba(76, 175, 80, 0.1);
+  background-color: var(--accent-bg-subtle);
 }
 
 .loading-step:hover {

@@ -31,7 +31,7 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  background: linear-gradient(90deg, transparent, var(--white-transparent-20), transparent);
   transition: left 0.5s;
 }
 
@@ -109,27 +109,27 @@
 }
 
 .badge.success {
-  background-color: rgba(76, 175, 80, 0.1);
+  background-color: var(--badge-success-bg);
   color: var(--success-green);
-  border: 1px solid rgba(76, 175, 80, 0.3);
+  border: 1px solid var(--badge-success-border);
 }
 
 .badge.warning {
-  background-color: rgba(255, 152, 0, 0.1);
+  background-color: var(--badge-warning-bg);
   color: var(--warning-yellow);
-  border: 1px solid rgba(255, 152, 0, 0.3);
+  border: 1px solid var(--badge-warning-border);
 }
 
 .badge.danger {
-  background-color: rgba(244, 67, 54, 0.1);
+  background-color: var(--badge-danger-bg);
   color: var(--danger-red);
-  border: 1px solid rgba(244, 67, 54, 0.3);
+  border: 1px solid var(--badge-danger-border);
 }
 
 .badge.info {
-  background-color: rgba(33, 150, 243, 0.1);
+  background-color: var(--badge-info-bg);
   color: var(--info-blue);
-  border: 1px solid rgba(33, 150, 243, 0.3);
+  border: 1px solid var(--badge-info-border);
 }
 
 /* Input Component */
@@ -139,7 +139,7 @@
   border: 2px solid var(--border-light);
   border-radius: var(--radius-smooth);
   font-size: 1rem;
-  background: white;
+  background: var(--container-bg);
   color: var(--text-primary);
   transition: all var(--transition-standard);
 }
@@ -147,7 +147,7 @@
 .input:focus {
   outline: none;
   border-color: var(--accent-bright);
-  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+  box-shadow: 0 0 0 3px var(--accent-bg-subtle);
 }
 
 .input:hover {
@@ -161,7 +161,7 @@
   border: 2px solid var(--border-light);
   border-radius: var(--radius-smooth);
   font-size: 1rem;
-  background: white;
+  background: var(--container-bg);
   color: var(--text-primary);
   cursor: pointer;
   transition: all var(--transition-standard);
@@ -170,7 +170,7 @@
 .select:focus {
   outline: none;
   border-color: var(--accent-bright);
-  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+  box-shadow: 0 0 0 3px var(--accent-bg-subtle);
 }
 
 /* Progress Component */

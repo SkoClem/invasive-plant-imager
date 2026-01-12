@@ -17,7 +17,7 @@
 }
 
 .auth-button:hover {
-  background: rgba(76, 175, 80, 0.1);
+  background: var(--accent-bg-subtle);
   transform: translateY(-1px);
 }
 
@@ -54,9 +54,9 @@
 
 /* Sign Out Button */
 .sign-out-button {
-  background: #f8f9fa;
-  color: #5f6368;
-  border: 1px solid #dadce0;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-light);
   padding: 0.5rem 1rem;
   border-radius: 6px;
   font-size: 0.85rem;
@@ -65,7 +65,7 @@
 }
 
 .sign-out-button:hover {
-  background: #f1f3f4;
+  background: var(--bg-secondary);
 }
 
 /* Google Icon */
@@ -96,9 +96,9 @@
 }
 
 .auth-button.enhanced:hover {
-  background: rgba(76, 175, 80, 0.1);
+  background: var(--accent-bg-subtle);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px var(--shadow-light);
 }
 
 /* Enhanced Auth Container */
@@ -106,16 +106,16 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  background: linear-gradient(135deg, var(--container-bg), #f8f9fa);
+  background: linear-gradient(135deg, var(--container-bg), var(--bg-primary));
   padding: 0.75rem 1.25rem;
   border-radius: 16px;
   border: 1px solid var(--border-subtle);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px var(--shadow-light);
   transition: all var(--transition-standard);
 }
 
 .auth-container.enhanced:hover {
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px var(--shadow-medium);
 }
 
 /* Enhanced User Info */
@@ -135,7 +135,7 @@
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid var(--accent-lime);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px var(--shadow-light);
 }
 
 .online-indicator {
@@ -145,9 +145,9 @@
   width: 12px;
   height: 12px;
   background: var(--success-green);
-  border: 2px solid white;
+  border: 2px solid var(--bg-secondary);
   border-radius: 50%;
-  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+  box-shadow: 0 0 0 2px var(--border-subtle);
 }
 
 .user-text {
@@ -170,9 +170,9 @@
 
 /* Enhanced Sign Out Button */
 .sign-out-button.enhanced {
-  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-  color: #5f6368;
-  border: 1px solid #dadce0;
+  background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+  color: var(--text-secondary);
+  border: 1px solid var(--border-light);
   padding: 0.6rem 1.2rem;
   border-radius: 10px;
   font-size: 0.85rem;
@@ -185,9 +185,9 @@
 }
 
 .sign-out-button.enhanced:hover {
-  background: linear-gradient(135deg, #e8eaed, #dadce0);
+  background: linear-gradient(135deg, var(--bg-secondary), var(--border-light));
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px var(--shadow-light);
 }
 
 /* Loading Spinner */
@@ -277,7 +277,7 @@
 }
 
 .auth-container.compact .user-menu-button:hover {
-  background: rgba(76, 175, 80, 0.1);
+  background: var(--accent-bg-subtle);
   border-color: var(--accent-bright);
 }
 
@@ -307,10 +307,10 @@
   top: 100%;
   right: 0;
   margin-top: 0.5rem;
-  background: white;
+  background: var(--container-bg);
   border: 1px solid var(--border-subtle);
   border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 40px var(--shadow-medium);
   z-index: 1000;
   min-width: 280px;
   overflow: hidden;
@@ -321,7 +321,7 @@
   align-items: center;
   gap: 1rem;
   padding: 1.5rem;
-  background: linear-gradient(135deg, var(--bg-primary), white);
+  background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
   border-bottom: 1px solid var(--border-subtle);
 }
 
@@ -371,7 +371,7 @@
 }
 
 .menu-item:hover {
-  background: rgba(76, 175, 80, 0.1);
+  background: var(--accent-bg-subtle);
   color: var(--accent-bright);
 }
 
@@ -383,7 +383,7 @@
 }
 
 .sign-out-item:hover {
-  background: rgba(244, 67, 54, 0.1);
+  background: var(--danger-bg-subtle);
   color: var(--danger-red);
 }
 

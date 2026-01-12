@@ -1,25 +1,27 @@
 /* Base CSS Variables and Global Styles */
 
 :root {
-  /* Color Palette */
+  /* Color Palette - Shared */
   --primary-green: #2d5a27;
-  --accent-bright: #4CAF50;
-  --accent-hover: #45a049;
+  --accent-bright: #2e7d32;
+  --accent-hover: #1b5e20;
   --danger-red: #f44336;
+  --danger-dark: #d32f2f;
   --warning-yellow: #ff9800;
   --info-blue: #2196F3;
   --success-green: #4CAF50;
-
-  /* Neutral Colors */
-  --bg-primary: #f5f5f0;
-  --bg-secondary: #ffffff;
-  --text-primary: #1a1a1a;
-  --text-secondary: #666666;
-  --border-light: #e0e0e0;
-  --border-subtle: #d0d0d0;
-  --shadow-light: rgba(0, 0, 0, 0.1);
-  --shadow-medium: rgba(0, 0, 0, 0.15);
-  --shadow-dark: rgba(0, 0, 0, 0.25);
+  
+  /* Additional colors from index.css */
+  --accent-lime: #4caf50;
+  --accent-chartreuse: #8bc34a;
+  --accent-bg-subtle: rgba(76, 175, 80, 0.1);
+  --accent-bg-hover: rgba(76, 175, 80, 0.2);
+  --glow-strong: rgba(46, 125, 50, 0.7);
+  --glow-medium: rgba(76, 175, 80, 0.5);
+  --glow-bright: rgba(76, 175, 80, 0.8);
+  --glow-subtle: rgba(76, 175, 80, 0.3);
+  --frosted-glass: rgba(255, 255, 255, 0.7);
+  --border-nav: rgba(76, 175, 80, 0.3);
 
   /* Layout Variables */
   --nav-padding-v: 1rem;
@@ -31,10 +33,111 @@
   --transition-standard: 0.3s ease;
   --transition-fast: 0.2s ease;
 
-  /* Component Variables */
-  --container-bg: rgba(255, 255, 255, 0.9);
-  --secondary-text: #666;
-  --primary-text: #333;
+  /* Default Light Theme */
+  --bg-primary: #fffaf5;
+  --bg-secondary: #ffffff;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --border-light: #e0e0e0;
+  --border-subtle: rgba(76, 175, 80, 0.2);
+  --border-bright: rgba(46, 125, 50, 0.7);
+  --shadow-light: rgba(0, 0, 0, 0.1);
+  --shadow-medium: rgba(0, 0, 0, 0.15);
+  --shadow-dark: rgba(0, 0, 0, 0.25);
+  --container-bg: #ffffff;
+  --secondary-text: #666666;
+  --primary-text: #333333;
+  --navbar-bg: rgba(255, 250, 245, 0.8);
+  --tab-nav-bg: rgba(255, 255, 255, 0.95);
+  --hero-gradient: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 50%, #e8f5e8 100%);
+  --section-gradient: linear-gradient(135deg, var(--bg-primary), #ffffff);
+  --background-light: #f5f5f5;
+  
+  /* Status Colors - Light */
+  --status-invasive-bg: #fff3cd;
+  --status-invasive-text: #856404;
+  --status-invasive-border: #ffeaa7;
+  --status-native-bg: #d4edda;
+  --status-native-text: #155724;
+  --status-native-border: #c3e6cb;
+  --white-transparent-20: rgba(255, 255, 255, 0.2);
+  
+  /* Badge Colors - Light */
+  --badge-success-bg: rgba(76, 175, 80, 0.1);
+  --badge-success-border: rgba(76, 175, 80, 0.3);
+  --badge-warning-bg: rgba(255, 152, 0, 0.1);
+  --badge-warning-border: rgba(255, 152, 0, 0.3);
+  --badge-danger-bg: rgba(244, 67, 54, 0.1);
+  --badge-danger-border: rgba(244, 67, 54, 0.3);
+  --badge-info-bg: rgba(33, 150, 243, 0.1);
+  --badge-info-border: rgba(33, 150, 243, 0.3);
+
+  --shadow-subtle: rgba(0, 0, 0, 0.05);
+  --overlay-dark: rgba(0, 0, 0, 0.7);
+  --overlay-darker: rgba(0, 0, 0, 0.9);
+
+  /* Specific Colors for Components */
+  --warning-amber: #ffc107;
+  --warning-amber-bg: rgba(255, 193, 7, 0.1);
+  --warning-amber-bg-hover: rgba(255, 193, 7, 0.15);
+  --warning-amber-shadow: rgba(255, 193, 7, 0.2);
+  
+  --info-blue-bg: rgba(33, 150, 243, 0.05);
+  --info-blue-hover: rgba(33, 150, 243, 0.05);
+  --info-blue-gradient-start: rgba(33, 150, 243, 0.05);
+  --info-blue-gradient-end: rgba(33, 150, 243, 0.02);
+}
+
+[data-theme='dark'] {
+  /* Dark Theme Overrides */
+  --bg-primary: #121212;
+  --bg-secondary: #1e1e1e;
+  --text-primary: #e0e0e0;
+  --text-secondary: #a0a0a0;
+  --border-light: #333333;
+  --border-subtle: rgba(76, 175, 80, 0.2);
+  --border-bright: rgba(76, 175, 80, 0.5);
+  --shadow-light: rgba(0, 0, 0, 0.3);
+  --shadow-medium: rgba(0, 0, 0, 0.4);
+  --shadow-dark: rgba(0, 0, 0, 0.6);
+  --container-bg: #1e1e1e;
+  --secondary-text: #a0a0a0;
+  --primary-text: #e0e0e0;
+  --accent-bright: #4caf50; /* Lighter green for dark mode */
+  --navbar-bg: rgba(18, 18, 18, 0.8);
+  --tab-nav-bg: rgba(30, 30, 30, 0.95);
+  --frosted-glass: rgba(30, 30, 30, 0.7);
+  --hero-gradient: linear-gradient(135deg, #121212 0%, #0f2015 50%, #121212 100%);
+  --section-gradient: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+  --background-light: #2a2a2a;
+  
+  /* Status Colors - Dark */
+  --status-invasive-bg: rgba(255, 193, 7, 0.15);
+  --status-invasive-text: #ffca28;
+  --status-invasive-border: rgba(255, 193, 7, 0.3);
+  --status-native-bg: rgba(76, 175, 80, 0.15);
+  --status-native-text: #81c784;
+  --status-native-border: rgba(76, 175, 80, 0.3);
+
+  /* Badge Colors - Dark */
+  --badge-success-bg: rgba(76, 175, 80, 0.15);
+  --badge-success-border: rgba(76, 175, 80, 0.4);
+  --badge-warning-bg: rgba(255, 152, 0, 0.15);
+  --badge-warning-border: rgba(255, 152, 0, 0.4);
+  --badge-danger-bg: rgba(244, 67, 54, 0.15);
+  --badge-danger-border: rgba(244, 67, 54, 0.4);
+  --badge-info-bg: rgba(33, 150, 243, 0.15);
+  --badge-info-border: rgba(33, 150, 243, 0.4);
+
+  --warning-amber: #ffd54f;
+  --warning-amber-bg: rgba(255, 193, 7, 0.15);
+  --warning-amber-bg-hover: rgba(255, 193, 7, 0.25);
+  --warning-amber-shadow: rgba(255, 193, 7, 0.3);
+
+  --info-blue-bg: rgba(33, 150, 243, 0.1);
+  --info-blue-hover: rgba(33, 150, 243, 0.15);
+  --info-blue-gradient-start: rgba(33, 150, 243, 0.1);
+  --info-blue-gradient-end: rgba(33, 150, 243, 0.05);
 }
 
 /* Global Reset */

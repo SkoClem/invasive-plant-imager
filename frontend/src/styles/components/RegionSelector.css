@@ -32,7 +32,7 @@
 .region-selector-button:focus {
   outline: none;
   border-color: var(--accent-bright);
-  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.2);
+  box-shadow: 0 0 0 3px var(--border-subtle);
 }
 
 .region-selector-content {
@@ -88,7 +88,7 @@
   background: var(--container-bg);
   border: 1px solid var(--border-nav);
   border-radius: var(--radius-card);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 40px var(--shadow-light);
   z-index: 1000;
   max-height: 500px;
   overflow-y: auto;
@@ -137,12 +137,12 @@
 }
 
 .dropdown-item:hover {
-  background: rgba(76, 175, 80, 0.1);
+  background: var(--accent-bg-subtle);
   transform: translate3d(4px, 0, 0);
 }
 
 .dropdown-item.selected {
-  background: rgba(76, 175, 80, 0.15);
+  background: var(--accent-bg-hover);
   color: var(--accent-bright);
   font-weight: 600;
 }
@@ -211,7 +211,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 1.25rem 1.5rem;
-  background: linear-gradient(135deg, var(--container-bg), #f8f9fa);
+  background: linear-gradient(135deg, var(--container-bg), var(--bg-primary));
   border: 2px solid var(--border-nav);
   border-radius: 16px;
   cursor: pointer;
@@ -220,14 +220,14 @@
 
 .region-selector-button.enhanced:hover {
   border-color: var(--accent-bright);
-  box-shadow: 0 4px 20px rgba(46, 125, 50, 0.15);
+  box-shadow: 0 4px 20px var(--border-subtle);
   transform: translateY(-2px);
 }
 
 .region-selector-button.enhanced:focus {
   outline: none;
   border-color: var(--accent-bright);
-  box-shadow: 0 0 0 4px rgba(46, 125, 50, 0.2);
+  box-shadow: 0 0 0 4px var(--border-subtle);
 }
 
 .region-icon-wrapper {
@@ -280,7 +280,7 @@
   background: var(--container-bg);
   border: 1px solid var(--border-nav);
   border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 20px 60px var(--shadow-medium);
   z-index: 1000;
   max-height: 600px;
   overflow-y: auto;
@@ -316,13 +316,13 @@
 }
 
 .tab-button:hover {
-  background: rgba(76, 175, 80, 0.05);
+  background: var(--accent-bg-subtle);
   color: var(--text-primary);
 }
 
 .tab-button.active {
   color: var(--accent-bright);
-  background: rgba(76, 175, 80, 0.1);
+  background: var(--accent-bg-subtle);
 }
 
 .tab-button.active::after {
@@ -370,7 +370,7 @@
 .search-input:focus {
   outline: none;
   border-color: var(--accent-bright);
-  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+  box-shadow: 0 0 0 3px var(--accent-bg-subtle);
 }
 
 .search-input::placeholder {
@@ -393,7 +393,7 @@
 }
 
 .search-clear:hover {
-  background: rgba(0, 0, 0, 0.1);
+  background: var(--shadow-light);
   color: var(--text-primary);
 }
 
@@ -429,7 +429,7 @@
 
 .search-result-item:hover {
   border-color: var(--accent-bright);
-  background: rgba(76, 175, 80, 0.05);
+  background: var(--accent-bg-subtle);
   transform: translateY(-1px);
 }
 
@@ -506,16 +506,16 @@
   padding: 0.75rem;
   border: 1px solid var(--border-subtle);
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(255, 193, 7, 0.05));
+  background: linear-gradient(135deg, var(--warning-amber-bg), var(--warning-amber-bg));
   cursor: pointer;
   transition: all var(--transition-standard);
 }
 
 .popular-item:hover {
-  border-color: #ffc107;
-  background: rgba(255, 193, 7, 0.15);
+  border-color: var(--warning-amber);
+  background: var(--warning-amber-bg-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.2);
+  box-shadow: 0 4px 12px var(--warning-amber-shadow);
 }
 
 .popular-flag {
@@ -533,7 +533,7 @@
 .popular-country {
   font-size: 0.75rem;
   color: var(--secondary-text);
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--bg-primary);
   padding: 0.125rem 0.375rem;
   border-radius: 8px;
 }
@@ -546,7 +546,7 @@
 }
 
 .regions-section {
-  background: linear-gradient(135deg, rgba(33, 150, 243, 0.05), rgba(33, 150, 243, 0.02));
+  background: linear-gradient(135deg, var(--info-blue-gradient-start), var(--info-blue-gradient-end));
   border-radius: 12px;
   margin: 0 1rem;
   padding: 1rem;
@@ -565,14 +565,14 @@
   padding: 0.75rem;
   border: 1px solid var(--border-subtle);
   border-radius: 12px;
-  background: white;
+  background: var(--container-bg);
   cursor: pointer;
   transition: all var(--transition-standard);
 }
 
 .region-item:hover {
   border-color: var(--info-blue);
-  background: rgba(33, 150, 243, 0.05);
+  background: var(--info-blue-hover);
   transform: translateY(-1px);
 }
 

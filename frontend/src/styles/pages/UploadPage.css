@@ -4,7 +4,7 @@
   margin-top: 120px !important;
   min-height: auto !important;
   height: auto !important;
-  background: linear-gradient(135deg, var(--bg-primary), white);
+  background: var(--section-gradient);
 }
 
 /* Upload Page Header */
@@ -50,7 +50,7 @@
   background: var(--container-bg);
   border-radius: var(--radius-card);
   border: 1px solid var(--border-subtle);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px var(--shadow-subtle);
 }
 
 .region-header h2 {
@@ -93,14 +93,14 @@
   justify-content: center;
   cursor: pointer;
   transition: all var(--transition-standard);
-  background: white;
+  background: var(--container-bg);
   margin: 0 auto;
   position: relative;
 }
 
 .upload-box:hover {
   border-color: var(--accent-bright);
-  background: rgba(76, 175, 80, 0.05);
+  background: var(--shadow-subtle);
   transform: translateY(-2px);
   box-shadow: 0 8px 25px var(--shadow-light);
 }
@@ -144,7 +144,7 @@
   position: absolute;
   top: 10px;
   right: 10px;
-  background: rgba(0, 0, 0, 0.7);
+  background: var(--overlay-dark);
   color: white;
   border: none;
   padding: 8px 12px;
@@ -156,7 +156,7 @@
 }
 
 .change-image-button:hover {
-  background: rgba(0, 0, 0, 0.9);
+  background: var(--overlay-darker);
   transform: scale(1.05);
 }
 

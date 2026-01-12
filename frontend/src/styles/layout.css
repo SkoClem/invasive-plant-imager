@@ -21,7 +21,7 @@
   padding-left: calc(var(--nav-padding-h) + env(safe-area-inset-left));
   padding-right: calc(var(--nav-padding-h) + env(safe-area-inset-right));
   padding-top: calc(var(--nav-padding-v) + env(safe-area-inset-top));
-  background-color: rgba(255, 250, 245, 0.8);
+  background-color: var(--navbar-bg);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border-light);
@@ -95,7 +95,7 @@
   display: flex;
   justify-content: space-around;
   align-items: center;
-  background-color: rgba(255, 255, 255, 0.95);
+  background-color: var(--tab-nav-bg);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-top: 1px solid var(--border-light);
