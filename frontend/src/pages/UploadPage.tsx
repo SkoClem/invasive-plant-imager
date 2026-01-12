@@ -320,8 +320,8 @@ const styles = `
   .region-icon { color: var(--accent-bright); flex-shrink: 0; }
   .region-text-wrapper { flex: 1; display: flex; flex-direction: column; gap: 0.25rem; }
   .region-label { font-size: 0.8rem; color: var(--secondary-text); font-weight: 500; }
-  .region-select { font-size: 1rem; font-weight: 600; color: var(--text-primary); padding: 0.5rem; border: 1px solid var(--border-subtle); border-radius: 6px; background-color: white; width: 100%; cursor: pointer; outline: none; transition: border-color 0.2s; }
-  .region-select:focus { border-color: var(--accent-bright); }
+  .region-select { font-size: 1rem; font-weight: 600; color: var(--text-primary); padding: 0.75rem 1rem; border: 1px solid var(--border-subtle); border-radius: 12px; background-color: var(--container-bg); width: 100%; cursor: pointer; outline: none; transition: all 0.2s; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; }
+  .region-select:focus { border-color: var(--accent-bright); box-shadow: 0 0 0 3px var(--border-subtle); }
   .region-subtitle { font-size: 0.85rem; color: var(--secondary-text); margin-top: 0.25rem; }
   .upload-guidelines ul { list-style-position: inside; color: var(--secondary-text); padding-left: 0; margin: 0; }
   .upload-guidelines li { margin-bottom: 0.75rem; line-height: 1.5; font-size: 0.95rem; }

@@ -38,6 +38,13 @@ const MapPage: React.FC = () => {
 
   // Center of Texas
   const centerPosition: [number, number] = [31.9686, -99.9018];
+  
+  // Bounds for Texas and neighboring regions
+  // South-West: [24.0, -108.0], North-East: [38.0, -92.0]
+  const texasBounds: [[number, number], [number, number]] = [
+    [24.0, -108.0],
+    [38.0, -92.0]
+  ];
 
   return (
     <div className="map-page enhanced">
@@ -52,7 +59,15 @@ const MapPage: React.FC = () => {
         ) : error ? (
           <div className="error-map">{error}</div>
         ) : (
-          <MapContainer center={centerPosition} zoom={6} scrollWheelZoom={true} className="leaflet-map">
+          <MapContainer 
+            center={centerPosition} 
+            zoom={6} 
+            minZoom={5}
+            maxBounds={texasBounds}
+            maxBoundsViscosity={1.0}
+            scrollWheelZoom={true} 
+            className="leaflet-map"
+          >
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

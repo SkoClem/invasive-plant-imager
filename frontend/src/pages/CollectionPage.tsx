@@ -63,6 +63,11 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
     e.stopPropagation();
     if (!image.plantData) return;
 
+    if (!image.plantData.isInvasive) {
+      alert('Only invasive plants can be reported to the community map.');
+      return;
+    }
+
     if (!window.confirm('Do you want to share this plant location on the community map? Your approximate location will be used.')) {
       return;
     }
