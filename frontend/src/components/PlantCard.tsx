@@ -7,8 +7,17 @@ interface PlantCardProps {
 }
 
 function PlantCard({ plant, onLearnMore }: PlantCardProps) {
+  // Determine gradient based on plant type (though these are all invasive in this context)
+  const bgClass = 'bg-invasive';
+  const icon = '⚠️';
+
   return (
-    <div className="plant-card">
+    <div className="plant-card enhanced">
+      <div className={`plant-card-avatar ${bgClass}`}>
+        <span className="avatar-icon">{icon}</span>
+        <span className="avatar-initial">{plant.commonName.charAt(0).toUpperCase()}</span>
+      </div>
+      
       <div className="plant-card-header">
         <h3 className="plant-name">{plant.commonName}</h3>
         <span className="scientific-name">{plant.scientificName}</span>

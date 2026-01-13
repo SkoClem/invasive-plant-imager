@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { PlantInfo } from '../types/api';
 import { mapService } from '../services/mapService';
 
@@ -20,6 +20,54 @@ interface CollectionPageProps {
   clearCollection?: () => Promise<void>;
   onItemClick?: (itemId: string) => void;
 }
+
+const PlantImage = ({ file, plantName, isInvasive, status }: { file?: File, plantName: string, isInvasive?: boolean, status: string }) => {
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setImageUrl(url);
+      return () => URL.revokeObjectURL(url);
+    }
+  }, [file]);
+
+  if (imageUrl) {
+    return (
+      <div className="plant-image-container">
+        <img src={imageUrl} alt={plantName} className="plant-card-image" />
+        <div className="image-overlay"></div>
+      </div>
+    );
+  }
+
+  // Fallback / Placeholder
+  let bgClass = 'bg-unknown';
+  let icon = '🌱'; // Default seedling
+
+  if (status === 'analyzing') {
+    bgClass = 'bg-analyzing';
+    icon = '🔍';
+  } else if (status === 'error') {
+    bgClass = 'bg-error';
+    icon = '⚠️';
+  } else if (isInvasive) {
+    bgClass = 'bg-invasive';
+    icon = '⚠️';
+  } else if (isInvasive === false) {
+    bgClass = 'bg-native';
+    icon = '🌿';
+  }
+
+  return (
+    <div className={`plant-card-placeholder ${bgClass}`}>
+      <div className="placeholder-content">
+        <span className="placeholder-icon">{icon}</span>
+        {/* <span className="plant-initial">{plantName.charAt(0).toUpperCase()}</span> */}
+      </div>
+    </div>
+  );
+};
 
 function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem, clearCollection, onItemClick }: CollectionPageProps) {
   const [viewMode, setViewMode] = React.useState<'mobile' | 'desktop'>('mobile');
@@ -217,12 +265,26 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
               {imageCollection.map((image) => {
                 const isDeleting = deletingItems.has(image.id);
                 const borderClass = image.plantData?.isInvasive ? 'invasive-border' : (image.plantData?.isInvasive === false ? 'native-border' : '');
+                
+                // Determine plant name for avatar
+                let plantName = 'Unknown';
+                if (image.plantData?.commonName) plantName = image.plantData.commonName;
+                else if (image.species) plantName = image.species;
+                else if (image.status === 'analyzing') plantName = 'Analyzing...';
+                
                 return (
                   <div 
                     key={image.id} 
                     className={`collection-item enhanced ${isDeleting ? 'shrinking' : ''} ${borderClass}`}
                     onClick={() => onItemClick && onItemClick(image.id)}
                   >
+                    <PlantImage 
+                      file={image.file} 
+                      plantName={plantName} 
+                      isInvasive={image.plantData?.isInvasive}
+                      status={image.status}
+                    />
+
                     <div className="item-header">
                       {image.status === 'analyzing' ? (
                         <div className="status-badge analyzing">Analyzing</div>

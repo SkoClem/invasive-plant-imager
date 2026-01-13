@@ -143,6 +143,51 @@
   border: 1px solid var(--border-subtle);
 }
 
+/* Enhanced Plant Card */
+.plant-card.enhanced {
+  position: relative;
+  overflow: hidden;
+  border: none;
+  background: white;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.plant-card.enhanced:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px var(--shadow-medium);
+}
+
+.plant-card-avatar {
+  height: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: -2rem -2rem 1.5rem -2rem; /* Negate card padding */
+  width: calc(100% + 4rem);
+  position: relative;
+}
+
+.bg-invasive {
+  background: linear-gradient(135deg, #ffcdd2 0%, #ef9a9a 100%);
+}
+
+.bg-native {
+  background: linear-gradient(135deg, #c8e6c9 0%, #a5d6a7 100%);
+}
+
+.avatar-icon {
+  font-size: 3.5rem;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.avatar-initial {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: rgba(255,255,255,0.6);
+  margin-top: -5px;
+}
+
 .plant-card-header {
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
@@ -546,6 +591,16 @@
     padding: 1.5rem;
   }
 
+  .plant-card-avatar {
+    margin: -1.5rem -1.5rem 1rem -1.5rem;
+    width: calc(100% + 3rem);
+    height: 120px;
+  }
+  
+  .avatar-icon {
+    font-size: 3rem;
+  }
+
   .resources-grid {
     grid-template-columns: 1fr;
   }
@@ -576,6 +631,20 @@
 
   .plant-card {
     padding: 1rem;
+  }
+
+  .plant-card-avatar {
+    margin: -1rem -1rem 1rem -1rem;
+    width: calc(100% + 2rem);
+    height: 100px;
+  }
+  
+  .avatar-icon {
+    font-size: 2.5rem;
+  }
+
+  .plant-name {
+    font-size: 1.25rem;
   }
 
   .resource-card,
