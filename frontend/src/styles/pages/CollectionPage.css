@@ -653,20 +653,56 @@
   }
 
   .collection-grid.enhanced {
-    grid-template-columns: 1fr;
-    gap: 1rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
   }
 
   .collection-item.enhanced {
-    margin-bottom: 1rem;
+    margin-bottom: 0;
   }
 
+  /* Make items more compact on mobile */
   .image-preview.enhanced {
-    height: 200px;
+    height: 140px;
+  }
+
+  .item-header {
+    padding: 0.5rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .status-badge {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.5rem;
   }
 
   .image-details.enhanced {
-    padding: 1rem;
+    padding: 0.75rem;
+  }
+  
+  .scientific-name {
+    font-size: 0.8rem;
+  }
+
+  .plant-description {
+    font-size: 0.8rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+  }
+  
+  .native-location, .invasive-status {
+    font-size: 0.75rem;
+    padding: 0.35rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .image-metadata {
+    display: none; /* Hide metadata on mobile to save space */
   }
 
   .collection-actions {
@@ -693,7 +729,14 @@
   }
 
   .page-title {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
+  }
+  
+  .collection-grid.enhanced {
+    /* On very small screens, maybe still 2 columns but very tight, or 1 column if needed. 
+       Let's stick to 2 columns as "extremely big" was the complaint. 
+       350px -> ~170px is a huge improvement. */
+    gap: 0.5rem;
   }
 
   .collection-stats {

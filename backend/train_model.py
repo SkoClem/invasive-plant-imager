@@ -16,13 +16,15 @@ LEARNING_RATE = 0.001
 
 # Paths to the datasets
 PLANT_DIR = "/Users/ericmin/Downloads/plantwild_v2"
+TREE_DIR = "/Users/ericmin/Downloads/tree"
 NON_PLANT_DIR = "/Users/ericmin/Downloads/dataset"
 MODEL_SAVE_PATH = "models/plant_classifier.pth"
 
 # Custom Dataset to handle two separate directories
 class BinaryDataset(Dataset):
-    def __init__(self, plant_dir, non_plant_dir, transform=None):
+    def __init__(self, plant_dir, tree_dir, non_plant_dir, transform=None):
         self.plant_dir = plant_dir
+        self.tree_dir = tree_dir
         self.non_plant_dir = non_plant_dir
         self.transform = transform
         self.image_paths = []
@@ -51,6 +53,14 @@ class BinaryDataset(Dataset):
         if not os.path.exists(plant_dir):
             print(f"⚠️ Warning: Plant directory not found: {plant_dir}")
 
+        # ADDED: Collect Tree images (Label 1)
+        tree_paths = find_images_recursive(tree_dir)
+        if not os.path.exists(tree_dir):
+            print(f"⚠️ Warning: Tree directory not found: {tree_dir}")
+        else:
+            print(f"   Found {len(tree_paths)} tree images.")
+            plant_paths.extend(tree_paths)
+
         # ADDED: Include extra local plant images (e.g., invasive2.png)
         extra_plant_dir = "extra_plants"
         if os.path.exists(extra_plant_dir):
@@ -61,7 +71,7 @@ class BinaryDataset(Dataset):
                 plant_paths.extend(extra_paths)
         
         num_plants_found = len(plant_paths)
-        print(f"   Found {num_plants_found} plant images (including extras).")
+        print(f"   Found {num_plants_found} plant images (Plants + Trees + Extras).")
 
         # 3. Balance Datasets
         # If we have plants and non-plants, and plants are more numerous, subset them.
@@ -153,26 +163,23 @@ def train():
     # 2. Load Data
     print(f"📂 Loading data from:")
     print(f"   Plants: {PLANT_DIR}")
+    print(f"   Trees: {TREE_DIR}")
     print(f"   Non-Plants: {NON_PLANT_DIR}")
 
-    train_dataset = BinaryDataset(PLANT_DIR, NON_PLANT_DIR, transform=transform)
+    # 3. Create Dataset and Dataloaders
+    # Now we pass TREE_DIR as well
+    dataset = BinaryDataset(PLANT_DIR, TREE_DIR, NON_PLANT_DIR, transform=transform)
     
-    if len(train_dataset) == 0:
-        print("❌ Error: No images found in the specified directories.")
+    if len(dataset) == 0:
+        print("❌ No images found. Exiting.")
         return
 
-    print(f"✅ Found {len(train_dataset)} total images.")
+    print(f"✅ Found {len(dataset)} total images.")
     
-    # Check balance
-    num_plants = sum(train_dataset.labels)
-    num_non_plants = len(train_dataset) - num_plants
-    print(f"   - Plants: {num_plants}")
-    print(f"   - Non-Plants: {num_non_plants}")
-
-    # Split into Train (80%) and Validation (20%)
-    train_size = int(0.8 * len(train_dataset))
-    val_size = len(train_dataset) - train_size
-    train_dataset, val_dataset = random_split(train_dataset, [train_size, val_size])
+    # 80% train, 20% validation
+    train_size = int(0.8 * len(dataset))
+    val_size = len(dataset) - train_size
+    train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
     
     print(f"   - Training Set: {len(train_dataset)} images")
     print(f"   - Validation Set: {len(val_dataset)} images")
