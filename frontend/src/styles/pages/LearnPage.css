@@ -158,7 +158,7 @@
 }
 
 .plant-card-avatar {
-  height: 140px;
+  height: 100px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -594,11 +594,11 @@
   .plant-card-avatar {
     margin: -1.5rem -1.5rem 1rem -1.5rem;
     width: calc(100% + 3rem);
-    height: 120px;
+    height: 100px;
   }
   
   .avatar-icon {
-    font-size: 3rem;
+    font-size: 2.5rem;
   }
 
   .resources-grid {
@@ -634,17 +634,17 @@
   }
 
   .plant-card-avatar {
-    margin: -1rem -1rem 1rem -1rem;
+    margin: -1rem -1rem 0.75rem -1rem;
     width: calc(100% + 2rem);
-    height: 100px;
+    height: 80px;
   }
   
   .avatar-icon {
-    font-size: 2.5rem;
+    font-size: 2rem;
   }
 
   .plant-name {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
   }
 
   .resource-card,

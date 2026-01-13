@@ -126,18 +126,20 @@
 .image-preview-container {
   position: relative;
   width: 100%;
-  max-width: 400px;
+  max-width: 300px; /* Reduced from 400px to better match toggle area */
   margin: 0 auto;
   border-radius: var(--radius-card);
   overflow: hidden;
   box-shadow: 0 4px 12px var(--shadow-light);
+  background: var(--container-bg);
 }
 
 .image-preview {
   width: 100%;
-  height: 300px;
-  object-fit: cover;
+  height: 250px; /* Reduced from 300px */
+  object-fit: contain; /* Show full image */
   display: block;
+  background-color: rgba(0, 0, 0, 0.03);
 }
 
 .change-image-button {

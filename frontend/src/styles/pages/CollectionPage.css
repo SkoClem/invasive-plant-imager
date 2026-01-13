@@ -254,7 +254,7 @@
 
 /* Plant Image / Placeholder */
 .plant-image-container {
-  height: 200px;
+  height: 150px;
   width: 100%;
   position: relative;
   overflow: hidden;
@@ -272,7 +272,7 @@
 }
 
 .plant-card-placeholder {
-  height: 200px;
+  height: 150px;
   width: 100%;
   display: flex;
   align-items: center;
@@ -481,11 +481,11 @@
   }
   
   .plant-image-container, .plant-card-placeholder {
-    height: 120px; /* Smaller image on mobile */
+    height: 100px; /* Smaller image on mobile */
   }
 
   .item-header {
-    padding: 0.5rem 0.75rem 0.25rem 0.75rem;
+    padding: 0.5rem 0.5rem 0.25rem 0.5rem;
   }
 
   .image-details.enhanced {

@@ -57,14 +57,19 @@ class FileRewardsManager:
     def award_species_if_new(self, user_id: str, species: str) -> Tuple[bool, int]:
         data = self.get_user_rewards(user_id)
         awarded_species: List[str] = data.get("awarded_species", [])
-        if species and species not in awarded_species:
-            awarded_species.append(species)
-            data["awarded_species"] = awarded_species
+        
+        # Always award coins for invasive species, even if already found
+        if species:
+            if species not in awarded_species:
+                awarded_species.append(species)
+                data["awarded_species"] = awarded_species
+            
             data["coins"] = int(data.get("coins", 0)) + 1
             self.rewards[user_id] = data
             self.save_rewards()
             return True, data["coins"]
-        # No award
+            
+        # No award if no species provided
         self.save_rewards()
         return False, int(data.get("coins", 0))
 
@@ -110,8 +115,11 @@ class FirestoreRewardsManager:
             if not isinstance(awarded_species, list):
                 awarded_species = []
 
-            if species and species not in awarded_species:
-                awarded_species.append(species)
+            # Always award coins for invasive species
+            if species:
+                if species not in awarded_species:
+                    awarded_species.append(species)
+                
                 coins += 1
                 doc_ref.set({"coins": coins, "awarded_species": awarded_species}, merge=True)
                 return True, coins

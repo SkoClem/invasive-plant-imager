@@ -95,52 +95,54 @@ function UploadPage({ setCurrentPage, startAnalysis, selectedRegion, setSelected
           </div>
         </div>
 
-        {/* Input Mode Toggle */}
-        <div className="input-mode-toggle">
-          <button 
-            className={`mode-arrow left-arrow ${inputMode === 'upload' ? 'active' : ''}`}
-            onClick={() => switchInputMode('left')}
-            aria-label="Switch input mode"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-              <path d="M15.41,7.41L14,6L8,12L14,18L15.41,16.59L10.83,12L15.41,7.41Z"/>
-            </svg>
-          </button>
-          
-          <div 
-            className="mode-display clickable"
-            onClick={triggerFileInput}
-            role="button"
-            aria-label={inputMode === 'camera' ? 'Tap here to take a photo' : 'Tap here to choose image'}
-          >
-            <div className="mode-icon">
-              {inputMode === 'camera' ? (
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="48" height="48" fill="currentColor">
-                  <path d="M9 3L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-3.17L15 3H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5 5z"/>
-                  <circle cx="12" cy="13" r="3"/>
-                </svg>
-              ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="48" height="48" fill="currentColor">
-                  <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
-                  <path d="M12,12L16,16H13V19H11V16H8L12,12Z"/>
-                </svg>
-              )}
+        {/* Input Mode Toggle - Hidden when image is selected */}
+        {!imagePreview && (
+          <div className="input-mode-toggle">
+            <button 
+              className={`mode-arrow left-arrow ${inputMode === 'upload' ? 'active' : ''}`}
+              onClick={() => switchInputMode('left')}
+              aria-label="Switch input mode"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                <path d="M15.41,7.41L14,6L8,12L14,18L15.41,16.59L10.83,12L15.41,7.41Z"/>
+              </svg>
+            </button>
+            
+            <div 
+              className="mode-display clickable"
+              onClick={triggerFileInput}
+              role="button"
+              aria-label={inputMode === 'camera' ? 'Tap here to take a photo' : 'Tap here to choose image'}
+            >
+              <div className="mode-icon">
+                {inputMode === 'camera' ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="48" height="48" fill="currentColor">
+                    <path d="M9 3L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-3.17L15 3H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5 5z"/>
+                    <circle cx="12" cy="13" r="3"/>
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="48" height="48" fill="currentColor">
+                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                    <path d="M12,12L16,16H13V19H11V16H8L12,12Z"/>
+                  </svg>
+                )}
+              </div>
+              <span className="mode-text">
+                {inputMode === 'camera' ? 'Tap here to take a photo' : 'Tap here to choose image'}
+              </span>
             </div>
-            <span className="mode-text">
-              {inputMode === 'camera' ? 'Tap here to take a photo' : 'Tap here to choose image'}
-            </span>
+            
+            <button 
+              className={`mode-arrow right-arrow ${inputMode === 'camera' ? 'active' : ''}`}
+              onClick={() => switchInputMode('right')}
+              aria-label="Switch input mode"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                <path d="M8.59,16.59L10,18L16,12L10,6L8.59,7.41L13.17,12L8.59,16.59Z"/>
+              </svg>
+            </button>
           </div>
-          
-          <button 
-            className={`mode-arrow right-arrow ${inputMode === 'camera' ? 'active' : ''}`}
-            onClick={() => switchInputMode('right')}
-            aria-label="Switch input mode"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-              <path d="M8.59,16.59L10,18L16,12L10,6L8.59,7.41L13.17,12L8.59,16.59Z"/>
-            </svg>
-          </button>
-        </div>
+        )}
 
         {/* Hidden file input */}
         <input
@@ -152,72 +154,21 @@ function UploadPage({ setCurrentPage, startAnalysis, selectedRegion, setSelected
           style={{ display: 'none' }}
         />
 
-        <div className="region-section" style={{ marginTop: '20px', marginBottom: '20px' }}>
-          <div className="region-display-container">
-            <div className="region-display">
-              <div className="region-icon-wrapper">
-                <span className="country-flag">🇺🇸</span>
-                <svg 
-                  className="region-icon" 
-                  viewBox="0 0 24 24" 
-                  width="20"
-                  height="20"
-                  fill="currentColor"
-                >
-                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                </svg>
-              </div>
-              <div className="region-text-wrapper">
-                <label htmlFor="region-select" className="region-label">Select Texas Region</label>
-                <select 
-                  id="region-select"
-                  className="region-select"
-                  value={selectedRegion}
-                  onChange={(e) => setSelectedRegion(e.target.value)}
-                >
-                  {texasRegions.map(region => (
-                    <option key={region} value={region}>{region}</option>
-                  ))}
-                </select>
-                <span className="region-subtitle">Specific region improves accuracy</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Image Preview Section */}
+        {/* Image Preview Section - Shown in place of toggle */}
         {imagePreview && (
-          <div className="upload-section-content">
+          <div className="upload-section-content" style={{ marginTop: '0' }}>
             <div className="upload-container">
               <div className="image-preview-container">
-                {imagePreview ? (
-                  <>
-                    <img src={imagePreview} alt="Preview" className="image-preview" />
-                    <button 
-                      className="change-image-button"
-                      onClick={() => {
-                        setSelectedFile(null);
-                        setImagePreview(null);
-                      }}
-                    >
-                      Change Image
-                    </button>
-                  </>
-                ) : (
-                  <div 
-                    className="upload-placeholder" 
-                    onClick={triggerFileInput}
-                    role="button"
-                    tabIndex={0}
-                  >
-                    <div className="upload-icon">
-                      {inputMode === 'camera' ? '' : ''}
-                    </div>
-                    <p className="upload-text">
-                      {inputMode === 'camera' ? 'Tap to Take Photo' : 'Tap to Upload Image'}
-                    </p>
-                  </div>
-                )}
+                <img src={imagePreview} alt="Preview" className="image-preview" />
+                <button 
+                  className="change-image-button"
+                  onClick={() => {
+                    setSelectedFile(null);
+                    setImagePreview(null);
+                  }}
+                >
+                  Change Image
+                </button>
               </div>
               
               {error && <div className="error-message">{error}</div>}
@@ -252,9 +203,43 @@ function UploadPage({ setCurrentPage, startAnalysis, selectedRegion, setSelected
                 {isAnalyzing ? 'Analyzing...' : 'Identify Plant'}
               </button>
             </div>
-
           </div>
         )}
+
+        <div className="region-section" style={{ marginTop: '20px', marginBottom: '20px' }}>
+          <div className="region-display-container">
+            <div className="region-display">
+              <div className="region-icon-wrapper">
+                <span className="country-flag">🇺🇸</span>
+                <svg 
+                  className="region-icon" 
+                  viewBox="0 0 24 24" 
+                  width="20"
+                  height="20"
+                  fill="currentColor"
+                >
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+              </div>
+              <div className="region-text-wrapper">
+                <label htmlFor="region-select" className="region-label">Select Texas Region</label>
+                <select 
+                  id="region-select"
+                  className="region-select"
+                  value={selectedRegion}
+                  onChange={(e) => setSelectedRegion(e.target.value)}
+                >
+                  {texasRegions.map(region => (
+                    <option key={region} value={region}>{region}</option>
+                  ))}
+                </select>
+                <span className="region-subtitle">Specific region improves accuracy</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
 
         {!imagePreview && error && (
           <div className="error-message">
