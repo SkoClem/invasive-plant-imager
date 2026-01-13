@@ -74,11 +74,11 @@ class BinaryDataset(Dataset):
         print(f"   Found {num_plants_found} plant images (Plants + Trees + Extras).")
 
         # 3. Balance Datasets
-        # If we have plants and non-plants, and plants are more numerous, subset them.
+        # We want to use ALL available plant/tree images as requested.
+        # We will NOT downsample plants even if they outnumber non-plants.
         if num_non_plants > 0 and num_plants_found > num_non_plants:
-            print(f"⚖️  Balancing dataset: Reducing plant images from {num_plants_found} to {num_non_plants} to match non-plants.")
-            # Randomly sample to avoid bias (e.g., if sorted by date)
-            plant_paths = random.sample(plant_paths, num_non_plants)
+            print(f"ℹ️  Keeping all {num_plants_found} plant images (Plants > Non-Plants).")
+            # previously: plant_paths = random.sample(plant_paths, num_non_plants)
         elif num_plants_found == 0:
             print("⚠️ Warning: No plant images found.")
         elif num_non_plants == 0:
