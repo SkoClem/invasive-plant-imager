@@ -105,19 +105,28 @@ def is_plant(image_bytes: bytes) -> bool:
         with torch.no_grad():
             outputs = model(image_tensor)
             # Output is [score_class_0, score_class_1]
-            # We need to know which class index corresponds to "Plant".
-            # Typically ImageFolder sorts alphabetically.
-            # If folders are "not_plant" and "plant":
-            # 0: not_plant
-            # 1: plant
             
-            _, predicted = torch.max(outputs, 1)
-            predicted_class = predicted.item()
+            # Apply Softmax to get probabilities
+            probs = F.softmax(outputs, dim=1)
+            prob_not_plant = probs[0][0].item()
+            prob_plant = probs[0][1].item()
             
-            # Assuming class 1 is Plant (based on alphabetical 'not_plant' vs 'plant')
-            # If user uses different folder names, this needs adjustment.
-            # For now, we assume 1 = Plant.
-            return predicted_class == 1 
+            print(f"🔍 Plant Detection Confidence: Plant={prob_plant:.4f}, Not Plant={prob_not_plant:.4f}")
+
+            # Lenient Threshold Logic:
+            # We assume class 1 is "Plant" and class 0 is "Not Plant".
+            # Instead of a hard 50% split (argmax), we only reject if we are VERY sure it's NOT a plant.
+            # Reject only if P(Not Plant) > 0.95
+            
+            if prob_not_plant > 0.95:
+                print(f"❌ Rejected as Not Plant (Confidence: {prob_not_plant:.2%})")
+                return False
+            else:
+                if prob_plant < 0.5:
+                    print(f"⚠️ Accepted as Plant despite low confidence (P(Plant)={prob_plant:.2%}) due to lenient filter.")
+                else:
+                    print(f"✅ Accepted as Plant (Confidence: {prob_plant:.2%})")
+                return True
             
     except Exception as e:
         print(f"Error during plant detection: {e}")

@@ -131,9 +131,12 @@ def train():
 
     # 1. Define Transforms
     # MUST match the input size expected by PlantCNN (64x64, RGB)
+    # ADDED: Data Augmentation to help with distracting backgrounds and color variations
     transform = transforms.Compose([
-        # transforms.Grayscale(num_output_channels=1), # Removed Grayscale
         transforms.Resize((64, 64)), # Increased resolution
+        transforms.RandomHorizontalFlip(), # Randomly flip horizontally
+        transforms.RandomRotation(15), # Randomly rotate +/- 15 degrees
+        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1), # Randomly change colors
         transforms.ToTensor(),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)) # Normalize RGB images
     ])
