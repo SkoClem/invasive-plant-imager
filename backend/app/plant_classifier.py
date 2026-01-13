@@ -113,19 +113,15 @@ def is_plant(image_bytes: bytes) -> bool:
             
             print(f"🔍 Plant Detection Confidence: Plant={prob_plant:.4f}, Not Plant={prob_not_plant:.4f}")
 
-            # Lenient Threshold Logic:
-            # We assume class 1 is "Plant" and class 0 is "Not Plant".
-            # Instead of a hard 50% split (argmax), we only reject if we are VERY sure it's NOT a plant.
-            # Reject only if P(Not Plant) > 0.95
+            # Strict Threshold Logic:
+            # We require the model to be at least 50% confident it IS a plant.
+            # This filters out non-plants effectively, though it may reject poor quality plant images.
             
-            if prob_not_plant > 0.95:
+            if prob_plant < 0.5:
                 print(f"❌ Rejected as Not Plant (Confidence: {prob_not_plant:.2%})")
                 return False
             else:
-                if prob_plant < 0.5:
-                    print(f"⚠️ Accepted as Plant despite low confidence (P(Plant)={prob_plant:.2%}) due to lenient filter.")
-                else:
-                    print(f"✅ Accepted as Plant (Confidence: {prob_plant:.2%})")
+                print(f"✅ Accepted as Plant (Confidence: {prob_plant:.2%})")
                 return True
             
     except Exception as e:
