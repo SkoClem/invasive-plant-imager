@@ -144,12 +144,6 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
               </div>
               <div className="stat-label">Identified</div>
             </div>
-            <div className="stat-card">
-              <div className="stat-number">
-                {imageCollection.filter(img => img.status === 'analyzing').length}
-              </div>
-              <div className="stat-label">Processing</div>
-            </div>
           </div>
         </div>
 

@@ -640,12 +640,16 @@
   }
 
   .collection-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 1rem;
+    padding: 0 1rem;
   }
 
   .stat-card {
-    min-width: 100px;
-    padding: 1rem;
+    min-width: 0; /* Allow shrinking below content size if needed */
+    padding: 0.75rem;
+    width: 100%;
   }
 
   .stat-number {

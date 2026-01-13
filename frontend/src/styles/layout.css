@@ -199,11 +199,23 @@
 @media (max-width: 480px) {
   .tab-navigation {
     padding: 0.25rem 0;
+    justify-content: flex-start;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  
+  .tab-navigation::-webkit-scrollbar {
+    display: none;
   }
 
   .tab-item {
     padding: 0.3rem 0.5rem;
-    min-width: 45px;
+    min-width: 70px; /* Ensure enough width to trigger scroll if many items */
+    flex-shrink: 0; /* Prevent shrinking */
+    flex: 0 0 auto;
   }
 
   .tab-icon {
