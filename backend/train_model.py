@@ -10,7 +10,7 @@ from PIL import Image
 
 # Configuration
 # User can adjust epochs here
-EPOCHS = 5
+EPOCHS = 10
 BATCH_SIZE = 32
 LEARNING_RATE = 0.001
 
@@ -51,8 +51,17 @@ class BinaryDataset(Dataset):
         if not os.path.exists(plant_dir):
             print(f"⚠️ Warning: Plant directory not found: {plant_dir}")
 
+        # ADDED: Include extra local plant images (e.g., invasive2.png)
+        extra_plant_dir = "extra_plants"
+        if os.path.exists(extra_plant_dir):
+            extra_paths = find_images_recursive(extra_plant_dir)
+            print(f"   Found {len(extra_paths)} extra plant images in {extra_plant_dir}")
+            # Add them multiple times to ensure they are learned (Oversampling)
+            for _ in range(50): 
+                plant_paths.extend(extra_paths)
+        
         num_plants_found = len(plant_paths)
-        print(f"   Found {num_plants_found} plant images.")
+        print(f"   Found {num_plants_found} plant images (including extras).")
 
         # 3. Balance Datasets
         # If we have plants and non-plants, and plants are more numerous, subset them.
