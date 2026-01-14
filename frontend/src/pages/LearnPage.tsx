@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { austinInvasivePlants } from '../data/invasivePlants';
 import { localResources } from '../data/resources';
-import PlantCard from '../components/PlantCard';
 import ResourceCard from '../components/ResourceCard';
 
 interface LearnPageProps {

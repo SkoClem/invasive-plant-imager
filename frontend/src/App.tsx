@@ -14,7 +14,6 @@ import SettingsPage from './pages/SettingsPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import AuthButton from './components/AuthButton';
-import ThemeToggle from './components/ThemeToggle';
 import { collectionService, CollectionItem, PlantInfo as BackendPlantInfo } from './services/collectionService';
 import { authService } from './services/authService';
 import { Message } from './components/PlantChat';
