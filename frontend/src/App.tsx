@@ -519,6 +519,8 @@ function AppContent() {
             default:
               return <HomePage
                 setCurrentPage={navigateToPage}
+                userRole={userRole}
+                setUserRole={setUserRole}
               />;
           }
         })()} 
