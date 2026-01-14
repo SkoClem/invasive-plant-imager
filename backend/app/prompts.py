@@ -66,18 +66,31 @@ def plant_expert_chat(question, context=None):
     """Generate a response as a plant expert"""
     plant_context = ""
     target_region = "Texas" # Default region
+    user_role = "Student" # Default role
 
     if context:
         species = context.get('species', 'this plant')
         # Use provided region if available and not empty, otherwise keep default
         if context.get('region'):
             target_region = context.get('region')
+        
+        if context.get('userRole'):
+            user_role = context.get('userRole')
             
         is_invasive = context.get('invasiveOrNot', False)
         plant_context = f"The user is currently viewing details about {species}, which is classified as {'invasive' if is_invasive else 'not invasive'} in {target_region}."
+
+    role_instruction = ""
+    if user_role == "Homeowner":
+        role_instruction = "- Frame your answer for a homeowner: focus on property value, garden maintenance, aesthetics, and cost-effective control methods."
+    elif user_role == "Land Manager":
+        role_instruction = "- Frame your answer for a land manager: focus on large-scale impact, long-term management strategies, economic efficiency, and regulatory compliance."
+    else: # Student
+        role_instruction = "- Frame your answer for a student: focus on educational value, ecological concepts, biological mechanisms, and scientific accuracy."
         
     return f"""You are an expert botanist and invasive species specialist, with a specific focus on {target_region}. 
 {plant_context}
+The user is identified as a: {user_role}.
 
 The user is asking: "{question}"
 
@@ -87,6 +100,7 @@ Important Context:
 
 Provide a concise, direct, and helpful response.
 - Answer the specific question immediately.
+{role_instruction}
 - Use as few words as possible.
 - Limit response to 3-4 sentences.
 - If asked about harms or threats, you MUST include economic damages (costs, crop loss, infrastructure damage) relevant to {target_region}, ideally supported by specific statistics or dollar amounts if available.
