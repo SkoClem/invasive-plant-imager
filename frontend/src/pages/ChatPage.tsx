@@ -90,7 +90,41 @@ const ChatPage: React.FC<ChatPageProps> = ({
                 )}
 
                 {(currentPlant.plantData.description || currentPlant.description) && (
-                  <p className="plant-description">{currentPlant.plantData.description || currentPlant.description}</p>
+                  <div className="detail-section">
+                    <h3 className="detail-title">Description</h3>
+                    <p className="plant-description">{currentPlant.plantData.description || currentPlant.description}</p>
+                  </div>
+                )}
+
+                {currentPlant.plantData.impact && (
+                  <div className="detail-section">
+                    <h3 className="detail-title">Invasive Effects</h3>
+                    <p className="detail-text">{currentPlant.plantData.impact}</p>
+                  </div>
+                )}
+
+                {currentPlant.plantData.nativeAlternatives && currentPlant.plantData.nativeAlternatives.length > 0 && (
+                  <div className="detail-section">
+                    <h3 className="detail-title">Native Alternatives</h3>
+                    <ul className="alternatives-list">
+                      {currentPlant.plantData.nativeAlternatives.map((alt, index) => (
+                        <li key={index} className="alternative-item">
+                          <strong>{alt.commonName}</strong> ({alt.scientificName})
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {currentPlant.plantData.controlMethods && currentPlant.plantData.controlMethods.length > 0 && (
+                  <div className="detail-section">
+                    <h3 className="detail-title">Removal Instructions</h3>
+                    <ul className="control-list">
+                      {currentPlant.plantData.controlMethods.map((method, index) => (
+                        <li key={index} className="control-item">{method}</li>
+                      ))}
+                    </ul>
+                  </div>
                 )}
               </div>
               

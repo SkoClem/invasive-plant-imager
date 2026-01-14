@@ -332,26 +332,11 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
                           <h3 className="plant-name" style={{ fontSize: '1.1rem', marginBottom: '4px' }}>
                             {image.plantData.commonName || image.plantData.scientificName || image.species || 'Unknown Plant'}
                           </h3>
-                          {image.plantData.scientificName && (
-                            <p className="scientific-name" style={{ fontSize: '0.9rem', marginBottom: '4px' }}>{image.plantData.scientificName}</p>
-                          )}
                           {image.plantData.region && (
                             <div className="native-location" style={{ fontSize: '0.8rem', marginBottom: '4px' }}>
                               <span className="location-icon"></span>
                               <span className="location-text">Native to: {image.plantData.region}</span>
                             </div>
-                          )}
-                          {image.plantData.description && (
-                            <p className="plant-description" style={{ 
-                              fontSize: '0.9rem', 
-                              display: '-webkit-box',
-                              WebkitLineClamp: 2,
-                              WebkitBoxOrient: 'vertical',
-                              overflow: 'hidden',
-                              marginBottom: '8px'
-                            }}>
-                              {image.plantData.description}
-                            </p>
                           )}
                         </>
                       ) : image.status === 'completed' && image.species ? (

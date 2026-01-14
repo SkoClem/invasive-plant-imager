@@ -231,23 +231,21 @@ async def analyze_plant(
                 parsed_data['analyzed_by'] = current_user['uid']
                 parsed_data['user_email'] = current_user['email']
 
-                # Award coin only for NEW invasive species scans
+                # Award coin for every scan
                 try:
                     is_invasive = bool(parsed_data.get('invasiveOrNot', False))
                     species = str(parsed_data.get('specieIdentified') or '').strip()
                     print(f"🌱 Plant: {species}, Invasive: {is_invasive}")
                     
-                    if is_invasive and species:
-                         awarded, total_coins = rewards_manager.award_species_if_new(current_user['uid'], species)
-                         parsed_data['coinAwarded'] = awarded
-                         parsed_data['coins'] = total_coins
-                         print(f"💰 Rewards processed. Awarded: {awarded}, Total: {total_coins}")
-                    else:
-                         # Return current coin count even if nothing was awarded
-                         user_rewards = rewards_manager.get_user_rewards(current_user['uid'])
-                         parsed_data['coinAwarded'] = False
-                         parsed_data['coins'] = int(user_rewards.get('coins', 0))
-                         print(f"💰 No new rewards. Current total: {parsed_data['coins']}")
+                    # Call award_species_if_new which now handles all coin logic (base + bonus)
+                    # Pass species if it's invasive/valid, else empty string just for base points
+                    species_to_record = species if (is_invasive and species) else ""
+                    
+                    awarded, total_coins = rewards_manager.award_species_if_new(current_user['uid'], species_to_record)
+                    parsed_data['coinAwarded'] = awarded
+                    parsed_data['coins'] = total_coins
+                    print(f"💰 Rewards processed. Awarded: {awarded}, Total: {total_coins}")
+
                 except Exception as e:
                     print(f"⚠️ Error processing rewards: {e}")
                     # Don't fail the analysis if rewards fail

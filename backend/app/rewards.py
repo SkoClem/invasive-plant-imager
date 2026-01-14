@@ -58,20 +58,28 @@ class FileRewardsManager:
         data = self.get_user_rewards(user_id)
         awarded_species: List[str] = data.get("awarded_species", [])
         
-        # Always award coins for invasive species, even if already found
-        if species:
-            if species not in awarded_species:
-                awarded_species.append(species)
-                data["awarded_species"] = awarded_species
+        # Always award coins for any plant scan (invasive or not, new or existing)
+        # 1 coin for every scan to encourage usage
+        # Bonus coin for NEW invasive species
+        
+        is_new_invasive = False
+        if species and species not in awarded_species:
+            awarded_species.append(species)
+            is_new_invasive = True
             
-            data["coins"] = int(data.get("coins", 0)) + 1
-            self.rewards[user_id] = data
-            self.save_rewards()
-            return True, data["coins"]
+        # Base reward: 1 coin per scan
+        reward = 1
+        
+        # Bonus: +1 coin if it's a new species
+        if is_new_invasive:
+            reward += 1
             
-        # No award if no species provided
+        data["awarded_species"] = awarded_species
+        data["coins"] = int(data.get("coins", 0)) + reward
+        
+        self.rewards[user_id] = data
         self.save_rewards()
-        return False, int(data.get("coins", 0))
+        return True, data["coins"]
 
 
 class FirestoreRewardsManager:
@@ -115,16 +123,25 @@ class FirestoreRewardsManager:
             if not isinstance(awarded_species, list):
                 awarded_species = []
 
-            # Always award coins for invasive species
-            if species:
-                if species not in awarded_species:
-                    awarded_species.append(species)
+            # Always award coins for any plant scan
+            # 1 coin for every scan to encourage usage
+            # Bonus coin for NEW invasive species
+            
+            is_new_invasive = False
+            if species and species not in awarded_species:
+                awarded_species.append(species)
+                is_new_invasive = True
+            
+            # Base reward: 1 coin per scan
+            reward = 1
+            
+            # Bonus: +1 coin if it's a new species
+            if is_new_invasive:
+                reward += 1
                 
-                coins += 1
-                doc_ref.set({"coins": coins, "awarded_species": awarded_species}, merge=True)
-                return True, coins
-            else:
-                return False, coins
+            coins += reward
+            doc_ref.set({"coins": coins, "awarded_species": awarded_species}, merge=True)
+            return True, coins
         except Exception as e:
             print(f"Error awarding rewards for user {user_id}: {e}")
             return False, 0
