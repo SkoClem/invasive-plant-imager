@@ -13,6 +13,7 @@ interface ChatPageProps {
   onNewMessage: (message: Message) => void;
   onNavigateToCollection: () => void;
   onNavigateToUpload: () => void;
+  userRole: string;
 }
 
 const ChatPage: React.FC<ChatPageProps> = ({ 
@@ -20,7 +21,8 @@ const ChatPage: React.FC<ChatPageProps> = ({
   messages, 
   onNewMessage,
   onNavigateToCollection,
-  onNavigateToUpload
+  onNavigateToUpload,
+  userRole
 }) => {
   return (
     <section className="chat-page results-section">
@@ -70,6 +72,20 @@ const ChatPage: React.FC<ChatPageProps> = ({
                         <span className="reasoning-label">Analysis:</span> {currentPlant.plantData.confidenceReasoning}
                       </p>
                     )}
+                    <div className="cost-optimization-message" style={{ 
+                      marginTop: '1rem', 
+                      padding: '0.75rem', 
+                      background: 'rgba(var(--primary-rgb), 0.1)', 
+                      borderRadius: 'var(--radius-sm)',
+                      fontSize: '0.85rem',
+                      color: 'var(--text-secondary)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem'
+                    }}>
+                      <span style={{ fontSize: '1.2rem' }}>⚡</span>
+                      This identification was optimized using a local model before querying a large AI system to reduce computational cost.
+                    </div>
                   </div>
                 )}
 
@@ -82,6 +98,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
                 plantData={currentPlant.plantData}
                 messages={messages}
                 onNewMessage={onNewMessage}
+                userRole={userRole}
               />
             </div>
 

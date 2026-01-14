@@ -37,6 +37,24 @@ function AboutPage({ setCurrentPage }: AboutPageProps) {
               guidance from local environmental agencies.
             </p>
 
+            <h2>Economic & Ecological Impact</h2>
+            <div className="impact-details" style={{ marginTop: '1rem', marginBottom: '2rem' }}>
+              <p>
+                Invasive species are not just a nuisance; they are a significant economic burden. In the United States alone, 
+                invasive species cost the economy an estimated <strong>$120 billion annually</strong> in lost agricultural yields, 
+                infrastructure damage, and direct control costs.
+              </p>
+              <ul style={{ listStyleType: 'disc', paddingLeft: '1.5rem', margin: '1rem 0' }}>
+                <li><strong>Agriculture:</strong> Invasive weeds compete with crops for nutrients and water, reducing yields and requiring expensive herbicide applications.</li>
+                <li><strong>Infrastructure:</strong> Plants like Kudzu and Japanese Knotweed can damage roads, foundations, and utility lines.</li>
+                <li><strong>Real Estate:</strong> Infestations can lower property values and increase maintenance costs for homeowners.</li>
+              </ul>
+              <p>
+                By identifying and reporting invasive plants early, we can help reduce these costs. Prevention and early detection 
+                are far more cost-effective than managing established infestations.
+              </p>
+            </div>
+
             <h2>Project Goals</h2>
             <p>
               The goal of this project is to explore how machine learning can support environmental awareness and

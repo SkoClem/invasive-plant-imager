@@ -14,18 +14,19 @@ interface PlantChatProps {
   plantData: PlantInfo;
   messages: Message[];
   onNewMessage: (message: Message) => void;
+  userRole?: string;
 }
 
 const PREDEFINED_QUESTIONS = [
   "What is the threat level?",
   "What are the harms of this species?",
   "What are the native lookalikes?",
-  "What are some native replacements?",
+  "What are the native replacements?",
   "What is the best course of action?",
   "Tell me more about this plant."
 ];
 
-const PlantChat: React.FC<PlantChatProps> = ({ plantData, messages, onNewMessage }) => {
+const PlantChat: React.FC<PlantChatProps> = ({ plantData, messages, onNewMessage, userRole = 'Student' }) => {
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { firebaseUser } = useAuth();
@@ -70,7 +71,8 @@ const PlantChat: React.FC<PlantChatProps> = ({ plantData, messages, onNewMessage
         region: plantData.region,
         invasiveOrNot: plantData.isInvasive,
         description: plantData.description,
-        invasiveEffects: plantData.impact
+        invasiveEffects: plantData.impact,
+        userRole: userRole
       };
 
       const token = firebaseUser ? await firebaseUser.getIdToken() : null;

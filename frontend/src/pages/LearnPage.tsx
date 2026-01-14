@@ -8,13 +8,12 @@ interface LearnPageProps {
   setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'learn' | 'loading' | 'chat') => void;
 }
 
-type LearnSection = 'why-matter' | 'local-focus' | 'resources' | 'homeowners';
+type LearnSection = 'local-focus' | 'resources' | 'homeowners';
 
 function LearnPage({ setCurrentPage }: LearnPageProps) {
-  const [activeSection, setActiveSection] = useState<LearnSection>('why-matter');
+  const [activeSection, setActiveSection] = useState<LearnSection>('local-focus');
 
   const sections: { id: LearnSection; title: string; icon: string }[] = [
-    { id: 'why-matter', title: 'Why They Matter', icon: '' },
     { id: 'local-focus', title: 'Local Focus', icon: '' },
     { id: 'resources', title: 'Resources', icon: '' },
     { id: 'homeowners', title: 'What You Can Do', icon: '' },
@@ -22,31 +21,6 @@ function LearnPage({ setCurrentPage }: LearnPageProps) {
 
   const renderSectionContent = () => {
     switch (activeSection) {
-      case 'why-matter':
-        return (
-          <div className="learn-section-content">
-            <h2>Why Invasive Plants Matter</h2>
-            <div className="content-grid">
-              <div className="content-card">
-                <h3> Ecological Impact</h3>
-                <p>Invasive species disrupt local ecosystems by outcompeting native plants, reducing biodiversity, and altering natural habitats.</p>
-              </div>
-              <div className="content-card">
-                <h3> Water Resources</h3>
-                <p>Many invasive plants consume more water than native species, affecting local water availability and quality in sensitive areas like the Balcones Canyonlands Preserve.</p>
-              </div>
-              <div className="content-card">
-                <h3> Wildlife Habitat</h3>
-                <p>Native wildlife depends on specific native plants for food and shelter. Invasive species can eliminate these critical resources.</p>
-              </div>
-              <div className="content-card">
-                <h3> Economic Costs</h3>
-                <p>Managing invasive species costs millions annually in control efforts, lost agricultural productivity, and damage to infrastructure.</p>
-              </div>
-            </div>
-          </div>
-        );
-
       case 'local-focus':
         return (
           <div className="learn-section-content">

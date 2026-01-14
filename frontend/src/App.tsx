@@ -43,8 +43,9 @@ function AppContent() {
   const [imageCollection, setImageCollection] = useState<CollectedImage[]>([]);
   const [lastResultId, setLastResultId] = useState<string | null>(null);
   const [chatHistories, setChatHistories] = useState<Record<string, Message[]>>({});
+  const [userRole, setUserRole] = useState<string>('Student');
   
-  // Load chat history from local storage on mount
+  // Load chat history and user role from local storage on mount
   useEffect(() => {
     const savedChat = localStorage.getItem('chatHistories');
     if (savedChat) {
@@ -54,12 +55,22 @@ function AppContent() {
         console.error("Failed to parse chat history", e);
       }
     }
+    
+    const savedRole = localStorage.getItem('userRole');
+    if (savedRole) {
+      setUserRole(savedRole);
+    }
   }, []);
   
   // Save chat history to local storage whenever it changes
   useEffect(() => {
     localStorage.setItem('chatHistories', JSON.stringify(chatHistories));
   }, [chatHistories]);
+
+  // Save user role to local storage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('userRole', userRole);
+  }, [userRole]);
   
   const pageRef = useRef<HTMLDivElement>(null);
   const { isAuthenticated, loading: authLoading } = useAuth();
@@ -463,6 +474,8 @@ function AppContent() {
             case 'home':
               return <HomePage
                 setCurrentPage={navigateToPage}
+                userRole={userRole}
+                setUserRole={setUserRole}
               />;
             case 'upload':
               return <UploadPage
@@ -489,6 +502,7 @@ function AppContent() {
                 onNewMessage={(msg) => handleNewMessage(msg, activeId)}
                 onNavigateToCollection={() => navigateToPage('collection')}
                 onNavigateToUpload={() => navigateToPage('upload')}
+                userRole={userRole}
               />;
             case 'about':
               return <AboutPage setCurrentPage={navigateToPage} />;
