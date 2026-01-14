@@ -12,7 +12,7 @@ function HomePage({ setCurrentPage, userRole, setUserRole }: HomePageProps) {
 
   if (isAuthenticated) {
     return (
-      <section className="home-section logged-in">
+      <section className="home-section logged-in" style={{ paddingTop: '80px' }}>
         <div className="container">
           <div className="welcome-header" style={{ marginBottom: '2rem', textAlign: 'center' }}>
             <h1>Welcome back{currentUser?.name ? `, ${currentUser.name}` : ''}!</h1>
@@ -125,14 +125,14 @@ function HomePage({ setCurrentPage, userRole, setUserRole }: HomePageProps) {
             <div className="hero-action">
               <button
                 className="button hero-button enhanced"
-                onClick={() => setCurrentPage('upload')}
+                onClick={() => document.querySelector<HTMLButtonElement>('.auth-button')?.click()}
               >
                 <span className="button-icon"></span>
-                <span className="button-text">Start Scanning</span>
+                <span className="button-text">Sign Me Up!</span>
               </button>
 
               <p className="region-hint-text">
-                 Select your region on the scan page for accurate plant identification
+                 Join now to start identifying and protecting your local ecosystem
               </p>
             </div>
           </div>

@@ -10,6 +10,7 @@ import LearnPage from './pages/LearnPage';
 import LoadingPage from './pages/LoadingPage';
 import ChatPage from './pages/ChatPage';
 import MapPage from './pages/MapPage';
+import SettingsPage from './pages/SettingsPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import AuthButton from './components/AuthButton';
@@ -19,7 +20,7 @@ import { authService } from './services/authService';
 import { Message } from './components/PlantChat';
 import CoinAnimation from './components/CoinAnimation';
 
-type PageType = 'home' | 'upload' | 'collection' | 'about' | 'learn' | 'loading' | 'chat' | 'map';
+type PageType = 'home' | 'upload' | 'collection' | 'about' | 'learn' | 'loading' | 'chat' | 'map' | 'settings';
 type DirectionType = 'forward' | 'backward';
 
 interface CollectedImage {
@@ -516,6 +517,12 @@ function AppContent() {
               />;
             case 'map':
               return <MapPage />;
+            case 'settings':
+              return <SettingsPage 
+                userRole={userRole} 
+                setUserRole={setUserRole} 
+                onNavigateBack={() => navigateToPage('home')} 
+              />;
             default:
               return <HomePage
                 setCurrentPage={navigateToPage}
@@ -539,8 +546,25 @@ function AppContent() {
         >
           InvasiScan
         </button>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <ThemeToggle />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <button 
+            className="icon-button"
+            onClick={() => navigateToPage('settings')}
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              fontSize: '1.2rem', 
+              cursor: 'pointer',
+              color: 'var(--text-primary)',
+              padding: '0.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            aria-label="Settings"
+          >
+            ⚙️
+          </button>
           <AuthButton variant="compact" />
         </div>
       </nav>

@@ -29,9 +29,26 @@ function LearnPage({ setCurrentPage }: LearnPageProps) {
               <p>Learn about the most problematic invasive plants in our area and how to identify and manage them.</p>
             </div>
 
-            <div className="plants-grid">
+            <div className="plants-list" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {austinInvasivePlants.map((plant) => (
-                <PlantCard key={plant.id} plant={plant} />
+                <div key={plant.id} className="plant-list-item" style={{
+                  padding: '1.5rem',
+                  backgroundColor: 'var(--container-bg)',
+                  borderRadius: 'var(--radius-card)',
+                  boxShadow: 'var(--shadow-sm)',
+                  border: '1px solid var(--border-subtle)'
+                }}>
+                  <div className="plant-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                    <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--primary)' }}>{plant.commonName}</h3>
+                    <span style={{ fontSize: '0.9rem', fontStyle: 'italic', color: 'var(--text-secondary)' }}>{plant.scientificName}</span>
+                  </div>
+                  <p style={{ margin: 0, color: 'var(--text-primary)', fontSize: '0.95rem', lineHeight: '1.5' }}>
+                    {plant.description}
+                  </p>
+                  <div className="plant-details" style={{ marginTop: '0.75rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                    <strong>Key ID Feature:</strong> {plant.identificationTips[0]}
+                  </div>
+                </div>
               ))}
             </div>
 
