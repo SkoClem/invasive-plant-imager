@@ -251,9 +251,10 @@ function UploadPage({ setCurrentPage, startAnalysis, selectedRegion, setSelected
         <div className="upload-guidelines">
           <h3>For best results:</h3>
           <ul>
-            <li>Ensure good lighting when taking photos</li>
-            <li>Focus on the plant's distinctive features</li>
+            <li>Move close so the plant fills most of the frame</li>
+            <li>Avoid busy backgrounds and strong shadows on the plant</li>
             <li>Include leaves, flowers, or fruits if possible</li>
+            <li>If your camera allows, increase color saturation for better contrast</li>
           </ul>
         </div>
       </div>

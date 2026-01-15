@@ -43,65 +43,33 @@ function HomePage({ setCurrentPage, userRole, setUserRole }: HomePageProps) {
             </div>
           </div>
 
-          <div className="quick-actions-grid" style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
-            gap: '1.5rem' 
-          }}>
-            <div 
+          <div className="quick-actions-grid">
+            <button 
               className="action-card primary" 
               onClick={() => setCurrentPage('upload')}
-              style={{
-                background: 'linear-gradient(135deg, var(--primary), var(--primary-dark))',
-                color: 'white',
-                padding: '2rem',
-                borderRadius: 'var(--radius-card)',
-                cursor: 'pointer',
-                textAlign: 'center',
-                boxShadow: 'var(--shadow-md)',
-                transition: 'transform 0.2s'
-              }}
             >
-              <div className="action-icon" style={{ fontSize: '3rem', marginBottom: '1rem' }}>📸</div>
-              <h3 style={{ color: 'white' }}>Scan New Plant</h3>
-              <p style={{ color: 'rgba(255,255,255,0.9)' }}>Identify invasive species instantly</p>
-            </div>
+              <div className="action-icon">📸</div>
+              <h3>Scan New Plant</h3>
+              <p>Identify invasive species instantly</p>
+            </button>
             
-            <div 
+            <button 
               className="action-card" 
               onClick={() => setCurrentPage('collection')}
-              style={{
-                background: 'var(--container-bg)',
-                padding: '2rem',
-                borderRadius: 'var(--radius-card)',
-                cursor: 'pointer',
-                textAlign: 'center',
-                boxShadow: 'var(--shadow-light)',
-                border: '1px solid var(--border-subtle)'
-              }}
             >
-              <div className="action-icon" style={{ fontSize: '3rem', marginBottom: '1rem' }}>🌿</div>
+              <div className="action-icon">🌿</div>
               <h3>My Collection</h3>
               <p>View your identified plants</p>
-            </div>
+            </button>
             
-            <div 
+            <button 
               className="action-card" 
               onClick={() => setCurrentPage('learn')}
-              style={{
-                background: 'var(--container-bg)',
-                padding: '2rem',
-                borderRadius: 'var(--radius-card)',
-                cursor: 'pointer',
-                textAlign: 'center',
-                boxShadow: 'var(--shadow-light)',
-                border: '1px solid var(--border-subtle)'
-              }}
             >
-              <div className="action-icon" style={{ fontSize: '3rem', marginBottom: '1rem' }}>📚</div>
+              <div className="action-icon">📚</div>
               <h3>Learn More</h3>
               <p>Explore the database</p>
-            </div>
+            </button>
           </div>
         </div>
       </section>

@@ -1,8 +1,11 @@
 import traceback
+import json
+import os
+from datetime import datetime
 from typing import Dict, Any, List
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Depends, Request
 from fastapi.responses import Response
-from app.schemas import Message, ChatRequest, PlantAnalysisRequest, PlantAnalysisResponse, FirebaseLoginRequest, LoginResponse, ProtectedResponse, SaveCollectionRequest, UserCollectionResponse, DeleteCollectionItemRequest, CreateMarkerRequest, MapMarker
+from app.schemas import Message, ChatRequest, PlantAnalysisRequest, PlantAnalysisResponse, FirebaseLoginRequest, LoginResponse, ProtectedResponse, SaveCollectionRequest, UserCollectionResponse, DeleteCollectionItemRequest, CreateMarkerRequest, MapMarker, FeedbackRequest
 from app.backend import Imager
 from app.auth import AuthService, get_current_user, get_current_user_optional
 from app.collections import collection_manager
@@ -269,6 +272,35 @@ async def analyze_plant(
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.post("/api/feedback")
+async def submit_feedback(
+    request: Request,
+    feedback: FeedbackRequest,
+    current_user: Dict[str, Any] = Depends(get_current_user_optional)
+):
+    try:
+        user_id = current_user['uid'] if current_user else None
+        user_email = current_user.get('email') if current_user else None
+        client_ip = request.client.host if request.client else None
+        entry = {
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "user_id": user_id,
+            "user_email": user_email,
+            "client_ip": client_ip,
+            "feedback": feedback.model_dump()
+        }
+        base_dir = os.path.dirname(os.path.dirname(__file__))
+        log_path = os.path.join(base_dir, "feedback_logs.jsonl")
+        try:
+            with open(log_path, "a", encoding="utf-8") as f:
+                f.write(json.dumps(entry) + "\n")
+        except Exception as e:
+            print(f"⚠️ Failed to write feedback log: {e}")
+        return {"status": "ok"}
+    except Exception as e:
+        print(f"❌ Feedback submission failed: {e}")
+        raise HTTPException(status_code=500, detail="Failed to submit feedback")
+
 # Rewards endpoints
 @router.get("/api/rewards")
 async def get_rewards(response: Response, current_user: Dict[str, Any] = Depends(get_current_user)):
@@ -312,5 +344,4 @@ async def get_markers(current_user: Dict[str, Any] = Depends(get_current_user_op
         return map_manager.get_all_markers()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 

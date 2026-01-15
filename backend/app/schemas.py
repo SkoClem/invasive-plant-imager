@@ -50,6 +50,16 @@ class PlantInfo(BaseModel):
     nativeAlternatives: List[Dict[str, str]] = []
     removeInstructions: str = ""
 
+class FeedbackRequest(BaseModel):
+    plantId: Optional[str] = None
+    specieIdentified: Optional[str] = None
+    isInvasive: Optional[bool] = None
+    userRegion: Optional[str] = None
+    nativeRegion: Optional[str] = None
+    feedbackType: str
+    comment: Optional[str] = None
+    context: Optional[Dict[str, Any]] = None
+
 class CollectionItem(BaseModel):
     id: str
     timestamp: datetime

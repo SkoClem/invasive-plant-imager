@@ -307,6 +307,61 @@
   background: var(--bg-primary);
 }
 
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.action-card {
+  background: var(--container-bg);
+  padding: 2rem;
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-light);
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.action-card.primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  box-shadow: var(--shadow-md);
+  border-color: transparent;
+}
+
+.action-card .action-icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.action-card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+.action-card p {
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.action-card.primary h3,
+.action-card.primary p {
+  color: white;
+}
+
+.action-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent-bright);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .hero-header.enhanced {

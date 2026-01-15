@@ -140,6 +140,7 @@
   object-fit: contain; /* Show full image */
   display: block;
   background-color: rgba(0, 0, 0, 0.03);
+  filter: saturate(1.4) contrast(1.05);
 }
 
 .change-image-button {

@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PlantChat, { Message } from '../components/PlantChat';
 import { PlantInfo } from '../types/api';
+import { API_BASE_URL } from '../config/api';
 
 interface ChatPageProps {
   currentPlant: {
@@ -24,6 +25,86 @@ const ChatPage: React.FC<ChatPageProps> = ({
   onNavigateToUpload,
   userRole
 }) => {
+  const [feedbackChoice, setFeedbackChoice] = useState<'up' | 'down' | null>(null);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [feedbackType, setFeedbackType] = useState<'wrong-plant' | 'wrong-invasive' | 'wrong-native-region' | ''>('');
+  const [feedbackText, setFeedbackText] = useState('');
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+  const [feedbackError, setFeedbackError] = useState<string | null>(null);
+
+  const handleThumbUp = async () => {
+    if (!currentPlant || !currentPlant.plantData) return;
+    setFeedbackChoice('up');
+    setFeedbackSubmitted(true);
+    setFeedbackError(null);
+    try {
+      await fetch(`${API_BASE_URL}/api/feedback`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          plantId: currentPlant.id,
+          specieIdentified: currentPlant.plantData.scientificName || currentPlant.plantData.commonName,
+          isInvasive: currentPlant.plantData.isInvasive,
+          userRegion: currentPlant.plantData.region,
+          nativeRegion: currentPlant.plantData.nativeRegion,
+          feedbackType: 'thumbs-up',
+          comment: null,
+          context: {
+            source: 'results-view',
+            description: currentPlant.description || currentPlant.plantData.description || null
+          }
+        })
+      });
+    } catch (e) {
+    }
+  };
+
+  const handleThumbDownClick = () => {
+    if (!currentPlant || !currentPlant.plantData) return;
+    setFeedbackChoice('down');
+    setShowFeedbackModal(true);
+    setFeedbackSubmitted(false);
+    setFeedbackError(null);
+    setFeedbackType('');
+    setFeedbackText('');
+  };
+
+  const handleSubmitFeedback = async () => {
+    if (!currentPlant || !currentPlant.plantData) return;
+    if (!feedbackType) {
+      setFeedbackError('Please select a reason.');
+      return;
+    }
+    setIsSubmittingFeedback(true);
+    setFeedbackError(null);
+    try {
+      await fetch(`${API_BASE_URL}/api/feedback`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          plantId: currentPlant.id,
+          specieIdentified: currentPlant.plantData.scientificName || currentPlant.plantData.commonName,
+          isInvasive: currentPlant.plantData.isInvasive,
+          userRegion: currentPlant.plantData.region,
+          nativeRegion: currentPlant.plantData.nativeRegion,
+          feedbackType,
+          comment: feedbackText || null,
+          context: {
+            source: 'results-view',
+            description: currentPlant.description || currentPlant.plantData.description || null
+          }
+        })
+      });
+      setFeedbackSubmitted(true);
+      setShowFeedbackModal(false);
+    } catch (e) {
+      setFeedbackError('Could not submit feedback. Please try again.');
+    } finally {
+      setIsSubmittingFeedback(false);
+    }
+  };
+
   return (
     <section className="chat-page results-section">
       <div className="container">
@@ -36,7 +117,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
               </div>
             </div>
 
-            <div className="results-content">
+              <div className="results-content">
               <div className="results-details">
                 {currentPlant.plantData.scientificName && (
                   <p className="scientific-name">{currentPlant.plantData.scientificName}</p>
@@ -124,6 +205,86 @@ const ChatPage: React.FC<ChatPageProps> = ({
                         <li key={index} className="control-item">{method}</li>
                       ))}
                     </ul>
+                  </div>
+                )}
+                <div className="feedback-section">
+                  <div className="feedback-prompt">Was this identification accurate?</div>
+                  <div className="feedback-buttons">
+                    <button
+                      className={`thumb-button up ${feedbackChoice === 'up' ? 'active' : ''}`}
+                      onClick={handleThumbUp}
+                      type="button"
+                    >
+                      <span className="thumb-icon">👍</span>
+                    </button>
+                    <button
+                      className={`thumb-button down ${feedbackChoice === 'down' ? 'active' : ''}`}
+                      onClick={handleThumbDownClick}
+                      type="button"
+                    >
+                      <span className="thumb-icon">👎</span>
+                    </button>
+                  </div>
+                </div>
+                {feedbackSubmitted && !showFeedbackModal && (
+                  <div className="feedback-status">Thanks for your feedback.</div>
+                )}
+                {showFeedbackModal && (
+                  <div className="feedback-modal-backdrop">
+                    <div className="feedback-modal">
+                      <h3 className="feedback-title">What was the issue?</h3>
+                      <div className="feedback-options">
+                        <button
+                          type="button"
+                          className={`feedback-option ${feedbackType === 'wrong-plant' ? 'selected' : ''}`}
+                          onClick={() => setFeedbackType('wrong-plant')}
+                        >
+                          Wrong plant species
+                        </button>
+                        <button
+                          type="button"
+                          className={`feedback-option ${feedbackType === 'wrong-invasive' ? 'selected' : ''}`}
+                          onClick={() => setFeedbackType('wrong-invasive')}
+                        >
+                          Wrong about invasiveness
+                        </button>
+                        <button
+                          type="button"
+                          className={`feedback-option ${feedbackType === 'wrong-native-region' ? 'selected' : ''}`}
+                          onClick={() => setFeedbackType('wrong-native-region')}
+                        >
+                          Wrong about native region
+                        </button>
+                      </div>
+                      <textarea
+                        className="feedback-textarea"
+                        placeholder="Add any details that would help us improve."
+                        value={feedbackText}
+                        onChange={(e) => setFeedbackText(e.target.value)}
+                      />
+                      {feedbackError && <div className="feedback-error">{feedbackError}</div>}
+                      <div className="feedback-actions">
+                        <button
+                          type="button"
+                          className="feedback-cancel"
+                          onClick={() => {
+                            setShowFeedbackModal(false);
+                            setFeedbackError(null);
+                          }}
+                          disabled={isSubmittingFeedback}
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          className="feedback-submit"
+                          onClick={handleSubmitFeedback}
+                          disabled={isSubmittingFeedback}
+                        >
+                          {isSubmittingFeedback ? 'Submitting...' : 'Submit Feedback'}
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>

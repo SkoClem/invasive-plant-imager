@@ -47,6 +47,7 @@ export const compressImage = async (
           return;
         }
         
+        ctx.filter = 'saturate(1.4) contrast(1.05)';
         ctx.drawImage(img, 0, 0, width, height);
         
         // Convert to blob/file
