@@ -58,7 +58,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
     } catch {
       setFeedbackCompleted(false);
     }
-  }, [currentPlant?.id]);
+  }, [currentPlant]);
 
   const markFeedbackCompleted = (plantId: string) => {
     try {
