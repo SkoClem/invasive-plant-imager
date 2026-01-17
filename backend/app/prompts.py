@@ -10,7 +10,7 @@ def optimized_analysis(region, date=None, season=None):
     return f"""Expert botanist for {region} invasive species. Analyze plant image with context: {context}. Return ONLY valid JSON:
 
 {{
-  "specieIdentified": "species name or null",
+  "specieIdentified": "Common English name followed by scientific Latin name in parentheses, for example 'Live Oak (Quercus virginiana)'. Use null only if the species truly cannot be identified.",
   "nativeRegion": "native region/country", 
   "invasiveOrNot": boolean,
   "confidenceScore": 0-100,
@@ -25,6 +25,12 @@ def optimized_analysis(region, date=None, season=None):
   ],
   "removeInstructions": "concise removal steps or empty string"
 }}
+
+Requirements for specieIdentified:
+- Always include a human-friendly common English name when one exists.
+- Always include the properly ordered scientific Latin name in parentheses: Genus first, species second (for example 'Quercus virginiana').
+- Never reverse the order of the Latin name (do not output 'Virginiana Quercus').
+- If no common name exists, repeat the scientific Latin name and still follow the pattern 'CommonOrScientific (Genus species)'.
 
 Always include native region. Focus on {region} invasive species. Consider the season and date for identification accuracy. Keep descriptions concise and to the point. JSON only."""
 
@@ -46,7 +52,7 @@ def json_information(analysis_text):
 
 Return ONLY valid JSON:
     {{
-      "specieIdentified": "species name",
+      "specieIdentified": "Common English name followed by scientific Latin name in parentheses, for example 'Live Oak (Quercus virginiana)'. Use null only if the species truly cannot be identified.",
       "nativeRegion": "native region",
       "invasiveOrNot": boolean,
       "invasiveEffects": "concise effects or empty string",
