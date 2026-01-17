@@ -144,13 +144,23 @@ export function convertToPlantInfo(response: PlantAnalysisResponse): PlantInfo {
     };
   }
 
-  let commonName = 'Unknown Plant';
-  let scientificName = 'Unknown';
+  let commonName =
+    (response.commonName ?? undefined) && typeof response.commonName === 'string'
+      ? response.commonName
+      : 'Unknown Plant';
+  let scientificName =
+    (response.scientificName ?? undefined) && typeof response.scientificName === 'string'
+      ? response.scientificName
+      : 'Unknown';
 
-  if (response.specieIdentified) {
+  if ((!response.commonName || !response.scientificName) && response.specieIdentified) {
     const normalized = normalizeNamesFromSpecieIdentified(response.specieIdentified);
-    scientificName = normalized.scientificName;
-    commonName = normalized.commonName;
+    if (!response.scientificName) {
+      scientificName = normalized.scientificName;
+    }
+    if (!response.commonName) {
+      commonName = normalized.commonName;
+    }
   }
 
   return {
@@ -173,4 +183,40 @@ export function convertToPlantInfo(response: PlantAnalysisResponse): PlantInfo {
     region: response.region || 'Unknown',
     nativeRegion: response.nativeRegion || 'Unknown'
   };
+}
+
+export type InvasiveStatus = 'invasive' | 'native' | 'native-invasive';
+
+const NATIVE_INVASIVE_SPECIES_SCIENTIFIC = ['juniperus ashei'];
+const NATIVE_INVASIVE_SPECIES_COMMON = ['ashe juniper'];
+
+export function getInvasiveStatus(plant: PlantInfo): InvasiveStatus {
+  const scientificName = (plant.scientificName || '').toLowerCase();
+  const commonName = (plant.commonName || '').toLowerCase();
+
+  const isExplicitNativeInvasive =
+    NATIVE_INVASIVE_SPECIES_SCIENTIFIC.some(name => scientificName.includes(name)) ||
+    NATIVE_INVASIVE_SPECIES_COMMON.some(name => commonName.includes(name));
+
+  if (isExplicitNativeInvasive) {
+    return 'native-invasive';
+  }
+
+  if (!plant.isInvasive) {
+    return 'native';
+  }
+
+  const scanRegion = (plant.region || '').toLowerCase();
+  const nativeRegion = (plant.nativeRegion || '').toLowerCase();
+
+  const isNativeToScanRegion =
+    scanRegion &&
+    nativeRegion &&
+    (nativeRegion.includes(scanRegion) || scanRegion.includes(nativeRegion));
+
+  if (isNativeToScanRegion) {
+    return 'native-invasive';
+  }
+
+  return 'invasive';
 }

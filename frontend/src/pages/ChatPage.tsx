@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PlantChat, { Message } from '../components/PlantChat';
 import { PlantInfo } from '../types/api';
 import { API_BASE_URL } from '../config/api';
-import { formatPlantDisplayName } from '../utils/dataConversion';
+import { formatPlantDisplayName, getInvasiveStatus } from '../utils/dataConversion';
 
 const FEEDBACK_STORAGE_KEY = 'plantFeedbackCompleted';
 
@@ -146,12 +146,36 @@ const ChatPage: React.FC<ChatPageProps> = ({
     }
   };
 
+  const invasiveStatus: 'invasive' | 'native' | 'native-invasive' | null =
+    currentPlant && currentPlant.plantData ? getInvasiveStatus(currentPlant.plantData) : null;
+
+  const headerStatusClass =
+    invasiveStatus === 'invasive'
+      ? 'invasive'
+      : invasiveStatus === 'native-invasive'
+      ? 'native-invasive'
+      : 'non-invasive';
+
+  const invasiveStatusClass =
+    invasiveStatus === 'invasive'
+      ? 'invasive'
+      : invasiveStatus === 'native-invasive'
+      ? 'native-invasive'
+      : 'native';
+
+  const invasiveStatusLabel =
+    invasiveStatus === 'invasive'
+      ? 'Invasive Species'
+      : invasiveStatus === 'native-invasive'
+      ? 'Native-Invasive Species'
+      : 'Native Plant';
+
   return (
     <section className="chat-page results-section">
       <div className="container">
         {currentPlant && currentPlant.plantData ? (
           <>
-            <div className={`results-header ${currentPlant.plantData.isInvasive ? 'invasive' : 'non-invasive'}`}>
+            <div className={`results-header ${headerStatusClass}`}>
               <div className="status-icon">{currentPlant.plantData.isInvasive ? '' : ''}</div>
               <div className="status-content">
                 <h1 className="status-title">
@@ -176,11 +200,9 @@ const ChatPage: React.FC<ChatPageProps> = ({
                     <span className="location-text">Native to: {currentPlant.plantData.region}</span>
                   </div>
                 )}
-                <div className={`invasive-status ${currentPlant.plantData.isInvasive ? 'invasive' : 'native'}`}>
+                <div className={`invasive-status ${invasiveStatusClass}`}>
                   <span className="status-icon">{currentPlant.plantData.isInvasive ? '' : ''}</span>
-                  <span className="status-text">
-                    {currentPlant.plantData.isInvasive ? 'Invasive Species' : 'Native Plant'}
-                  </span>
+                  <span className="status-text">{invasiveStatusLabel}</span>
                 </div>
                 
                 {currentPlant.plantData.confidenceScore !== undefined && (

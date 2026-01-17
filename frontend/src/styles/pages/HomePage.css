@@ -333,7 +333,6 @@
   background: linear-gradient(135deg, var(--primary), var(--primary-dark));
   color: white;
   box-shadow: var(--shadow-md);
-  border-color: transparent;
 }
 
 .action-card .action-icon {

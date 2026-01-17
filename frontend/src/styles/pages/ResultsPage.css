@@ -28,6 +28,11 @@
   color: white;
 }
 
+.results-header.native-invasive {
+  background: linear-gradient(135deg, #ff9800, #ffc107);
+  color: white;
+}
+
 .status-icon {
   font-size: 3rem;
   flex-shrink: 0;
@@ -41,6 +46,35 @@
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
+}
+
+.invasive-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: 0.75rem;
+}
+
+.invasive-status.invasive {
+  background: rgba(244, 67, 54, 0.16);
+  color: var(--danger-red);
+  border: 1px solid rgba(244, 67, 54, 0.35);
+}
+
+.invasive-status.native {
+  background: rgba(76, 175, 80, 0.12);
+  color: var(--success-green);
+  border: 1px solid rgba(76, 175, 80, 0.28);
+}
+
+.invasive-status.native-invasive {
+  background: rgba(255, 152, 0, 0.14);
+  color: var(--warning-yellow);
+  border: 1px solid rgba(255, 152, 0, 0.4);
 }
 
 .status-subtitle {

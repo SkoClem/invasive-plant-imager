@@ -42,6 +42,8 @@ class ProtectedResponse(BaseModel):
 # Collection schemas
 class PlantInfo(BaseModel):
     specieIdentified: Optional[str] = None
+    commonName: Optional[str] = None
+    scientificName: Optional[str] = None
     nativeRegion: Optional[str] = None
     invasiveOrNot: bool = False
     confidenceScore: Optional[float] = None
@@ -68,6 +70,7 @@ class CollectionItem(BaseModel):
     species: Optional[str] = None
     description: Optional[str] = None
     plant_data: Optional[PlantInfo] = None
+    imageDataUrl: Optional[str] = None
 
     class Config:
         extra = 'ignore'

@@ -7,6 +7,8 @@ export interface NativeAlternative {
 export interface PlantAnalysisResponse {
   specieIdentified: string | null;
   nativeRegion: string | null;
+  commonName?: string | null;
+  scientificName?: string | null;
   invasiveOrNot: boolean;
   confidenceScore?: number;
   confidenceReasoning?: string;

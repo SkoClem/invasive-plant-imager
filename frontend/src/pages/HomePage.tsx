@@ -45,7 +45,7 @@ function HomePage({ setCurrentPage, userRole, setUserRole }: HomePageProps) {
 
           <div className="quick-actions-grid">
             <button 
-              className="action-card primary" 
+              className="action-card" 
               onClick={() => setCurrentPage('upload')}
             >
               <div className="action-icon">📸</div>

@@ -3,7 +3,7 @@ import { plantAnalysisService } from '../services/plantAnalysisService';
 
 interface UploadPageProps {
   setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'learn' | 'loading' | 'chat') => void;
-  startAnalysis: (file: File, region: string) => void;
+  startAnalysis: (file: File, region: string, imageDataUrl?: string) => void;
   selectedRegion: string;
   setSelectedRegion: (region: string) => void;
 }
@@ -190,11 +190,11 @@ function UploadPage({ setCurrentPage, startAnalysis, selectedRegion, setSelected
                         return;
                       }
                       
-                      startAnalysis(selectedFile, selectedRegion);
+                      startAnalysis(selectedFile, selectedRegion, imagePreview || undefined);
                     } catch (err) {
                       console.error("Plant check failed:", err);
                       // Fallback: proceed to analysis if check fails
-                      startAnalysis(selectedFile, selectedRegion);
+                      startAnalysis(selectedFile, selectedRegion, imagePreview || undefined);
                     }
                   }
                 }}

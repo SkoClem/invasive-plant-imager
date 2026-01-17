@@ -253,6 +253,10 @@
   border-color: var(--accent-light);
 }
 
+.collection-item.enhanced.native-invasive-border {
+  border-color: #FFA726;
+}
+
 .collection-item.enhanced:hover {
   transform: translateY(-5px);
   box-shadow: 0 12px 35px var(--shadow-medium);
@@ -292,6 +296,10 @@
 
 .bg-native {
   background: linear-gradient(135deg, #c8e6c9 0%, #a5d6a7 100%);
+}
+
+.bg-native-invasive {
+  background: linear-gradient(135deg, #ffe0b2 0%, #ffcc80 100%);
 }
 
 .bg-unknown, .bg-analyzing {
@@ -366,6 +374,12 @@
   background: rgba(76, 175, 80, 0.1);
   color: var(--success-green);
   border: 1px solid rgba(76, 175, 80, 0.2);
+}
+
+.status-badge.native-invasive {
+  background: rgba(255, 152, 0, 0.1);
+  color: var(--warning-yellow);
+  border: 1px solid rgba(255, 152, 0, 0.3);
 }
 
 .item-actions {

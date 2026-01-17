@@ -11,6 +11,8 @@ def optimized_analysis(region, date=None, season=None):
 
 {{
   "specieIdentified": "Common English name followed by scientific Latin name in parentheses, for example 'Live Oak (Quercus virginiana)'. Use null only if the species truly cannot be identified.",
+  "commonName": "Common English Name (e.g., Live Oak)",
+  "scientificName": "Scientific Latin Name (e.g., Quercus virginiana)",
   "nativeRegion": "native region/country", 
   "invasiveOrNot": boolean,
   "confidenceScore": 0-100,
@@ -31,6 +33,7 @@ Requirements for specieIdentified:
 - Always include the properly ordered scientific Latin name in parentheses: Genus first, species second (for example 'Quercus virginiana').
 - Never reverse the order of the Latin name (do not output 'Virginiana Quercus').
 - If no common name exists, repeat the scientific Latin name and still follow the pattern 'CommonOrScientific (Genus species)'.
+- The common English name you output here will be shown as the main title in the largest font to the user, so it must be the clearest, most widely used everyday name.
 
 Always include native region. Focus on {region} invasive species. Consider the season and date for identification accuracy. Keep descriptions concise and to the point. JSON only."""
 

@@ -31,6 +31,7 @@ interface CollectedImage {
   timestamp: Date;
   region: string;
   plantData?: PlantInfo;
+  imageDataUrl?: string;
 }
 
 function AppContent() {
@@ -283,10 +284,17 @@ function AppContent() {
     let plantData: PlantInfo | undefined = undefined;
     
     if (item.plant_data) {
-      const normalized = normalizeNamesFromSpecieIdentified(item.plant_data.specieIdentified);
+      let { commonName, scientificName } = item.plant_data;
+      
+      if (!commonName || !scientificName) {
+        const normalized = normalizeNamesFromSpecieIdentified(item.plant_data.specieIdentified);
+        commonName = commonName || normalized.commonName;
+        scientificName = scientificName || normalized.scientificName;
+      }
+
       plantData = {
-        scientificName: normalized.scientificName,
-        commonName: normalized.commonName,
+        scientificName: scientificName || 'Unknown',
+        commonName: commonName || 'Unknown Plant',
         isInvasive: item.plant_data.invasiveOrNot || false,
         confidenceScore: item.plant_data.confidenceScore,
         confidenceReasoning: item.plant_data.confidenceReasoning,
@@ -312,12 +320,13 @@ function AppContent() {
       description: item.description,
       timestamp: typeof item.timestamp === 'string' ? new Date(item.timestamp) : item.timestamp,
       region: item.region,
-      plantData: plantData
+      plantData: plantData,
+      imageDataUrl: item.imageDataUrl
     };
   };
 
   // Start analysis with file and region
-  const startAnalysis = (file: File, region: string) => {
+  const startAnalysis = (file: File, region: string, imageDataUrl?: string) => {
     // Add image to collection with analyzing status
     const hasBackendSession = authService.isAuthenticated();
     const newImage: CollectedImage = {
@@ -325,7 +334,8 @@ function AppContent() {
       file,
       status: 'analyzing',
       timestamp: new Date(),
-      region: region || selectedRegion
+      region: region || selectedRegion,
+      imageDataUrl
     };
   
     const updatedCollection = [...imageCollection, newImage];
@@ -393,7 +403,8 @@ function AppContent() {
               status: status,
               species: plantData?.commonName || plantData?.scientificName,
               description: plantData?.description,
-              plant_data: plantData ? convertPlantInfoToBackend(plantData) : undefined
+              plant_data: plantData ? convertPlantInfoToBackend(plantData) : undefined,
+              imageDataUrl: targetItem.imageDataUrl
           };
 
           // Call saveCollectionItem asynchronously

@@ -3,6 +3,8 @@ import { API_BASE_URL } from '../config/api';
 
 export interface PlantInfo {
   specieIdentified?: string;
+  commonName?: string;
+  scientificName?: string;
   nativeRegion?: string;
   invasiveOrNot: boolean;
   confidenceScore?: number;
@@ -24,6 +26,7 @@ export interface CollectionItem {
   species?: string;
   description?: string;
   plant_data?: PlantInfo;
+  imageDataUrl?: string;
 }
 
 export interface UserCollectionResponse {

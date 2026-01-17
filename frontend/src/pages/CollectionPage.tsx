@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { PlantInfo } from '../types/api';
 import { mapService } from '../services/mapService';
-import { formatPlantDisplayName } from '../utils/dataConversion';
+import { formatPlantDisplayName, getInvasiveStatus, InvasiveStatus } from '../utils/dataConversion';
 
 interface CollectedImage {
   id: string;
@@ -22,16 +22,33 @@ interface CollectionPageProps {
   onItemClick?: (itemId: string) => void;
 }
 
-const PlantImage = ({ file, plantName, isInvasive, status }: { file?: File, plantName: string, isInvasive?: boolean, status: string }) => {
+const PlantImage = ({
+  file,
+  plantName,
+  status,
+  invasiveStatus,
+  imageDataUrl
+}: {
+  file?: File;
+  plantName: string;
+  status: string;
+  invasiveStatus?: InvasiveStatus;
+  imageDataUrl?: string;
+}) => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
+    if (imageDataUrl) {
+      setImageUrl(imageDataUrl);
+      return;
+    }
+
     if (file) {
       const url = URL.createObjectURL(file);
       setImageUrl(url);
       return () => URL.revokeObjectURL(url);
     }
-  }, [file]);
+  }, [file, imageDataUrl]);
 
   if (imageUrl) {
     return (
@@ -52,10 +69,13 @@ const PlantImage = ({ file, plantName, isInvasive, status }: { file?: File, plan
   } else if (status === 'error') {
     bgClass = 'bg-error';
     icon = '⚠️';
-  } else if (isInvasive) {
+  } else if (invasiveStatus === 'invasive') {
     bgClass = 'bg-invasive';
     icon = '⚠️';
-  } else if (isInvasive === false) {
+  } else if (invasiveStatus === 'native-invasive') {
+    bgClass = 'bg-native-invasive';
+    icon = '⚠️';
+  } else if (invasiveStatus === 'native') {
     bgClass = 'bg-native';
     icon = '🌿';
   }
@@ -264,7 +284,18 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
             <div className={`collection-grid enhanced ${viewMode === 'desktop' ? 'desktop-view' : ''}`}>
               {imageCollection.map((image) => {
                 const isDeleting = deletingItems.has(image.id);
-                const borderClass = image.plantData?.isInvasive ? 'invasive-border' : (image.plantData?.isInvasive === false ? 'native-border' : '');
+                const invasiveStatus: InvasiveStatus | undefined = image.plantData
+                  ? getInvasiveStatus(image.plantData)
+                  : undefined;
+
+                const borderClass =
+                  invasiveStatus === 'invasive'
+                    ? 'invasive-border'
+                    : invasiveStatus === 'native-invasive'
+                    ? 'native-invasive-border'
+                    : invasiveStatus === 'native'
+                    ? 'native-border'
+                    : '';
                 
                 let plantName = 'Unknown Plant';
                 if (image.plantData) {
@@ -288,9 +319,10 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
                   >
                     <PlantImage 
                       file={image.file} 
-                      plantName={plantName} 
-                      isInvasive={image.plantData?.isInvasive}
+                      plantName={plantName}
                       status={image.status}
+                      invasiveStatus={invasiveStatus}
+                      imageDataUrl={(image as any).imageDataUrl}
                     />
 
                     <div className="item-header">
@@ -298,8 +330,10 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
                         <div className="status-badge analyzing">Analyzing</div>
                       ) : image.status === 'error' ? (
                         <div className="status-badge error">Error</div>
-                      ) : image.plantData?.isInvasive ? (
+                      ) : invasiveStatus === 'invasive' ? (
                         <div className="status-badge invasive">Invasive</div>
+                      ) : invasiveStatus === 'native-invasive' ? (
+                        <div className="status-badge native-invasive">Native-Invasive</div>
                       ) : (
                         <div className="status-badge native">Native</div>
                       )}
