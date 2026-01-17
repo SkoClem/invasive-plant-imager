@@ -17,7 +17,7 @@ import { collectionService, CollectionItem, PlantInfo as BackendPlantInfo } from
 import { authService } from './services/authService';
 import { Message } from './components/PlantChat';
 import CoinAnimation from './components/CoinAnimation';
-import { formatPlantDisplayName, normalizeNamesFromSpecieIdentified } from './utils/dataConversion';
+import { normalizeNamesFromSpecieIdentified } from './utils/dataConversion';
 
 type PageType = 'home' | 'upload' | 'collection' | 'about' | 'learn' | 'loading' | 'chat' | 'map' | 'settings';
 type DirectionType = 'forward' | 'backward';
