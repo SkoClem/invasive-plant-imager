@@ -1,6 +1,62 @@
 import { PlantAnalysisResponse } from '../types/plantAnalysis';
 import { PlantInfo } from '../types/api';
 
+const SCIENTIFIC_NAME_PATTERN = /^[A-Z][a-z]+ [a-z]+/;
+
+function isLikelyScientificName(name: string): boolean {
+  return SCIENTIFIC_NAME_PATTERN.test(name.trim());
+}
+
+const SCIENTIFIC_TO_COMMON_MAP: Record<string, string> = {
+  'Juniperus ashei': 'Ashe Juniper'
+};
+
+function buildFriendlyNameFromScientific(scientificName: string): string {
+  const trimmed = scientificName.trim();
+  const parts = trimmed.split(/\s+/);
+  if (parts.length < 2) {
+    return trimmed || 'Unknown Plant';
+  }
+
+  const genus = parts[0];
+  const epithet = parts[1];
+  const key = `${genus} ${epithet}`;
+
+  if (SCIENTIFIC_TO_COMMON_MAP[key]) {
+    return SCIENTIFIC_TO_COMMON_MAP[key];
+  }
+
+  let genusDisplay = genus;
+  if (genus === 'Juniperus') {
+    genusDisplay = 'Juniper';
+  }
+
+  let epithetBase = epithet.toLowerCase();
+  const stripped = epithetBase.replace(/ii$|i$/, '');
+  if (stripped.length > 0) {
+    epithetBase = stripped;
+  }
+
+  const epithetDisplay = epithetBase.charAt(0).toUpperCase() + epithetBase.slice(1);
+
+  return `${epithetDisplay} ${genusDisplay}`;
+}
+
+export function formatPlantDisplayName(scientificName?: string, commonName?: string): string {
+  const trimmedCommon = commonName?.trim();
+  const trimmedScientific = scientificName?.trim();
+
+  if (trimmedCommon && (!trimmedScientific || trimmedCommon !== trimmedScientific)) {
+    return trimmedCommon;
+  }
+
+  if (trimmedScientific && isLikelyScientificName(trimmedScientific)) {
+    return buildFriendlyNameFromScientific(trimmedScientific);
+  }
+
+  return trimmedCommon || trimmedScientific || 'Unknown Plant';
+}
+
 export function convertToPlantInfo(response: PlantAnalysisResponse): PlantInfo {
   // Handle non-plant case explicitly to avoid parsing issues
   if (response.specieIdentified === "Not a Plant") {
@@ -46,9 +102,11 @@ export function convertToPlantInfo(response: PlantAnalysisResponse): PlantInfo {
     }
   }
 
+  const displayCommonName = formatPlantDisplayName(scientificName, commonName);
+
   return {
     scientificName,
-    commonName,
+    commonName: displayCommonName,
     isInvasive: response.invasiveOrNot,
     confidenceScore: response.confidenceScore,
     confidenceReasoning: response.confidenceReasoning,

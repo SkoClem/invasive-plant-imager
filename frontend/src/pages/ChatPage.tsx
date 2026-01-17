@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PlantChat, { Message } from '../components/PlantChat';
 import { PlantInfo } from '../types/api';
 import { API_BASE_URL } from '../config/api';
+import { formatPlantDisplayName } from '../utils/dataConversion';
 
 const FEEDBACK_STORAGE_KEY = 'plantFeedbackCompleted';
 
@@ -153,7 +154,12 @@ const ChatPage: React.FC<ChatPageProps> = ({
             <div className={`results-header ${currentPlant.plantData.isInvasive ? 'invasive' : 'non-invasive'}`}>
               <div className="status-icon">{currentPlant.plantData.isInvasive ? '' : ''}</div>
               <div className="status-content">
-                <h1 className="status-title">{currentPlant.plantData.commonName || currentPlant.plantData.scientificName || 'Analysis Result'}</h1>
+                <h1 className="status-title">
+                  {formatPlantDisplayName(
+                    currentPlant.plantData.scientificName,
+                    currentPlant.plantData.commonName
+                  ) || 'Analysis Result'}
+                </h1>
               </div>
             </div>
 

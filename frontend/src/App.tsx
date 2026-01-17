@@ -17,6 +17,7 @@ import { collectionService, CollectionItem, PlantInfo as BackendPlantInfo } from
 import { authService } from './services/authService';
 import { Message } from './components/PlantChat';
 import CoinAnimation from './components/CoinAnimation';
+import { formatPlantDisplayName } from './utils/dataConversion';
 
 type PageType = 'home' | 'upload' | 'collection' | 'about' | 'learn' | 'loading' | 'chat' | 'map' | 'settings';
 type DirectionType = 'forward' | 'backward';
@@ -282,9 +283,10 @@ function AppContent() {
     let plantData: PlantInfo | undefined = undefined;
     
     if (item.plant_data) {
+      const rawName: string = item.plant_data.specieIdentified || '';
       plantData = {
-        scientificName: item.plant_data.specieIdentified || '',
-        commonName: item.plant_data.specieIdentified || '', // Use same name if only one available
+        scientificName: rawName,
+        commonName: formatPlantDisplayName(rawName, rawName),
         isInvasive: item.plant_data.invasiveOrNot || false,
         confidenceScore: item.plant_data.confidenceScore,
         confidenceReasoning: item.plant_data.confidenceReasoning,

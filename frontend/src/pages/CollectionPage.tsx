@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { PlantInfo } from '../types/api';
 import { mapService } from '../services/mapService';
+import { formatPlantDisplayName } from '../utils/dataConversion';
 
 interface CollectedImage {
   id: string;
@@ -265,12 +266,19 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
                 const isDeleting = deletingItems.has(image.id);
                 const borderClass = image.plantData?.isInvasive ? 'invasive-border' : (image.plantData?.isInvasive === false ? 'native-border' : '');
                 
-                let plantName = 'Unknown';
-                if (image.plantData?.commonName) plantName = image.plantData.commonName;
-                else if (image.species) plantName = image.species;
-                else if (image.status === 'analyzing') plantName = 'Analyzing...';
+                let plantName = 'Unknown Plant';
+                if (image.plantData) {
+                  plantName = formatPlantDisplayName(
+                    image.plantData.scientificName,
+                    image.plantData.commonName
+                  );
+                } else if (image.species) {
+                  plantName = formatPlantDisplayName(undefined, image.species);
+                } else if (image.status === 'analyzing') {
+                  plantName = 'Analyzing...';
+                }
 
-                const commonName = image.plantData?.commonName || image.species || image.plantData?.scientificName;
+                const displayName = plantName;
                 const scientificName = image.plantData?.scientificName;
                 
                 return (
@@ -347,9 +355,9 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
                       {image.status === 'completed' && image.plantData ? (
                         <>
                           <h3 className="plant-name" style={{ fontSize: '1.1rem', marginBottom: '4px' }}>
-                            {commonName || 'Unknown Plant'}
+                            {displayName || 'Unknown Plant'}
                           </h3>
-                          {scientificName && scientificName !== commonName && (
+                          {scientificName && scientificName !== displayName && (
                             <p className="scientific-name">
                               {scientificName}
                             </p>
@@ -363,7 +371,9 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
                         </>
                       ) : image.status === 'completed' && image.species ? (
                         <>
-                          <h3 className="plant-name" style={{ fontSize: '1.1rem' }}>{image.species}</h3>
+                          <h3 className="plant-name" style={{ fontSize: '1.1rem' }}>
+                            {displayName || image.species}
+                          </h3>
                           {image.description && (
                             <p className="plant-description" style={{ fontSize: '0.9rem' }}>{image.description}</p>
                           )}
