@@ -404,6 +404,14 @@
   background: rgba(33, 150, 243, 0.1);
 }
 
+.action-button.chat-button {
+  color: var(--accent-bright);
+}
+
+.action-button.chat-button:hover {
+  background: rgba(76, 175, 80, 0.1);
+}
+
 /* Image Details */
 .image-details.enhanced {
   padding: 0.5rem 1rem 1.5rem 1rem;

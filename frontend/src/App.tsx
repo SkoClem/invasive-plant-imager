@@ -9,7 +9,6 @@ import AboutPage from './pages/AboutPage';
 import LearnPage from './pages/LearnPage';
 import LoadingPage from './pages/LoadingPage';
 import ChatPage from './pages/ChatPage';
-import MapPage from './pages/MapPage';
 import SettingsPage from './pages/SettingsPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -513,8 +512,6 @@ function AppContent() {
                 pendingAnalysis={pendingAnalysis}
                 updateImageInCollection={updateImageInCollection}
               />;
-            case 'map':
-              return <MapPage />;
             case 'settings':
               return <SettingsPage 
                 userRole={userRole} 
@@ -620,17 +617,6 @@ function AppContent() {
           <span className="tab-label">Chat</span>
         </button>
         <button
-          className={`tab-item ${currentPage === 'map' ? 'active' : ''}`}
-          onClick={() => navigateToPage('map')}
-        >
-          <div className="tab-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-              <path d="M20.5 3l-6 2.25L8.5 3 3.5 4.75v14.5l6 2.25 6-2.25 5 1.75V3zM14 18l-6 2.25V5.5L14 3.25V18z"/>
-            </svg>
-          </div>
-          <span className="tab-label">Map</span>
-        </button>
-          <button
           className={`tab-item ${currentPage === 'learn' ? 'active' : ''}`}
           onClick={() => navigateToPage('learn')}
         >

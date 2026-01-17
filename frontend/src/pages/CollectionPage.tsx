@@ -149,7 +149,6 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
               scan_id: image.id
             });
             alert('Successfully added to map!');
-            setCurrentPage('map');
           } catch (error: any) {
             console.error('Error adding to map:', error);
             // Show the error message from backend if available
@@ -278,7 +277,6 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
                   <div 
                     key={image.id} 
                     className={`collection-item enhanced ${isDeleting ? 'shrinking' : ''} ${borderClass}`}
-                    onClick={() => onItemClick && onItemClick(image.id)}
                   >
                     <PlantImage 
                       file={image.file} 
@@ -300,21 +298,38 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
                       
                       <div className="header-actions">
                         {image.status === 'completed' && (
-                          <button
-                            className="action-button map-button"
-                            aria-label="Add to Map"
-                            title="Add to Map"
-                            onClick={(e) => handleAddToMap(e, image)}
-                            disabled={addingToMap === image.id}
-                          >
-                            {addingToMap === image.id ? (
-                              <div className="spinner-small"></div>
-                            ) : (
-                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                          <>
+                            <button
+                              className="action-button chat-button"
+                              aria-label="Chat about this plant"
+                              title="Chat about this plant"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (onItemClick) {
+                                  onItemClick(image.id);
+                                }
+                              }}
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M4 4h16v10H5.17L4 15.17V4zm0-2c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2H4z"/>
                               </svg>
-                            )}
-                          </button>
+                            </button>
+                            <button
+                              className="action-button map-button"
+                              aria-label="Add to Map"
+                              title="Add to Map"
+                              onClick={(e) => handleAddToMap(e, image)}
+                              disabled={addingToMap === image.id}
+                            >
+                              {addingToMap === image.id ? (
+                                <div className="spinner-small"></div>
+                              ) : (
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                                </svg>
+                              )}
+                            </button>
+                          </>
                         )}
                         <button 
                           className="action-button delete-button"
@@ -388,33 +403,61 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
                       
                       <div className="action-buttons" style={{ marginTop: '12px', display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                         {image.status === 'completed' && image.plantData && (
-                          <button 
-                            className="action-button map-button"
-                            onClick={(e) => handleAddToMap(e, image)}
-                            disabled={addingToMap === image.id}
-                            title="Add to Community Map"
-                            style={{
-                              background: 'transparent',
-                              border: 'none',
-                              cursor: 'pointer',
-                              padding: '8px',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              color: '#2196f3',
-                              borderRadius: '50%',
-                              transition: 'background-color 0.2s'
-                            }}
-                          >
-                            {addingToMap === image.id ? (
-                              <div className="spinner-small"></div>
-                            ) : (
+                          <>
+                            <button 
+                              className="action-button chat-button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (onItemClick) {
+                                  onItemClick(image.id);
+                                }
+                              }}
+                              title="Chat about this plant"
+                              style={{
+                                background: 'transparent',
+                                border: 'none',
+                                cursor: 'pointer',
+                                padding: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: 'var(--accent-bright)',
+                                borderRadius: '50%',
+                                transition: 'background-color 0.2s'
+                              }}
+                            >
                               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                                <circle cx="12" cy="10" r="3"></circle>
+                                <path d="M21 11.5a8.38 8.38 0 0 1-1.9 5.4 8.5 8.5 0 0 1-6.6 3.1 8.38 8.38 0 0 1-5.4-1.9L3 21l1.9-4.1a8.38 8.38 0 0 1-1.9-5.4 8.5 8.5 0 0 1 3.1-6.6A8.38 8.38 0 0 1 11.5 3h.5a8.5 8.5 0 0 1 8 8v.5z"></path>
                               </svg>
-                            )}
-                          </button>
+                            </button>
+                            <button 
+                              className="action-button map-button"
+                              onClick={(e) => handleAddToMap(e, image)}
+                              disabled={addingToMap === image.id}
+                              title="Add to Community Map"
+                              style={{
+                                background: 'transparent',
+                                border: 'none',
+                                cursor: 'pointer',
+                                padding: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: '#2196f3',
+                                borderRadius: '50%',
+                                transition: 'background-color 0.2s'
+                              }}
+                            >
+                              {addingToMap === image.id ? (
+                                <div className="spinner-small"></div>
+                              ) : (
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                  <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                              )}
+                            </button>
+                          </>
                         )}
                         <button 
                           className="action-button delete-button"
