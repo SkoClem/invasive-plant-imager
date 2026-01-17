@@ -11,6 +11,39 @@ const SCIENTIFIC_TO_COMMON_MAP: Record<string, string> = {
   'Juniperus ashei': 'Ashe Juniper'
 };
 
+const NAME_OVERRIDE_RULES: {
+  match: RegExp;
+  commonName: string;
+  scientificName: string;
+}[] = [
+  {
+    match: /quercus\s+virginiana|virginiana\s+quercus|live\s+oak/i,
+    commonName: 'Live Oak',
+    scientificName: 'Quercus virginiana'
+  }
+];
+
+function applyNameOverrides(
+  raw: string | null | undefined,
+  commonName: string,
+  scientificName: string
+): { commonName: string; scientificName: string } {
+  if (!raw) {
+    return { commonName, scientificName };
+  }
+
+  for (const rule of NAME_OVERRIDE_RULES) {
+    if (rule.match.test(raw)) {
+      return {
+        commonName: rule.commonName,
+        scientificName: rule.scientificName
+      };
+    }
+  }
+
+  return { commonName, scientificName };
+}
+
 function buildFriendlyNameFromScientific(scientificName: string): string {
   const trimmed = scientificName.trim();
   const parts = trimmed.split(/\s+/);
@@ -57,8 +90,44 @@ export function formatPlantDisplayName(scientificName?: string, commonName?: str
   return trimmedCommon || trimmedScientific || 'Unknown Plant';
 }
 
+export function normalizeNamesFromSpecieIdentified(
+  specieIdentified: string | null | undefined
+): { scientificName: string; commonName: string } {
+  if (!specieIdentified) {
+    return { scientificName: 'Unknown', commonName: 'Unknown Plant' };
+  }
+
+  const parts = specieIdentified.split(' (');
+  const firstPart = parts[0].trim();
+  const secondPart = parts.length > 1 ? parts[1].replace(')', '').trim() : '';
+
+  let commonName = 'Unknown Plant';
+  let scientificName = 'Unknown';
+
+  const firstIsScientific = isLikelyScientificName(firstPart);
+  const secondIsScientific = secondPart ? isLikelyScientificName(secondPart) : false;
+
+  if (firstIsScientific && secondPart) {
+    scientificName = firstPart;
+    commonName = secondPart;
+  } else if (secondIsScientific && !firstIsScientific) {
+    commonName = firstPart;
+    scientificName = secondPart;
+  } else {
+    commonName = firstPart;
+    scientificName = secondPart || firstPart.split(' ').slice(-2).join(' ');
+  }
+
+  const overridden = applyNameOverrides(specieIdentified, commonName, scientificName);
+  commonName = overridden.commonName;
+  scientificName = overridden.scientificName;
+
+  const displayCommon = formatPlantDisplayName(scientificName, commonName);
+
+  return { scientificName, commonName: displayCommon };
+}
+
 export function convertToPlantInfo(response: PlantAnalysisResponse): PlantInfo {
-  // Handle non-plant case explicitly to avoid parsing issues
   if (response.specieIdentified === "Not a Plant") {
     return {
       scientificName: "Non-Plant Object",
@@ -77,36 +146,16 @@ export function convertToPlantInfo(response: PlantAnalysisResponse): PlantInfo {
 
   let commonName = 'Unknown Plant';
   let scientificName = 'Unknown';
-  
+
   if (response.specieIdentified) {
-    const parts = response.specieIdentified.split(' (');
-    const firstPart = parts[0].trim();
-    const secondPart = parts.length > 1 ? parts[1].replace(')', '').trim() : '';
-
-    // Heuristic: Scientific names are typically 2+ words, first capitalized, second lowercase (e.g., "Taraxacum officinale")
-    // We check if the first part looks like a scientific name
-    const isFirstPartScientific = /^[A-Z][a-z]+ [a-z]+/.test(firstPart);
-
-    if (isFirstPartScientific && secondPart) {
-      // Format: Scientific (Common) -> Swap
-      scientificName = firstPart;
-      commonName = secondPart;
-    } else if (secondPart && /^[A-Z][a-z]+ [a-z]+/.test(secondPart)) {
-      // Format: Common (Scientific) -> Keep as is
-      commonName = firstPart;
-      scientificName = secondPart;
-    } else {
-      // Ambiguous or single name
-      commonName = firstPart;
-      scientificName = secondPart || (firstPart.split(' ').slice(-2).join(' '));
-    }
+    const normalized = normalizeNamesFromSpecieIdentified(response.specieIdentified);
+    scientificName = normalized.scientificName;
+    commonName = normalized.commonName;
   }
-
-  const displayCommonName = formatPlantDisplayName(scientificName, commonName);
 
   return {
     scientificName,
-    commonName: displayCommonName,
+    commonName,
     isInvasive: response.invasiveOrNot,
     confidenceScore: response.confidenceScore,
     confidenceReasoning: response.confidenceReasoning,

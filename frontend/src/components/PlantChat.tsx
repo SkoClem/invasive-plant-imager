@@ -3,6 +3,7 @@ import { PlantInfo } from '../types/api';
 import '../styles/components/PlantChat.css';
 import { useAuth } from '../contexts/AuthContext';
 import { API_BASE_URL } from '../config/api';
+import { formatPlantDisplayName } from '../utils/dataConversion';
 
 export interface Message {
   id: string;
@@ -36,10 +37,15 @@ const PlantChat: React.FC<PlantChatProps> = ({ plantData, messages, onNewMessage
   useEffect(() => {
     if (messages.length === 0 && !initializedRef.current) {
       initializedRef.current = true;
+      const displayName = formatPlantDisplayName(
+        plantData.scientificName,
+        plantData.commonName
+      );
+
       onNewMessage({
         id: 'welcome',
         sender: 'bot',
-        text: `Hello! I'm your plant expert. I can tell you more about ${plantData.commonName || plantData.scientificName}. What would you like to know?`
+        text: `Hello! I'm your plant expert. I can tell you more about ${displayName}. What would you like to know?`
       });
     }
   }, [messages.length, plantData.commonName, plantData.scientificName, onNewMessage]);
@@ -67,7 +73,7 @@ const PlantChat: React.FC<PlantChatProps> = ({ plantData, messages, onNewMessage
     try {
       // Prepare context
       const context = {
-        species: plantData.commonName || plantData.scientificName,
+        species: formatPlantDisplayName(plantData.scientificName, plantData.commonName),
         region: plantData.region,
         invasiveOrNot: plantData.isInvasive,
         description: plantData.description,
