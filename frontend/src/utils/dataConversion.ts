@@ -19,9 +19,36 @@ export function convertToPlantInfo(response: PlantAnalysisResponse): PlantInfo {
     };
   }
 
+  let commonName = 'Unknown Plant';
+  let scientificName = 'Unknown';
+  
+  if (response.specieIdentified) {
+    const parts = response.specieIdentified.split(' (');
+    const firstPart = parts[0].trim();
+    const secondPart = parts.length > 1 ? parts[1].replace(')', '').trim() : '';
+
+    // Heuristic: Scientific names are typically 2+ words, first capitalized, second lowercase (e.g., "Taraxacum officinale")
+    // We check if the first part looks like a scientific name
+    const isFirstPartScientific = /^[A-Z][a-z]+ [a-z]+/.test(firstPart);
+
+    if (isFirstPartScientific && secondPart) {
+      // Format: Scientific (Common) -> Swap
+      scientificName = firstPart;
+      commonName = secondPart;
+    } else if (secondPart && /^[A-Z][a-z]+ [a-z]+/.test(secondPart)) {
+      // Format: Common (Scientific) -> Keep as is
+      commonName = firstPart;
+      scientificName = secondPart;
+    } else {
+      // Ambiguous or single name
+      commonName = firstPart;
+      scientificName = secondPart || (firstPart.split(' ').slice(-2).join(' '));
+    }
+  }
+
   return {
-    scientificName: response.specieIdentified?.split(' ').slice(-2).join(' ') || 'Unknown',
-    commonName: response.specieIdentified?.split(' (')[0] || 'Unknown Plant',
+    scientificName,
+    commonName,
     isInvasive: response.invasiveOrNot,
     confidenceScore: response.confidenceScore,
     confidenceReasoning: response.confidenceReasoning,

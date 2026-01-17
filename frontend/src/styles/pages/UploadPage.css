@@ -98,6 +98,22 @@
   position: relative;
 }
 
+/* Centering for Laptop/Desktop */
+@media (min-width: 768px) {
+  .upload-guidelines,
+  .region-section {
+    max-width: 800px;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  
+  .upload-page-header {
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
 .upload-box:hover {
   border-color: var(--accent-bright);
   background: var(--shadow-subtle);
