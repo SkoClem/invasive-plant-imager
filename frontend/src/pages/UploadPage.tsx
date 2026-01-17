@@ -247,14 +247,13 @@ function UploadPage({ setCurrentPage, startAnalysis, selectedRegion, setSelected
           </div>
         )}
 
-
         <div className="upload-guidelines">
           <h3>For best results:</h3>
           <ul>
-            <li>Move close so the plant fills most of the frame</li>
-            <li>Avoid busy backgrounds and strong shadows on the plant</li>
-            <li>Include leaves, flowers, or fruits if possible</li>
-            <li>If your camera allows, increase color saturation for better contrast</li>
+            <li>MOVE CLOSE</li>
+            <li>CLEAR PICTURE</li>
+            <li>INCLUDE FOLIAGE</li>
+            <li>INCREASE SATURATION</li>
           </ul>
         </div>
       </div>
@@ -296,8 +295,8 @@ const styles = `
   .change-image-button:hover { background: rgba(0, 0, 0, 0.9); }
   .upload-container { margin-bottom: 20px; }
   .file-info { font-size: 14px; color: #666; display: inline-block; }
-  .upload-guidelines { background-color: var(--container-bg); border-radius: var(--radius-card); padding: 1.5rem; margin-top: 1rem; border: 1px solid var(--border-subtle); }
-  .upload-guidelines h3 { color: var(--accent-bright); margin-bottom: 1rem; font-size: 1.1rem; }
+  .upload-guidelines { background-color: var(--container-bg); border-radius: var(--radius-card); padding: 1.5rem; margin-top: 1rem; border: 1px solid var(--border-subtle); box-shadow: 0 0 18px rgba(255, 152, 0, 0.25); }
+  .upload-guidelines h3 { color: var(--accent-bright); margin-bottom: 1rem; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.08em; }
   .region-section { margin-top: 2rem; margin-bottom: 1rem; }
   .region-display-container { margin-bottom: 0; }
   .region-display { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem; background: var(--container-bg); border: 1px solid var(--border-subtle); border-radius: var(--radius-card); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); }
@@ -309,9 +308,9 @@ const styles = `
   .region-select { font-size: 1rem; font-weight: 600; color: var(--text-primary); padding: 0.75rem 1rem; border: 1px solid var(--border-subtle); border-radius: 12px; background-color: var(--container-bg); width: 100%; cursor: pointer; outline: none; transition: all 0.2s; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; }
   .region-select:focus { border-color: var(--accent-bright); box-shadow: 0 0 0 3px var(--border-subtle); }
   .region-subtitle { font-size: 0.85rem; color: var(--secondary-text); margin-top: 0.25rem; }
-  .upload-guidelines ul { list-style-position: inside; color: var(--secondary-text); padding-left: 0; margin: 0; }
-  .upload-guidelines li { margin-bottom: 0.75rem; line-height: 1.5; font-size: 0.95rem; }
-  @media (max-width: 480px) { .input-mode-toggle { gap: 0.75rem; padding: 0.75rem; } .mode-arrow { width: 40px; height: 40px; } .mode-display { padding: 1rem 1.5rem; min-width: 160px; } .mode-icon { font-size: 1.25rem; } .mode-text { font-size: 0.9rem; } .upload-section { padding-top: 60px; min-height: auto; padding-bottom: 120px; } .container { padding: 0 1rem; max-width: 100%; } .upload-guidelines { margin-top: 1.5rem; padding: 1.25rem; } .upload-guidelines h3 { font-size: 1rem; } .upload-guidelines li { font-size: 0.9rem; margin-bottom: 0.6rem; } .upload-button { margin-top: 1.5rem; min-width: auto; width: 100%; padding: 1rem; } .upload-section { margin-bottom: 2rem; } }
+  .upload-guidelines ul { list-style: none; color: var(--secondary-text); padding-left: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; }
+  .upload-guidelines li { margin: 0; line-height: 1; font-size: 0.9rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.5rem 0.9rem; border-radius: 999px; background: linear-gradient(135deg, #ffeb3b, #ff9800); color: #222; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18); }
+  @media (max-width: 480px) { .input-mode-toggle { gap: 0.75rem; padding: 0.75rem; } .mode-arrow { width: 40px; height: 40px; } .mode-display { padding: 1rem 1.5rem; min-width: 160px; } .mode-icon { font-size: 1.25rem; } .mode-text { font-size: 0.9rem; } .upload-section { padding-top: 60px; min-height: auto; padding-bottom: 120px; } .container { padding: 0 1rem; max-width: 100%; } .upload-guidelines { margin-top: 1.5rem; padding: 1.25rem; } .upload-guidelines h3 { font-size: 1rem; } .upload-guidelines li { font-size: 0.85rem; } .upload-button { margin-top: 1.5rem; min-width: auto; width: 100%; padding: 1rem; } .upload-section { margin-bottom: 2rem; } }
   @media (hover: none) and (pointer: coarse) { .mode-arrow { width: 52px; height: 52px; } .mode-display { padding: 1.5rem 2rem; min-height: 80px; } .region-display { padding: 1rem; gap: 0.75rem; } .region-select { font-size: 1rem; padding: 0.75rem; } .region-subtitle { font-size: 0.8rem; } }
 `;
 

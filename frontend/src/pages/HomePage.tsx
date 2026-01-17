@@ -2,7 +2,7 @@ import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface HomePageProps {
-  setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'learn' | 'loading' | 'chat') => void;
+  setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'learn' | 'loading' | 'chat' | 'settings') => void;
   userRole: string;
   setUserRole: (role: string) => void;
 }
@@ -27,20 +27,20 @@ function HomePage({ setCurrentPage, userRole, setUserRole }: HomePageProps) {
             marginBottom: '3rem',
             textAlign: 'center'
           }}>
-            <h3>Customize Your Experience</h3>
-            <p style={{ marginBottom: '1.5rem', color: 'var(--text-secondary)' }}>Select your role to get tailored identification insights:</p>
-            <div className="role-buttons" style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-              {['Student', 'Homeowner', 'Land Manager'].map((role) => (
-                <button
-                  key={role}
-                  className={`button ${userRole === role ? 'primary-button' : 'secondary-button'}`}
-                  onClick={() => setUserRole(role)}
-                  style={{ minWidth: '120px' }}
-                >
-                  {role}
-                </button>
-              ))}
-            </div>
+            <h3>Your Current Experience</h3>
+            <p style={{ marginBottom: '1.5rem', color: 'var(--text-secondary)' }}>
+              Your insights are tailored to your selected role.
+            </p>
+            <p style={{ marginBottom: '1.5rem', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+              To change your role, visit the Settings page.
+            </p>
+            <button
+              className="button secondary-button"
+              onClick={() => setCurrentPage('settings')}
+              style={{ minWidth: '160px' }}
+            >
+              Go to Settings
+            </button>
           </div>
 
           <div className="quick-actions-grid">

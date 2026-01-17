@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PlantChat, { Message } from '../components/PlantChat';
 import { PlantInfo } from '../types/api';
 import { API_BASE_URL } from '../config/api';
+
+const FEEDBACK_STORAGE_KEY = 'plantFeedbackCompleted';
 
 interface ChatPageProps {
   currentPlant: {
@@ -30,13 +32,48 @@ const ChatPage: React.FC<ChatPageProps> = ({
   const [feedbackType, setFeedbackType] = useState<'wrong-plant' | 'wrong-invasive' | 'wrong-native-region' | ''>('');
   const [feedbackText, setFeedbackText] = useState('');
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
-  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   const [feedbackError, setFeedbackError] = useState<string | null>(null);
+  const [feedbackCompleted, setFeedbackCompleted] = useState(false);
+
+  useEffect(() => {
+    if (!currentPlant || !currentPlant.id) {
+      setFeedbackCompleted(false);
+      setFeedbackChoice(null);
+      setShowFeedbackModal(false);
+      setFeedbackError(null);
+      setFeedbackType('');
+      setFeedbackText('');
+      return;
+    }
+    try {
+      const stored = localStorage.getItem(FEEDBACK_STORAGE_KEY);
+      const parsed: Record<string, boolean> = stored ? JSON.parse(stored) : {};
+      const completed = !!parsed[currentPlant.id];
+      setFeedbackCompleted(completed);
+      setFeedbackChoice(null);
+      setShowFeedbackModal(false);
+      setFeedbackError(null);
+      setFeedbackType('');
+      setFeedbackText('');
+    } catch {
+      setFeedbackCompleted(false);
+    }
+  }, [currentPlant?.id]);
+
+  const markFeedbackCompleted = (plantId: string) => {
+    try {
+      const stored = localStorage.getItem(FEEDBACK_STORAGE_KEY);
+      const parsed: Record<string, boolean> = stored ? JSON.parse(stored) : {};
+      parsed[plantId] = true;
+      localStorage.setItem(FEEDBACK_STORAGE_KEY, JSON.stringify(parsed));
+    } catch {
+    }
+  };
 
   const handleThumbUp = async () => {
     if (!currentPlant || !currentPlant.plantData) return;
+    if (feedbackCompleted) return;
     setFeedbackChoice('up');
-    setFeedbackSubmitted(true);
     setFeedbackError(null);
     try {
       await fetch(`${API_BASE_URL}/api/feedback`, {
@@ -56,15 +93,17 @@ const ChatPage: React.FC<ChatPageProps> = ({
           }
         })
       });
+      markFeedbackCompleted(currentPlant.id);
+      setFeedbackCompleted(true);
     } catch (e) {
     }
   };
 
   const handleThumbDownClick = () => {
     if (!currentPlant || !currentPlant.plantData) return;
+    if (feedbackCompleted) return;
     setFeedbackChoice('down');
     setShowFeedbackModal(true);
-    setFeedbackSubmitted(false);
     setFeedbackError(null);
     setFeedbackType('');
     setFeedbackText('');
@@ -96,8 +135,9 @@ const ChatPage: React.FC<ChatPageProps> = ({
           }
         })
       });
-      setFeedbackSubmitted(true);
       setShowFeedbackModal(false);
+      markFeedbackCompleted(currentPlant.id);
+      setFeedbackCompleted(true);
     } catch (e) {
       setFeedbackError('Could not submit feedback. Please try again.');
     } finally {
@@ -117,9 +157,11 @@ const ChatPage: React.FC<ChatPageProps> = ({
               </div>
             </div>
 
-              <div className="results-content">
+          <div className="results-content">
               <div className="results-details">
-                {currentPlant.plantData.scientificName && (
+                {currentPlant.plantData.scientificName &&
+                  currentPlant.plantData.scientificName !==
+                    (currentPlant.plantData.commonName || currentPlant.plantData.scientificName) && (
                   <p className="scientific-name">{currentPlant.plantData.scientificName}</p>
                 )}
                 {currentPlant.plantData.region && (
@@ -207,26 +249,28 @@ const ChatPage: React.FC<ChatPageProps> = ({
                     </ul>
                   </div>
                 )}
-                <div className="feedback-section">
-                  <div className="feedback-prompt">Was this identification accurate?</div>
-                  <div className="feedback-buttons">
-                    <button
-                      className={`thumb-button up ${feedbackChoice === 'up' ? 'active' : ''}`}
-                      onClick={handleThumbUp}
-                      type="button"
-                    >
-                      <span className="thumb-icon">👍</span>
-                    </button>
-                    <button
-                      className={`thumb-button down ${feedbackChoice === 'down' ? 'active' : ''}`}
-                      onClick={handleThumbDownClick}
-                      type="button"
-                    >
-                      <span className="thumb-icon">👎</span>
-                    </button>
+                {!feedbackCompleted && (
+                  <div className="feedback-section">
+                    <div className="feedback-prompt">Was this identification accurate?</div>
+                    <div className="feedback-buttons">
+                      <button
+                        className={`thumb-button up ${feedbackChoice === 'up' ? 'active' : ''}`}
+                        onClick={handleThumbUp}
+                        type="button"
+                      >
+                        <span className="thumb-icon">✓</span>
+                      </button>
+                      <button
+                        className={`thumb-button down ${feedbackChoice === 'down' ? 'active' : ''}`}
+                        onClick={handleThumbDownClick}
+                        type="button"
+                      >
+                        <span className="thumb-icon">✕</span>
+                      </button>
+                    </div>
                   </div>
-                </div>
-                {feedbackSubmitted && !showFeedbackModal && (
+                )}
+                {feedbackCompleted && !showFeedbackModal && (
                   <div className="feedback-status">Thanks for your feedback.</div>
                 )}
                 {showFeedbackModal && (
