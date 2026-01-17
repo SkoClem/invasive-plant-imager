@@ -117,7 +117,6 @@ function AppContent() {
     if (savedCollection) {
       try {
         const parsedCollection = JSON.parse(savedCollection);
-        // Convert timestamp strings back to Date objects
         const restoredCollection = parsedCollection.map((img: any) => ({
           ...img,
           timestamp: new Date(img.timestamp),
@@ -131,25 +130,25 @@ function AppContent() {
 
   // Save collection to localStorage
   const saveToLocalStorage = (collection: CollectedImage[]) => {
-    if (collection.length > 0) {
-      // Create a serializable version of the collection (without File objects)
-      const serializableCollection = collection.map(img => ({
-        ...img,
-        file: undefined, // Remove File object as it's not serializable
-      }));
-
-      try {
+    try {
+      if (collection.length > 0) {
+        const serializableCollection = collection.map(img => ({
+          ...img,
+          file: undefined,
+        }));
         localStorage.setItem('imageCollection', JSON.stringify(serializableCollection));
-      } catch (err) {
-        console.error('Failed to save collection to localStorage:', err);
+      } else {
+        localStorage.removeItem('imageCollection');
       }
+    } catch (err) {
+      console.error('Failed to save collection to localStorage:', err);
     }
   };
 
   // Save collection whenever it changes (for localStorage users)
   useEffect(() => {
     const hasBackendSession = authService.isAuthenticated();
-    if (!hasBackendSession && imageCollection.length > 0) {
+    if (!hasBackendSession) {
       saveToLocalStorage(imageCollection);
     }
   }, [imageCollection, isAuthenticated]);

@@ -239,6 +239,12 @@
   flex-direction: column;
 }
 
+.collection-item.enhanced.shrinking {
+  transform: scale(0.85);
+  opacity: 0;
+  pointer-events: none;
+}
+
 .collection-item.enhanced.invasive-border {
   border-color: var(--danger-light);
 }

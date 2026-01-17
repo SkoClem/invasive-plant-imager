@@ -266,11 +266,13 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
                 const isDeleting = deletingItems.has(image.id);
                 const borderClass = image.plantData?.isInvasive ? 'invasive-border' : (image.plantData?.isInvasive === false ? 'native-border' : '');
                 
-                // Determine plant name for avatar
                 let plantName = 'Unknown';
                 if (image.plantData?.commonName) plantName = image.plantData.commonName;
                 else if (image.species) plantName = image.species;
                 else if (image.status === 'analyzing') plantName = 'Analyzing...';
+
+                const commonName = image.plantData?.commonName || image.species || image.plantData?.scientificName;
+                const scientificName = image.plantData?.scientificName;
                 
                 return (
                   <div 
@@ -330,8 +332,13 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
                       {image.status === 'completed' && image.plantData ? (
                         <>
                           <h3 className="plant-name" style={{ fontSize: '1.1rem', marginBottom: '4px' }}>
-                            {image.plantData.commonName || image.plantData.scientificName || image.species || 'Unknown Plant'}
+                            {commonName || 'Unknown Plant'}
                           </h3>
+                          {scientificName && scientificName !== commonName && (
+                            <p className="scientific-name">
+                              {scientificName}
+                            </p>
+                          )}
                           {image.plantData.region && (
                             <div className="native-location" style={{ fontSize: '0.8rem', marginBottom: '4px' }}>
                               <span className="location-icon"></span>
