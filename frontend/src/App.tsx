@@ -77,34 +77,129 @@ function AppContent() {
   const pageRef = useRef<HTMLDivElement>(null);
   const { isAuthenticated, loading: authLoading } = useAuth();
 
-  // Redirect to home on login/logout
   useEffect(() => {
     if (!authLoading) {
       setCurrentPage('home');
     }
   }, [isAuthenticated, authLoading]);
 
-  // Load collection from backend if backend JWT is present, otherwise from localStorage
+  const readLocalCollection = (): CollectedImage[] => {
+    const savedCollection = localStorage.getItem('imageCollection');
+    if (!savedCollection) return [];
+
+    try {
+      const parsedCollection = JSON.parse(savedCollection);
+      return parsedCollection.map((img: any) => ({
+        ...img,
+        timestamp: new Date(img.timestamp),
+      }));
+    } catch (error) {
+      console.error('Error loading collection from localStorage:', error);
+      return [];
+    }
+  };
+
+  const mergeCollections = (
+    localCollection: CollectedImage[],
+    backendCollection: CollectedImage[]
+  ): CollectedImage[] => {
+    const mergedMap = new Map<string, CollectedImage>();
+
+    localCollection.forEach(item => {
+      mergedMap.set(item.id, item);
+    });
+
+    backendCollection.forEach(item => {
+      const existing = mergedMap.get(item.id);
+      if (existing) {
+        mergedMap.set(item.id, {
+          ...existing,
+          ...item,
+          timestamp: item.timestamp || existing.timestamp,
+          region: item.region || existing.region,
+          imageDataUrl: item.imageDataUrl || existing.imageDataUrl,
+          plantData: item.plantData || existing.plantData,
+          species: item.species || existing.species,
+          description: item.description || existing.description,
+        });
+      } else {
+        mergedMap.set(item.id, item);
+      }
+    });
+
+    const merged = Array.from(mergedMap.values());
+    merged.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+    return merged;
+  };
+
+  const convertBackendToFrontend = (item: any): CollectedImage => {
+    if (item.plantData) return item;
+
+    let plantData: PlantInfo | undefined = undefined;
+    
+    if (item.plant_data) {
+      let { commonName, scientificName } = item.plant_data;
+      
+      if (!commonName || !scientificName) {
+        const normalized = normalizeNamesFromSpecieIdentified(item.plant_data.specieIdentified);
+        commonName = commonName || normalized.commonName;
+        scientificName = scientificName || normalized.scientificName;
+      }
+
+      plantData = {
+        scientificName: scientificName || 'Unknown',
+        commonName: commonName || 'Unknown Plant',
+        isInvasive: item.plant_data.invasiveOrNot || false,
+        confidenceScore: item.plant_data.confidenceScore,
+        confidenceReasoning: item.plant_data.confidenceReasoning,
+        description: item.description || '',
+        impact: item.plant_data.invasiveEffects || '',
+        nativeAlternatives: (item.plant_data.nativeAlternatives || []).map((alt: any) => ({
+          scientificName: alt.scientificName || '',
+          commonName: alt.commonName || '',
+          description: alt.characteristics || '',
+          benefits: [],
+        })),
+        controlMethods: (item.plant_data.removeInstructions || '').split(';').map((s: string) => s.trim()).filter(Boolean),
+        region: item.region || '',
+        nativeRegion: item.plant_data.nativeRegion || ''
+      };
+    }
+
+    return {
+      id: item.id,
+      file: undefined,
+      status: item.status,
+      species: item.species,
+      description: item.description,
+      timestamp: typeof item.timestamp === 'string' ? new Date(item.timestamp) : item.timestamp,
+      region: item.region,
+      plantData: plantData,
+      imageDataUrl: item.imageDataUrl
+    };
+  };
+
   const loadCollection = useCallback(async () => {
+    const localCollection = readLocalCollection();
     const hasBackendSession = authService.isAuthenticated();
     if (hasBackendSession) {
       try {
         const backendCollection = await collectionService.getUserCollection();
-        // Convert backend items to frontend format
         const frontendCollection = backendCollection.map(convertBackendToFrontend);
-        setImageCollection(frontendCollection);
+        const mergedCollection = mergeCollections(localCollection, frontendCollection);
+        setImageCollection(mergedCollection);
         setIsCollectionLoaded(true);
       } catch (error) {
         console.error('Error loading collection from backend:', error);
-        // Fall back to localStorage if backend fails
-        loadFromLocalStorage();
+        setImageCollection(localCollection);
+        setIsCollectionLoaded(true);
       }
     } else {
-      loadFromLocalStorage();
+      setImageCollection(localCollection);
+      setIsCollectionLoaded(true);
     }
-  }, []);
+  }, [convertBackendToFrontend]);
 
-  // Load region and collection on component mount
   useEffect(() => {
     const savedRegion = localStorage.getItem('selectedRegion');
     if (savedRegion) {
@@ -114,25 +209,6 @@ function AppContent() {
     loadCollection();
   }, [isAuthenticated, loadCollection]);
 
-  // Load collection from localStorage
-  const loadFromLocalStorage = () => {
-    const savedCollection = localStorage.getItem('imageCollection');
-    if (savedCollection) {
-      try {
-        const parsedCollection = JSON.parse(savedCollection);
-        const restoredCollection = parsedCollection.map((img: any) => ({
-          ...img,
-          timestamp: new Date(img.timestamp),
-        }));
-        setImageCollection(restoredCollection);
-      } catch (error) {
-        console.error('Error loading collection from localStorage:', error);
-      }
-    }
-    setIsCollectionLoaded(true);
-  };
-
-  // Save collection to localStorage
   const saveToLocalStorage = (collection: CollectedImage[]) => {
     try {
       if (collection.length > 0) {
@@ -260,7 +336,6 @@ function AppContent() {
     }, 10);
   };
 
-  // Convert PlantInfo from API format to backend format
   const convertPlantInfoToBackend = useCallback((apiPlantInfo: PlantInfo): BackendPlantInfo => {
     return {
       specieIdentified: apiPlantInfo.scientificName || apiPlantInfo.commonName,
@@ -277,56 +352,6 @@ function AppContent() {
       removeInstructions: apiPlantInfo.controlMethods.join('; ')
     };
   }, []);
-
-  // Convert Backend format to Frontend format
-  const convertBackendToFrontend = (item: any): CollectedImage => {
-    // If it already has plantData (local storage format), use it
-    if (item.plantData) return item;
-
-    // If it has plant_data (backend format), convert it
-    let plantData: PlantInfo | undefined = undefined;
-    
-    if (item.plant_data) {
-      let { commonName, scientificName } = item.plant_data;
-      
-      if (!commonName || !scientificName) {
-        const normalized = normalizeNamesFromSpecieIdentified(item.plant_data.specieIdentified);
-        commonName = commonName || normalized.commonName;
-        scientificName = scientificName || normalized.scientificName;
-      }
-
-      plantData = {
-        scientificName: scientificName || 'Unknown',
-        commonName: commonName || 'Unknown Plant',
-        isInvasive: item.plant_data.invasiveOrNot || false,
-        confidenceScore: item.plant_data.confidenceScore,
-        confidenceReasoning: item.plant_data.confidenceReasoning,
-        description: item.description || '', // Use top-level description if available
-        impact: item.plant_data.invasiveEffects || '',
-        nativeAlternatives: (item.plant_data.nativeAlternatives || []).map((alt: any) => ({
-          scientificName: alt.scientificName || '',
-          commonName: alt.commonName || '',
-          description: alt.characteristics || '',
-          benefits: [], // Backend doesn't store this yet
-        })),
-        controlMethods: (item.plant_data.removeInstructions || '').split(';').map((s: string) => s.trim()).filter(Boolean),
-        region: item.region || '', // User's scan region
-        nativeRegion: item.plant_data.nativeRegion || '' // Plant's native region
-      };
-    }
-
-    return {
-      id: item.id,
-      file: undefined,
-      status: item.status,
-      species: item.species,
-      description: item.description,
-      timestamp: typeof item.timestamp === 'string' ? new Date(item.timestamp) : item.timestamp,
-      region: item.region,
-      plantData: plantData,
-      imageDataUrl: item.imageDataUrl
-    };
-  };
 
   // Start analysis with file and region
   const startAnalysis = (file: File, region: string, imageDataUrl?: string) => {
