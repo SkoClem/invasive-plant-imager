@@ -246,15 +246,15 @@
 }
 
 .collection-item.enhanced.invasive-border {
-  border-color: var(--danger-light);
+  border-color: #ef4444;
 }
 
 .collection-item.enhanced.native-border {
-  border-color: var(--accent-light);
+  border-color: #22c55e;
 }
 
 .collection-item.enhanced.native-invasive-border {
-  border-color: #FFA726;
+  border-color: #facc15;
 }
 
 .collection-item.enhanced:hover {
