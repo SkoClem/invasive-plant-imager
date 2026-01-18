@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { plantAnalysisService } from '../services/plantAnalysisService';
+import { compressImage } from '../utils/imageUtils';
 
 interface UploadPageProps {
   setCurrentPage: (page: 'home' | 'upload' | 'collection' | 'about' | 'learn' | 'loading' | 'chat') => void;
@@ -57,26 +58,44 @@ function UploadPage({ setCurrentPage, startAnalysis, selectedRegion, setSelected
     }
   };
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setSelectedFile(file);
-      setError(null);
+      try {
+        // Compress image for efficient storage and analysis
+        // Using 800px and 0.7 quality to ensure Data URL is well under 1MB (Firestore limit)
+        const compressedFile = await compressImage(file, 800, 0.7);
+        
+        setSelectedFile(compressedFile);
+        setError(null);
 
-      console.log('File selected:', {
-        name: file.name,
-        size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
-        type: file.type,
-        lastModified: new Date(file.lastModified).toISOString()
-      });
+        console.log('File selected:', {
+          name: file.name,
+          originalSize: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
+          compressedSize: `${(compressedFile.size / 1024 / 1024).toFixed(2)} MB`,
+          type: file.type
+        });
 
-      // Create preview data URL for immediate display
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const originalDataUrl = e.target?.result as string;
-        setImagePreview(originalDataUrl);
-      };
-      reader.readAsDataURL(file);
+        // Create preview data URL for immediate display and persistence
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const originalDataUrl = e.target?.result as string;
+          setImagePreview(originalDataUrl);
+        };
+        reader.readAsDataURL(compressedFile);
+      } catch (err) {
+        console.error('Image compression failed:', err);
+        // Fallback to original file
+        setSelectedFile(file);
+        setError(null);
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const originalDataUrl = e.target?.result as string;
+          setImagePreview(originalDataUrl);
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 

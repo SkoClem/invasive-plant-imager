@@ -35,6 +35,10 @@ Requirements for specieIdentified:
 - If no common name exists, repeat the scientific Latin name and still follow the pattern 'CommonOrScientific (Genus species)'.
 - The common English name you output here will be shown as the main title in the largest font to the user, so it must be the clearest, most widely used everyday name.
 
+Requirements for nativeRegion:
+- Ensure the 'nativeRegion' field matches any native region information provided in other fields (like confidenceReasoning or invasiveEffects).
+- If there is a contradiction, prioritize the most scientifically accurate native region.
+
 Always include native region. Focus on {region} invasive species. Consider the season and date for identification accuracy. Keep descriptions concise and to the point. JSON only."""
 
 def paragraph_analysis(region):

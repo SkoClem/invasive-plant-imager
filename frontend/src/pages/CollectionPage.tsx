@@ -396,10 +396,10 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
                               {scientificName}
                             </p>
                           )}
-                          {image.plantData.region && (
+                          {image.plantData.nativeRegion && (
                             <div className="native-location" style={{ fontSize: '0.8rem', marginBottom: '4px' }}>
                               <span className="location-icon"></span>
-                              <span className="location-text">Native to: {image.plantData.region}</span>
+                              <span className="location-text">Native to: {image.plantData.nativeRegion}</span>
                             </div>
                           )}
                         </>

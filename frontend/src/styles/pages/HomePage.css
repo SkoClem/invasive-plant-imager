@@ -318,7 +318,7 @@
   padding: 2rem;
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-light);
-  border: 1px solid var(--border-subtle);
+  border: 2px solid var(--border-subtle); /* Increased visibility */
   cursor: pointer;
   text-align: center;
   transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
@@ -327,6 +327,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  box-sizing: border-box; /* Ensure border is included in width/height */
 }
 
 .action-card.primary {

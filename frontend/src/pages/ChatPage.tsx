@@ -194,10 +194,10 @@ const ChatPage: React.FC<ChatPageProps> = ({
                     (currentPlant.plantData.commonName || currentPlant.plantData.scientificName) && (
                   <p className="scientific-name">{currentPlant.plantData.scientificName}</p>
                 )}
-                {currentPlant.plantData.region && (
+                {currentPlant.plantData.nativeRegion && (
                   <div className="native-location">
                     <span className="location-icon"></span>
-                    <span className="location-text">Native to: {currentPlant.plantData.region}</span>
+                    <span className="location-text">Native to: {currentPlant.plantData.nativeRegion}</span>
                   </div>
                 )}
                 <div className={`invasive-status ${invasiveStatusClass}`}>

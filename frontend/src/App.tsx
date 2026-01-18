@@ -45,6 +45,7 @@ function AppContent() {
   const [lastResultId, setLastResultId] = useState<string | null>(null);
   const [chatHistories, setChatHistories] = useState<Record<string, Message[]>>({});
   const [userRole, setUserRole] = useState<string>('Student');
+  const [isCollectionLoaded, setIsCollectionLoaded] = useState(false);
   
   // Load chat history and user role from local storage on mount
   useEffect(() => {
@@ -92,6 +93,7 @@ function AppContent() {
         // Convert backend items to frontend format
         const frontendCollection = backendCollection.map(convertBackendToFrontend);
         setImageCollection(frontendCollection);
+        setIsCollectionLoaded(true);
       } catch (error) {
         console.error('Error loading collection from backend:', error);
         // Fall back to localStorage if backend fails
@@ -127,6 +129,7 @@ function AppContent() {
         console.error('Error loading collection from localStorage:', error);
       }
     }
+    setIsCollectionLoaded(true);
   };
 
   // Save collection to localStorage
@@ -146,13 +149,13 @@ function AppContent() {
     }
   };
 
-  // Save collection whenever it changes (for localStorage users)
+  // Save collection whenever it changes (always mirror to localStorage)
   useEffect(() => {
-    const hasBackendSession = authService.isAuthenticated();
-    if (!hasBackendSession) {
-      saveToLocalStorage(imageCollection);
-    }
-  }, [imageCollection, isAuthenticated]);
+    // Don't save empty collection if we haven't loaded yet
+    if (!isCollectionLoaded) return;
+
+    saveToLocalStorage(imageCollection);
+  }, [imageCollection, isCollectionLoaded]);
 
   // Delete collection item
   const deleteCollectionItem = async (itemId: string) => {
