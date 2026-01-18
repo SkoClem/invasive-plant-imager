@@ -338,7 +338,7 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
                         <div className="status-badge native">Native</div>
                       )}
                       
-                      <div className="header-actions">
+                      <div className="item-actions">
                         {image.status === 'completed' && (
                           <>
                             <button
@@ -443,76 +443,6 @@ function CollectionPage({ setCurrentPage, imageCollection, deleteCollectionItem,
                           <span className="metadata-icon"></span>
                           <span className="metadata-text">{image.region}</span>
                         </div>
-                      </div>
-                      
-                      <div className="action-buttons" style={{ marginTop: '12px', display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                        {image.status === 'completed' && image.plantData && (
-                          <>
-                            <button 
-                              className="action-button chat-button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (onItemClick) {
-                                  onItemClick(image.id);
-                                }
-                              }}
-                              title="Chat about this plant"
-                              style={{
-                                background: 'transparent',
-                                border: 'none',
-                                cursor: 'pointer',
-                                padding: '8px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                color: 'var(--accent-bright)',
-                                borderRadius: '50%',
-                                transition: 'background-color 0.2s'
-                              }}
-                            >
-                              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M21 11.5a8.38 8.38 0 0 1-1.9 5.4 8.5 8.5 0 0 1-6.6 3.1 8.38 8.38 0 0 1-5.4-1.9L3 21l1.9-4.1a8.38 8.38 0 0 1-1.9-5.4 8.5 8.5 0 0 1 3.1-6.6A8.38 8.38 0 0 1 11.5 3h.5a8.5 8.5 0 0 1 8 8v.5z"></path>
-                              </svg>
-                            </button>
-                            <button 
-                              className="action-button map-button"
-                              onClick={(e) => handleAddToMap(e, image)}
-                              disabled={addingToMap === image.id}
-                              title="Add to Community Map"
-                              style={{
-                                background: 'transparent',
-                                border: 'none',
-                                cursor: 'pointer',
-                                padding: '8px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                color: '#2196f3',
-                                borderRadius: '50%',
-                                transition: 'background-color 0.2s'
-                              }}
-                            >
-                              {addingToMap === image.id ? (
-                                <div className="spinner-small"></div>
-                              ) : (
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                                  <circle cx="12" cy="10" r="3"></circle>
-                                </svg>
-                              )}
-                            </button>
-                          </>
-                        )}
-                        <button 
-                          className="action-button delete-button"
-                          onClick={(e) => handleDelete(e, image.id)}
-                          title="Delete from Collection"
-                        >
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="3 6 5 6 21 6"></polyline>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                          </svg>
-                        </button>
                       </div>
                     </div>
                   </div>

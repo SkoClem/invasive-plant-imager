@@ -339,7 +339,9 @@ function AppContent() {
   const convertPlantInfoToBackend = useCallback((apiPlantInfo: PlantInfo): BackendPlantInfo => {
     return {
       specieIdentified: apiPlantInfo.scientificName || apiPlantInfo.commonName,
-      nativeRegion: apiPlantInfo.nativeRegion || apiPlantInfo.region, // Use nativeRegion if available, otherwise fallback
+      commonName: apiPlantInfo.commonName,
+      scientificName: apiPlantInfo.scientificName,
+      nativeRegion: apiPlantInfo.nativeRegion || apiPlantInfo.region,
       invasiveOrNot: apiPlantInfo.isInvasive,
       confidenceScore: apiPlantInfo.confidenceScore,
       confidenceReasoning: apiPlantInfo.confidenceReasoning,
