@@ -132,7 +132,7 @@ function AppContent() {
     return merged;
   };
 
-  const convertBackendToFrontend = (item: any): CollectedImage => {
+  const convertBackendToFrontend = useCallback((item: any): CollectedImage => {
     if (item.plantData) return item;
 
     let plantData: PlantInfo | undefined = undefined;
@@ -177,7 +177,7 @@ function AppContent() {
       plantData: plantData,
       imageDataUrl: item.imageDataUrl
     };
-  };
+  }, []);
 
   const loadCollection = useCallback(async () => {
     const localCollection = readLocalCollection();
